@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "244754131896",
+    "project_id": "dealdeck-rn01",
+    "storage_bucket": "dealdeck-rn01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244754131896:android:8f398622599bb72fd37d4d",
+        "android_client_info": {
+          "package_name": "com.dealdeck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244754131896-4040mi9hj0r0lpis3gq8d4gelevu8c24.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dealdeck",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "244754131896-gpf8hsp80krih26ibl8uifnktl742tt6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUQctl7M6gSr6zJQuHcP97HODJGIx77Sc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244754131896-gpf8hsp80krih26ibl8uifnktl742tt6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
