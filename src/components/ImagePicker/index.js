@@ -19,7 +19,6 @@ const ImagePickerComponent = ({ onSelectImage }) => {
     };
 
     launchCamera(options, response => {
-      console.log(response);
       if (response.didCancel) {
         console.log('User cancelled camera picker');
       } else if (response.error) {
@@ -45,7 +44,6 @@ const ImagePickerComponent = ({ onSelectImage }) => {
       };
 
       const result = await launchImageLibrary(options);
-      console.log('result', result);
       if (result?.assets) {
         const res = `data:image/jpeg;base64,${result?.assets[0]?.base64}`;
         setSelectedImage(res);

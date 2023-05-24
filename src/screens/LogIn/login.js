@@ -30,38 +30,28 @@ const LogInForm = observer(({ navigation }) => {
         setShowPasswordWarning(false); // Update showEmailWarning to false on input change
     };
 
-    const inputValidation = () => {
-        // const isEmailEmpty = email.trim() === '';
-        // const isPasswordEmpty = password.trim() === '';
-        // setShowEmailWarning(isEmailEmpty);
-        // setShowPasswordWarning(isPasswordEmpty);
-        // const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // const passReg = /^[^\s]{8,}$/;
-        // const isValidEmail = mailReg.test(email);
-        // const isValidPassword = passReg.test(password);
-        // if (!isEmailEmpty && !isPasswordEmpty && !isValidEmail) {
-        //     ShowToast({ type: "error", text1: "Inavlid email", color: "red" })
-        // } else if (!showPasswordWarning && !isEmailEmpty && !isValidPassword) {
-        //     ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" })
-        // } else if (!showEmailWarning && !showPasswordWarning && isValidEmail && isValidPassword) {
-        //     navigation.navigate('mainScreen')
-        // }
-
-        // const abcdef = {
-        //     UID: "123456789",
-        //     name: {
-        //         fname: "John",
-        //         lname: "Doe"
-        //     },
-        //     image: "https://example.com/image.jpg",
-        //     mobile: "1234567890",
-        //     password: "password123",
-        //     registeredThrough: "email"
-        // };
-
-        // Auth.registerUser(abcdef);
-
-
+    const inputValidation = async () => {
+        const isEmailEmpty = email.trim() === '';
+        const isPasswordEmpty = password.trim() === '';
+        setShowEmailWarning(isEmailEmpty);
+        setShowPasswordWarning(isPasswordEmpty);
+        const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
+        const isValidEmail = mailReg.test(email);
+        const isValidPassword = passReg.test(password);
+        if (!isEmailEmpty && !isPasswordEmpty && !isValidEmail) {
+            ShowToast({ type: "error", text1: "Inavlid email", color: "red" })
+        } else if (!showPasswordWarning && !isEmailEmpty && !isValidPassword) {
+            ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" })
+        } else if (!showEmailWarning && !showPasswordWarning && isValidEmail && isValidPassword) {
+            const res = await Auth.login({ email, password });
+            if (res?.status === "success") {
+                console.log('res', res);
+                navigation.navigate('mainScreen')
+            } else {
+                ShowToast({ type: "error", text1: res?.message, color: "red" })
+            }
+        }
     }
 
 

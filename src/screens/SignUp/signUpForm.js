@@ -16,7 +16,6 @@ import CustomModal from "../../components/Modal/customModal";
 const SignUpForm = ({ navigation }) => {
     const { Auth } = useStore();
 
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
@@ -60,14 +59,13 @@ const SignUpForm = ({ navigation }) => {
 
     const handleImageSelect = (imageURI) => {
         setSelectedImageURI(imageURI);
-        console.log('urii', imageURI)
     };
 
     const toggleModal = () => {
         setModalVisible(true);
     };
 
-    const inputValidation = () => {
+    const inputValidation = async () => {
         const isFnameEmpty = firstName.trim() === '';
         const isPhoneEmpty = phone.trim() === '';
         const isEmailEmpty = email.trim() === '';
@@ -78,7 +76,7 @@ const SignUpForm = ({ navigation }) => {
         setShowPhoneWarning(isPhoneEmpty);
         const fnameReg = /^[A-Za-z ]{1,10}$/;
         const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passReg = /^(?=.*\d)[^\s]{8,12}$/;
+        const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
         const phoneReg = /^(?!0)\d{10}$/;
         const doesPassMatch = (password === passwordAgain)
         const isFnameValid = fnameReg.test(firstName);
@@ -91,10 +89,11 @@ const SignUpForm = ({ navigation }) => {
         else if (!isPhoneEmpty && !isPhoneValid) { ShowToast({ type: "error", text1: "Inavlid phone number.", color: "red" }) }
         else if (!isPasswordEmpty && !isValidPassword) { ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" }) }
         else if (!isEmailEmpty && !isPasswordEmpty && !isFnameEmpty && !isPhoneEmpty && isValidEmail && isValidPassword && isFnameValid && isPhoneValid && doesPassMatch) {
-            const res = Auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
-            if (res) {
+            const res = await Auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
+            if (res?.status === "success") {
                 toggleModal();
-            }
+            } else ShowToast({ type: "error", text1: res?.message, color: "red" })
+
         }
     }
 
@@ -231,9 +230,9 @@ const SignUpForm = ({ navigation }) => {
                 </View>
             </ScrollView>
             <CustomModal
-            title="Registration successful!"
-            content="Registration completed successfully. Please proceed to login."
-            btnText="Go to login"
+                title="Registration successful!"
+                content="Registration completed successfully. Please proceed to login."
+                btnText="Go to login"
                 visible={modalVisible}
                 onClose={toggleModal}
                 oneBtn={true}

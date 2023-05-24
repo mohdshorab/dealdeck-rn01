@@ -1,6 +1,6 @@
 import React from "react";
 import { action, makeAutoObservable, observable } from "mobx";
-import { checkUserExistOrNotInFSTore, registerUserToFirestore } from "../service/signUpServices";
+import { loginWithEmailAndPassword, registerUserToFirestore } from "../service/authServices";
 
 export default class AuthStore {
 
@@ -39,21 +39,34 @@ export default class AuthStore {
     @action
     login = async (data) => {
         this.showLoader = true;
-        const res = await login(data);
+        const res = await loginWithEmailAndPassword(data);
+        if (res?.status === 'success') {
+            this.profileData = res;
+            this.isLoggedIn = true;
+            this.showLoader = false;
+            return res;
+        }
+        if (res?.status === false) {
+            this.showLoader = false;
+            return { message: "Please check your email and password, or try sign-up"};
+        }
+        if (res?.status === 'error') {
+            this.showLoader = false;
+            return { message: 'Error encountered, Please connect with @dealdeck team' }
+        }
+
     }
 
     @action
     registerUser = async (data) => {
-        console.log('res', data)
         this.showLoader = true;
-        const userDontExist = await checkUserExistOrNotInFSTore(data.email);
-        console.log('user exist',userDontExist);
-        if (!userDontExist) {
-            const res = await registerUserToFirestore(data);
-            console.log(res);
+        const res = await registerUserToFirestore(data);
+        if (res?.status === 'success') {
+            this.showLoader = false;
             return res;
         }
-
+        if (res?.status === 'exist') { this.showLoader = false; return { message: 'User already exist, please login.' } }
+        if (res?.status === 'error') { { this.showLoader = false; return { message: 'Error encountered, Please connect with @dealdeck team' } } }
     }
 
 }
