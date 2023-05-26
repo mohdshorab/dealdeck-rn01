@@ -14,7 +14,7 @@ const unProtectedRoutes = [
 ];
 
 const AppStackNavigation = (isLoggedIn) => {
-    const initialRouteName = isLoggedIn ? 'logInForm' : 'logInForm';
+    const initialRouteName = isLoggedIn ? 'mainScreen' : 'mainScreen';
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ drawer: false, headerShown: false}} >

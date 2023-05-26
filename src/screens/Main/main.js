@@ -3,50 +3,57 @@ import {
     SafeAreaView, Text, View
 } from "react-native";
 import CustomHeader from "../../components/Header";
-import auth from '@react-native-firebase/auth';
-
+import { useStore } from "../../store";
+import CustomSearchBar from "../../components/SearchBar/searchBar";
 
 const Main = ({ navigation }) => {
-    // return (
-    //     <SafeAreaView style={{flex:1, backgroundColor:"#fff"}} >
-    //         <CustomHeader title={'DealDeck'}  />
-    //         <View>
-    //             <Text>Hi, username</Text>
-    //         </View>
-    //     </SafeAreaView>
-    // )
+    const { auth,products } = useStore();
 
-
-    const [initializing, setInitializing] = useState(true);
-    const [user, setUser] = useState();
-
-    // Handle user state changes
-    function onAuthStateChanged(user) {
-        setUser(user);
-        if (initializing) setInitializing(false);
+    const JSON = {
+        "images": [
+            {
+                "id": "1",
+                "url": "https://example.com/image1.jpg",
+                "title": "Image 1",
+                "description": "Description for Image 1"
+            },
+            {
+                "id": "2",
+                "url": "https://example.com/image2.jpg",
+                "title": "Image 2",
+                "description": "Description for Image 2"
+            },
+            {
+                "id": "3",
+                "url": "https://example.com/image3.jpg",
+                "title": "Image 3",
+                "description": "Description for Image 3"
+            },
+            {
+                "id": "4",
+                "url": "https://example.com/image4.jpg",
+                "title": "Image 4",
+                "description": "Description for Image 4"
+            },
+            {
+                "id": "5",
+                "url": "https://example.com/image5.jpg",
+                "title": "Image 5",
+                "description": "Description for Image 5"
+            }
+        ]
     }
-
-    useEffect(() => {
-        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-        return subscriber; // unsubscribe on unmount
-    }, []);
-
-    if (initializing) return null;
-
-    if (!user) {
-        return (
-            <View>
-                <Text>Login</Text>
-            </View>
-        );
-    }
+    
 
     return (
-        <View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} >
             <CustomHeader title={'DealDeck'} />
-            <Text>Welcome {user.email}</Text>
-        </View>
-    );
+            <CustomSearchBar />
+            <View>
+                <Text>Hi, {auth?.profileData.userName}</Text>
+            </View>
+        </SafeAreaView>
+    )
 
 }
 

@@ -7,7 +7,6 @@ export default class AuthStore {
     @observable profileData
     @observable isLoading
     @observable isLogout
-    @observable userData
     @observable notificationList
     @observable showPassword
     @observable isLoggedIn
@@ -25,7 +24,6 @@ export default class AuthStore {
         this.profileData = {};
         this.isLoading = false;
         this.isLogout = false;
-        this.userData = {};
         this.notificationList = [];
         this.isLoggedIn = true;
         this.showLoader = false;
