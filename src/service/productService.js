@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const baseUrl = 'https://dummyjson.com';
 
-export const getSearchResults = async ( searchTerm) => {
+export const getSearchResults = async (searchTerm) => {
   try {
     const response = await axios.get(`${baseUrl}/products/search?q=${searchTerm}`);
     return response.data;
@@ -29,5 +29,15 @@ export const getAllProducts = async () => {
   } catch (error) {
     console.error('API Error:', error);
     throw new Error('Failed to fetch all products from the API.');
+  }
+}
+
+export const getProductsByCategories = async () => {
+  try {
+    const response = await axios.get(`${baseUrl}/products/categories`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw new Error('Failed to fetch product categories from the API.');
   }
 }

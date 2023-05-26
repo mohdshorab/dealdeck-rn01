@@ -1,17 +1,18 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { getAllProducts } from "../service/productService";
+import { getAllProducts, getProductsByCategories } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
 
 export default class Products {
 
     @observable showLoader;
     @observable products;
-
+    @observable productCategories;
     @action
     initialState() {
-            this.showLoader = false;
-            this.products = {};
-        }
+        this.showLoader = false;
+        this.products = {};
+        this.productCategories = [];
+    }
 
     constructor(store) {
         this.store = store;
@@ -20,15 +21,39 @@ export default class Products {
     }
 
     @action
-    loadProducts = async() => {
-        this.showLoader = true;
-        const res = await getAllProducts();
-        if(!isNull(res.products) && !isUndefined(res.products) ){
-            this.products = res.products;
-            this.showLoader = false;
-            return true;
+    init = async () => {
+        try {
+            this.showLoader = true;
+            await Promise.allSettled([
+                this.loadProducts,
+                this.loadProductsCategories
+            ])
+                .then((results) => {
+                    results.forEach(element => {
+                        console.log(element.status);
+                    })
+                })
+            this.showLoader(false);
+        } catch (e) {
+            console.log(e);
+            this.showLoader(false);
         }
-        this.showLoader = false;
+    }
+
+    @action
+    loadProducts = async () => {
+        const res = await getAllProducts();
+        if (!isNull(res.products) && !isUndefined(res.products)) {
+            this.products = res.products;
+        }
+    }
+
+    @action
+    loadProductsCategories = async () => {
+        const res = await getProductsByCategories();
+        if (!isNull(res) && !isUndefined(res)) {
+            this.productCategories = res;
+        }
     }
 
 
