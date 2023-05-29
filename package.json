@@ -7,6 +7,7 @@
     "pod-install": "cd ios && pod install && cd ..",
     "ios": "react-native run-ios",
     "gradlew-clean": "cd android && ./gradlew clean",
+    "build-release":"cd android && ./gradlew assembleRelease",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"

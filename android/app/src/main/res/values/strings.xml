@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Dealdeck</string>
+         <string moduleConfig="true" name="CodePushDeploymentKey">VPfU9OPmh7xj4X1CyofNxW28j2dh-aVk5RD2u</string>
 </resources>
