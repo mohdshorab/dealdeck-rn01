@@ -2,6 +2,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <Firebase.h>
+#import <CodePush/CodePush.h>
 
 
 @implementation AppDelegate
@@ -21,11 +22,11 @@
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-#if DEBUG
+  #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
-#else
-  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-#endif
+  #else
+    return [CodePush bundleURL];
+  #endif
 }
 
 /// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.

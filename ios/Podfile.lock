@@ -596,6 +596,7 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
+  - Base64 (1.1.2)
   - boost (1.76.0)
   - BoringSSL-GRPC (0.0.24):
     - BoringSSL-GRPC/Implementation (= 0.0.24)
@@ -603,6 +604,11 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.24):
     - BoringSSL-GRPC/Interface (= 0.0.24)
   - BoringSSL-GRPC/Interface (0.0.24)
+  - CodePush (8.0.2):
+    - Base64 (~> 1.1)
+    - JWT (~> 3.0.0-beta.12)
+    - React-Core
+    - SSZipArchive (~> 2.2.2)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.71.8)
   - FBReactNativeSpec (0.71.8):
@@ -734,6 +740,8 @@ PODS:
   - hermes-engine (0.71.8):
     - hermes-engine/Pre-built (= 0.71.8)
   - hermes-engine/Pre-built (0.71.8)
+  - JWT (3.0.0-beta.14):
+    - Base64 (~> 1.1.2)
   - leveldb-library (1.22.2)
   - libevent (2.1.12)
   - Libuv-gRPC (0.0.10):
@@ -1116,10 +1124,12 @@ PODS:
     - React-RCTImage
   - RNVectorIcons (9.2.0):
     - React-Core
+  - SSZipArchive (2.2.3)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
+  - CodePush (from `../node_modules/react-native-code-push`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
@@ -1172,6 +1182,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
+    - Base64
     - BoringSSL-GRPC
     - Firebase
     - FirebaseAuth
@@ -1183,15 +1194,19 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
+    - JWT
     - leveldb-library
     - libevent
     - Libuv-gRPC
     - nanopb
     - PromisesObjC
+    - SSZipArchive
 
 EXTERNAL SOURCES:
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
+  CodePush:
+    :path: "../node_modules/react-native-code-push"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   FBLazyVector:
@@ -1283,8 +1298,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
+  Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
+  CodePush: 9eddecce05cd10491e2673b259c85885a462be33
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: f637f31eacba90d4fdeff3fa41608b8f361c173b
   FBReactNativeSpec: 0d9a4f4de7ab614c49e98c00aedfd3bfbda33d59
@@ -1300,6 +1317,7 @@ SPEC CHECKSUMS:
   gRPC-Core: 943e491cb0d45598b0b0eb9e910c88080369290b
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   hermes-engine: 47986d26692ae75ee7a17ab049caee8864f855de
+  JWT: ef71dfb03e1f842081e64dc42eef0e164f35d251
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   Libuv-gRPC: 55e51798e14ef436ad9bc45d12d43b77b49df378
@@ -1343,6 +1361,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 42ec7c28dd02d540ed6c9159c57a98ff016492dc
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
+  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   Yoga: 065f0b74dba4832d6e328238de46eb72c5de9556
 
 PODFILE CHECKSUM: d732b32d317bed2fef959338b57fdf5a7fc09af4

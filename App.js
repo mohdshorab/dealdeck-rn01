@@ -16,7 +16,11 @@ import Toast from 'react-native-toast-message';
 import { StoreProvider } from './src/store';
 import firebase from 'firebase/app';
 import { stores } from './src/store';
+import codePush from "react-native-code-push";
 
+
+
+let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
 
 class App extends Component {
 
@@ -28,10 +32,18 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    this.syncCodePush();
     await stores.products.init();
     setTimeout(() => {
       this.setState({ showSplashScreen: false });
     }, 2000); // 2 second delay
+  }
+
+  syncCodePush() {
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE,
+    });
   }
 
   render() {
@@ -47,7 +59,7 @@ class App extends Component {
   }
 }
 
-export default App;
+export default codePush(codePushOptions)(App);
 
 
 const styles = StyleSheet.create({
