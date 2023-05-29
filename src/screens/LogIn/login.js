@@ -14,7 +14,7 @@ import { useStore } from "../../store";
 import { observer } from 'mobx-react';
 
 const LogInForm = observer(({ navigation }) => {
-    const { Auth } = useStore();
+    const { auth } = useStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showEmailWarning, setShowEmailWarning] = useState(false);
@@ -31,27 +31,29 @@ const LogInForm = observer(({ navigation }) => {
     };
 
     const inputValidation = async () => {
-        const isEmailEmpty = email.trim() === '';
-        const isPasswordEmpty = password.trim() === '';
-        setShowEmailWarning(isEmailEmpty);
-        setShowPasswordWarning(isPasswordEmpty);
-        const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
-        const isValidEmail = mailReg.test(email);
-        const isValidPassword = passReg.test(password);
-        if (!isEmailEmpty && !isPasswordEmpty && !isValidEmail) {
-            ShowToast({ type: "error", text1: "Inavlid email", color: "red" })
-        } else if (!showPasswordWarning && !isEmailEmpty && !isValidPassword) {
-            ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" })
-        } else if (!showEmailWarning && !showPasswordWarning && isValidEmail && isValidPassword) {
-            const res = await Auth.login({ email, password });
-            if (res?.status === "success") {
-                console.log('res', res);
-                navigation.navigate('mainScreen')
-            } else {
-                ShowToast({ type: "error", text1: res?.message, color: "red" })
-            }
-        }
+        // const isEmailEmpty = email.trim() === '';
+        // const isPasswordEmpty = password.trim() === '';
+        // setShowEmailWarning(isEmailEmpty);
+        // setShowPasswordWarning(isPasswordEmpty);
+        // const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
+        // const isValidEmail = mailReg.test(email);
+        // const isValidPassword = passReg.test(password);
+        // if (!isEmailEmpty && !isPasswordEmpty && !isValidEmail) {
+        //     ShowToast({ type: "error", text1: "Inavlid email", color: "red" })
+        // } else if (!showPasswordWarning && !isEmailEmpty && !isValidPassword) {
+        //     ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" })
+        // } else if (!showEmailWarning && !showPasswordWarning && isValidEmail && isValidPassword) {
+        //     const res = await auth.login({ email, password });
+        //     if (res?.status === "success") {
+        //         console.log('res', res);
+        //         navigation.navigate('mainScreen')
+        //     } else {
+        //         ShowToast({ type: "error", text1: res?.message, color: "red" })
+        //     }
+        // }
+        navigation.navigate('mainScreen')
+
     }
 
 
@@ -87,11 +89,11 @@ const LogInForm = observer(({ navigation }) => {
                             placeholder={"password"}
                             value={password}
                             onChangeText={handlePasswordChange}
-                            secureTextEntry={!Auth.showPassword ? true : false}
+                            secureTextEntry={!auth.showPassword ? true : false}
                             style={{ flex: 1, paddingVertical: 0, }}
                         />
-                        <TouchableOpacity onPress={() => Auth.showPassword ? Auth.willShowPassword(false) : Auth.willShowPassword(true)}>
-                            {Auth.showPassword ? <Icon name="eye" color="#808080" style={{ marginRight: 10 }} size={17} />
+                        <TouchableOpacity onPress={() => auth.showPassword ? auth.willShowPassword(false) : auth.willShowPassword(true)}>
+                            {auth.showPassword ? <Icon name="eye" color="#808080" style={{ marginRight: 10 }} size={17} />
                                 : <Icon name="eye-with-line" color="#808080" style={{ marginRight: 10 }} size={17} />}
                         </TouchableOpacity>
                     </View>

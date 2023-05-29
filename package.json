@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "pod-install": "cd ios && pod install && cd ..",
     "ios": "react-native run-ios",
+    "gradlew-clean": "cd android && ./gradlew clean",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
@@ -28,11 +29,11 @@
     "moment": "^2.29.4",
     "react": "18.2.0",
     "react-native": "0.71.8",
-    "react-native-config": "^1.5.1",
     "react-native-gesture-handler": "^2.10.1",
     "react-native-image-picker": "^5.3.1",
     "react-native-safe-area-context": "^4.5.2",
     "react-native-screens": "^3.20.0",
+    "react-native-super-grid": "^5.0.0",
     "react-native-swiper": "^1.6.0",
     "react-native-toast-message": "^2.1.6",
     "react-native-vector-icons": "^9.2.0"

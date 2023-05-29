@@ -1,5 +1,5 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { getAllProducts, getProductsByCategories } from "../service/productService";
+import { getAllProducts, getProductsByCategories, getProductsRandomly } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
 
 export default class Products {
@@ -7,11 +7,15 @@ export default class Products {
     @observable showLoader;
     @observable products;
     @observable productCategories;
+    @observable randomProduct;
+
+
     @action
     initialState() {
         this.showLoader = false;
         this.products = {};
         this.productCategories = [];
+        this.randomProduct = [];
     }
 
     constructor(store) {
@@ -23,20 +27,21 @@ export default class Products {
     @action
     init = async () => {
         try {
-            this.showLoader = true;
+            // this.showLoader = true;
             await Promise.allSettled([
                 this.loadProducts,
-                this.loadProductsCategories
+                this.loadProductsCategories,
+                this.loadRandomProducts
             ])
                 .then((results) => {
                     results.forEach(element => {
                         console.log(element.status);
                     })
                 })
-            this.showLoader(false);
+            // this.showLoader(false);
         } catch (e) {
             console.log(e);
-            this.showLoader(false);
+            // this.showLoader(false);
         }
     }
 
@@ -51,9 +56,13 @@ export default class Products {
     @action
     loadProductsCategories = async () => {
         const res = await getProductsByCategories();
-        if (!isNull(res) && !isUndefined(res)) {
-            this.productCategories = res;
-        }
+        (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : {}
+    }
+
+    @action
+    loadRandomProducts = async () => {
+        const res = await getProductsRandomly();
+        res && res?.products.length ? this.randomProduct = res.products : []
     }
 
 

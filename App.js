@@ -15,6 +15,7 @@ import AppStackNavigation from './src/navigation/Nav';
 import Toast from 'react-native-toast-message';
 import { StoreProvider } from './src/store';
 import firebase from 'firebase/app';
+import { stores } from './src/store';
 
 
 class App extends Component {
@@ -26,7 +27,8 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    await stores.products.init();
     setTimeout(() => {
       this.setState({ showSplashScreen: false });
     }, 2000); // 2 second delay

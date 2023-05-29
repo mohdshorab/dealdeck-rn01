@@ -7,41 +7,34 @@ const ImagePickerComponent = ({ onSelectImage }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleOpenCamera = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-      maxWidth: 500,
-      maxHeight: 500,
-      storageOptions: {
-        skipBackup: true,
-      },
-    };
+  const options = {
+    includeBase64: true,
+    mediaType: 'photo',
+    quality: 1,
+    maxWidth: 500,
+    maxHeight: 500,
+    storageOptions: {
+      skipBackup: true,
+    },
+  };
 
-    launchCamera(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled camera picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.uri) {
-        setSelectedImage(response.uri);
+  const handleOpenCamera = async () => {
+    try {
+      const result = await launchCamera(options);
+      if (result?.assets) {
+        const res = `data:image/jpeg;base64,${result?.assets[0]?.base64}`;
+        setSelectedImage(res);
+        onSelectImage(res);
+        setModalVisible(false);
       }
-      setModalVisible(false);
-    });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleSelectFromGallery = async () => {
     try {
-      const options = {
-        includeBase64 :true,
-        mediaType: 'photo',
-        quality: 1,
-        maxWidth: 500,
-        maxHeight: 500,
-        storageOptions: {
-          skipBackup: true,
-        },
-      };
+
 
       const result = await launchImageLibrary(options);
       if (result?.assets) {
@@ -58,7 +51,7 @@ const ImagePickerComponent = ({ onSelectImage }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        {!selectedImage ? <Image source={cameraIcon} style={[styles.icon,{width:80, height:80}]} />
+        {!selectedImage ? <Image source={cameraIcon} style={[styles.icon, { width: 80, height: 80 }]} />
           : <Image source={{ uri: selectedImage }} style={[styles.icon]} />
         }
       </TouchableOpacity>

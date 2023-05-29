@@ -4,7 +4,7 @@ import Swiper from 'react-native-swiper';
 
 const Carousel = ({ images, onPress }) => {
   return (
-    <View style={styles.carouselContainer}>
+    // <View style={styles.carouselContainer}>
 
       <Swiper
         autoplay
@@ -21,7 +21,7 @@ const Carousel = ({ images, onPress }) => {
           </TouchableOpacity>
         ))}
       </Swiper>
-    </View>
+    // </View>
   );
 };
 

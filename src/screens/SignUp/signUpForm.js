@@ -14,7 +14,7 @@ import CustomModal from "../../components/Modal/customModal";
 
 
 const SignUpForm = ({ navigation }) => {
-    const { Auth } = useStore();
+    const { auth } = useStore();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#fff", justifyContent: "center" },
     thinLeftIcon: {
         marginLeft: 10,
-        marginTop: 0,
-        marginBottom: 25
+        marginTop: 10,
+        marginBottom: 25,
     },
     body: {
         paddingHorizontal: 25,

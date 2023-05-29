@@ -1,25 +1,17 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, TextInput, StyleSheet, Modal, Text } from 'react-native';
+import { View, TouchableOpacity, TextInput, StyleSheet, Modal, Text, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Picker } from '@react-native-picker/picker';
 import { BlurView } from '@react-native-community/blur';
 import CustomButton from '../Button';
 
 const SearchBar = ({ pickerItems }) => {
-    const [isFocused, setFocused] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('');
 
 
-    const handleFocus = () => {
-        setFocused(true);
-    };
-
-    const handleBlur = () => {
-        setFocused(false);
-    };
-
     const handleOpenModal = () => {
+        Keyboard.dismiss();
         setModalVisible(true);
     };
 
@@ -29,42 +21,39 @@ const SearchBar = ({ pickerItems }) => {
 
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
-        setModalVisible(false);
+        // setModalVisible(false);
     };
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.iconContainer} onPress={handleFocus}>
+            <TouchableOpacity style={styles.iconContainer} >
                 <Icon name="search1" size={24} color="#00c0ff" style={{ marginRight: 15, marginTop: 4 }} />
             </TouchableOpacity>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Search"
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+            // onBlur={handleBlur}
             />
-            {isFocused && (
-                <TouchableOpacity style={styles.filterIconContainer} onPress={handleOpenModal}>
-                    <Icon name="filter" size={24} color="#00c0ff" style={{ marginRight: 15, marginTop: 4 }} />
-                </TouchableOpacity>
-            )}
-            <Modal visible={isModalVisible} transparent={true} onRequestClose={handleCloseModal}>
+            <TouchableOpacity style={styles.filterIconContainer} onPress={handleOpenModal}>
+                <Icon name="filter" size={24} color="#00c0ff" style={{ marginRight: 15, marginTop: 4 }} />
+            </TouchableOpacity>
+            <Modal visible={isModalVisible} transparent={false} onRequestClose={handleCloseModal}  >
                 <BlurView style={styles.blurContainer} blurType="light" blurAmount={4} reducedTransparencyFallbackColor="white">
-                    <View style={{ width: '90%', height: '35%', borderRadius: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff'  }} >
+                    <View style={{ marginRight: 10, marginLeft: 10, padding: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }} >
                         <Text style={{ fontSize: 25, fontWeight: 600, width: '90%', }} >Apply Filters</Text>
                         <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }} >
                             <Text style={{ fontWeight: 400, fontSize: 23 }} > Categories : </Text>
                             <Picker
-                                style={{ width: '55%' }}
+                                style={{ width: '55%', }}
                                 selectedValue={selectedCategory}
                                 onValueChange={handleCategoryChange}>
                                 <Picker.Item label="Java" value="java" />
                                 <Picker.Item label="JavaScript" value="js" />
                             </Picker>
                         </View>
-                        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-evenly' }} >
-                            <CustomButton title='Cancel' buttonStyle={{ padding: 10, width: '45%', backgroundColor: 'red' }} onPress={handleCloseModal} />
-                            <CustomButton title='Apply' buttonStyle={{ padding: 10, width: '45%' }} onPress={handleCategoryChange} />
+                        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', }} >
+                            <CustomButton title='Cancel' buttonStyle={{ padding: 5, width: '45%', backgroundColor: 'red' }} onPress={handleCloseModal} />
+                            <CustomButton title='Apply' buttonStyle={{ padding: 5, width: '45%' }} onPress={handleCategoryChange} />
                         </View>
                     </View>
                 </BlurView>
@@ -82,7 +71,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 10,
         margin: 5,
-        marginTop: 0
+        marginBottom: 10
     },
     iconContainer: {
         padding: 8,
@@ -96,9 +85,13 @@ const styles = StyleSheet.create({
     },
     blurContainer: {
         flex: 1,
-        alignItems: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
+        // height:'50%',
+        // width: '100%'
     },
+
+
 
 
 });

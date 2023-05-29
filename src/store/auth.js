@@ -1,4 +1,3 @@
-import React from "react";
 import { action, makeAutoObservable, observable } from "mobx";
 import { loginWithEmailAndPassword, registerUserToFirestore } from "../service/authServices";
 
