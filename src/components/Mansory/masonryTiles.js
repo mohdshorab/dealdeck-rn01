@@ -1,17 +1,32 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Image, Platform, View } from "react-native";
-export const MasonryTiles = ({ product }) => {
+import StarRating from 'react-native-star-rating';
+
+
+
+export const MasonryTiles = ({ product, index }) => {
   const formattedTitle = product.title.replace(/-/, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
   const discountedPrice = product.price - (product.price * product.discountPercentage / 100);
+  const notEvenIndex = index % 2 !== 0;
+
   return (
-    <TouchableOpacity style={styles.itemContainer}>
+    <TouchableOpacity style={[styles.itemContainer, notEvenIndex && styles.evenItemContainer]}>
       <Image source={{ uri: product.thumbnail }} style={styles.itemImage} />
-      <Text style={styles.itemTitle}>{formattedTitle}</Text>
-      <View style={{ flexDirection: "row" }} >
-        <Text style={{ fontWeight: 500, color: 'green', fontSize: 15 }} >{product.discountPercentage}% off </Text>
-        <Text style={{fontWeight:'bold', color:'grey'}} >{product.price} </Text>
-        </View>
-        <Text style={{ fontWeight: 'bold', color: 'green' }} > ${discountedPrice.toFixed(2)}</Text>
+      <Text style={styles.itemTitle} adjustsFontSizeToFit numberOfLines={1} >{formattedTitle}</Text>
+      <View style={styles.productDetailsView} >
+        <Text style={styles.discountPercentage} >{product.discountPercentage}% off</Text>
+        <StarRating
+          disabled={true}
+          maxStars={5}
+          rating={product.rating}
+          starSize={13}
+          fullStarColor={'green'}
+        />
+      </View>
+      <View style={styles.productDetailsView} >
+        <Text style={styles.productPrice} >${product.price}</Text>
+        <Text style={styles.discountedPrice} >${discountedPrice.toFixed(2)}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -20,61 +35,63 @@ export const MasonryTiles = ({ product }) => {
 const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
-    marginBottom: 10,
     borderRadius: 8,
     overflow: 'hidden',
-    width: '100%',
+    width: '50%',
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+  evenItemContainer: {
+    flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: '50%',
+    padding: 10,
+    backgroundColor: "#fff",
+    marginRight: 10, // Add margin only if the index is even
   },
   itemImage: {
     width: '100%',
-    height: 180,
+    height: 100,
     resizeMode: 'cover',
-    borderRadius: 10,
+    borderRadius:10
   },
   itemTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    // fontWeight: 'bold',
     marginTop: 5,
-    // paddingHorizontal: 10,
+    alignSelf: 'flex-start',
+  },
+  productDetailsView: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '100%',
     alignSelf: 'center',
   },
-  horizontalLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'black',
-  },
-  randomProductContainer: {
-    flex: 1,
-    // alignItems: 'center',
-    margin: 10,
+  productDetailsSubView: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
     width: '100%',
-    ...Platform.select({
-      android: {
-        elevation: 3,
-
-      },
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
-      },
-    }),
   },
+  discountPercentage: {
+    fontWeight: 500,
+    color: 'green',
+    fontSize: 13,
+  },
+  productPrice: {
+    fontWeight: 'bold',
+    color: 'grey',
+    fontSize: 13,
+    textDecorationLine: 'line-through'
+  },
+  discountedPrice: {
+    fontWeight: 'bold',
+    color: 'green',
+    fontSize: 13
+  },
+  rating: {
+    color: 'darkblue',
+    fontSize: 13
+  }
 
-
-
-    exactPricecontainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    text: {
-      marginRight: 10,
-    },
-    line: {
-      flex: 1,
-      height: 1,
-      backgroundColor: 'black',
-    },
-  
 });

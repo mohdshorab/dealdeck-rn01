@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 
 const Carousel = ({ images, onPress }) => {
   return (
-    // <View style={styles.carouselContainer}>
 
       <Swiper
         autoplay
@@ -21,15 +21,14 @@ const Carousel = ({ images, onPress }) => {
           </TouchableOpacity>
         ))}
       </Swiper>
-    // </View>
   );
 };
 
 const styles = StyleSheet.create({
-  carouselContainer: {
-    // height: '300',
-    marginBottom: 20,
-  },
+  // carouselContainer: {
+  //   // height: '300',
+  //   marginBottom: 20,
+  // },
   slide: {
     flex: 1,
     justifyContent: 'center',
