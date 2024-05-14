@@ -1,6 +1,7 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { getAllProducts, getProductsByCategories, getProductsRandomly } from "../service/productService";
+import { getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
+import { Alert } from "react-native";
 
 export default class Products {
 
@@ -55,7 +56,7 @@ export default class Products {
 
     @action
     loadProductsCategories = async () => {
-        const res = await getProductsByCategories();
+        const res = await getProductsCategories();
         (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : {}
     }
 
@@ -63,6 +64,13 @@ export default class Products {
     loadRandomProducts = async () => {
         const res = await getProductsRandomly();
         res && res?.products.length ? this.randomProduct = res.products : []
+    }
+
+    @action
+    loadProductsOfCategory = async (category) => {
+        const res = await getProductsOfCategory(category);
+        if (res && res?.products.length) return res.products;
+        else Alert.alert('Got an error while fetching the data.')
     }
 
 

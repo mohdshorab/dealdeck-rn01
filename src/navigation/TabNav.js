@@ -9,7 +9,8 @@ const Tab = createBottomTabNavigator();
 export default TabNav = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      screenOptions={        ({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -33,11 +34,6 @@ export default TabNav = () => {
         name="Main"
         component={HomeScreen}
         options={{ tabBarLabel: 'Home' }}
-      />
-      <Tab.Screen
-        name="Home"
-        component={ProductDetail}
-        options={{ tabBarLabel: 'Products' }}
       />
       <Tab.Screen
         name="Settings"

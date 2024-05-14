@@ -7,6 +7,7 @@ import SignUpForm from "../screens/SignUp/signUpForm";
 import Profile from "../screens/Profile";
 import HomeScreen from "../screens/HomeScreen";
 import TabNav from "./TabNav";
+import ProductDetail from "../screens/ProductDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -40,8 +41,12 @@ const AppStackNavigation = (isLoggedIn) => {
                     />
                 ))} */}
                 <Stack.Screen
-                name="TabNav"
-                component={TabNav}
+                    name="TabNav"
+                    component={TabNav}
+                />
+                <Stack.Screen
+                    name="Products"
+                    component={ProductDetail}
                 />
             </Stack.Navigator>
         </NavigationContainer>

@@ -32,7 +32,7 @@ export const getAllProducts = async () => {
   }
 }
 
-export const getProductsByCategories = async () => {
+export const getProductsCategories = async () => {
   try {
     const response = await axios.get(`${baseUrl}/products/categories`);
     return response.data;
@@ -51,5 +51,16 @@ export const getProductsRandomly = async()=>{
   } catch(error){
     console.error('API Error:', error);
     throw new Error('Failed to fetch limited products from the API.');
+  }
+}
+
+
+export const getProductsOfCategory = async (categoryName) => {
+  try {
+    const response = await axios.get(`${baseUrl}/products/category/${categoryName}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw new Error('Failed to fetch product categories from the API.');
   }
 }

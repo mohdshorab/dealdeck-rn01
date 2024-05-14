@@ -28,10 +28,10 @@ const HomeScreen = observer(({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container} >
-            <CustomHeader title={'DealDeck'} />
+            <CustomHeader title={'DealDeck'} FullHeader />
             <ScrollView >
                 <CustomSearchBar />
-                <Carousel images={carouselJson.images} />
+                <Carousel images={carouselJson.images} autoplay={true}/>
                 <Text style={{ fontSize: 30, marginLeft: 10, marginBottom: 10, marginTop: 20 }} >Collections  </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {
@@ -63,8 +63,8 @@ const HomeScreen = observer(({ navigation }) => {
                             const nextItem = products.randomProduct[index + 1]; // Get the next item in the array
                             return (
                                 <View style={styles.rowContainer} key={item.id}>
-                                    <MasonryTiles product={item} />
-                                    {nextItem && <MasonryTiles product={nextItem} index={index} />}
+                                    <MasonryTiles product={item} navigation={navigation} />
+                                    {nextItem && <MasonryTiles product={nextItem} index={index}  navigation={navigation} />}
                                 </View>
                             );
                         }

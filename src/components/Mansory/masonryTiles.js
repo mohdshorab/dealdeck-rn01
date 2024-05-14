@@ -4,15 +4,17 @@ import StarRating from 'react-native-star-rating';
 
 
 
-export const MasonryTiles = ({ product, index }) => {
-  const formattedTitle = product.title.replace(/-/, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
+export const MasonryTiles = ({ product, index, navigation }) => {
+  // const formattedTitle = product.title.replace(/-/, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
   const discountedPrice = product.price - (product.price * product.discountPercentage / 100);
   const notEvenIndex = index % 2 !== 0;
 
   return (
-    <TouchableOpacity style={[styles.itemContainer, notEvenIndex && styles.evenItemContainer]}>
+    <TouchableOpacity style={[styles.itemContainer, notEvenIndex && styles.evenItemContainer]}
+      onPress={() => navigation.navigate('Products',{productData:product})}
+    >
       <Image source={{ uri: product.thumbnail }} style={styles.itemImage} />
-      <Text style={styles.itemTitle} adjustsFontSizeToFit numberOfLines={1} >{formattedTitle}</Text>
+      <Text style={styles.itemTitle} adjustsFontSizeToFit numberOfLines={1} >{product.title}</Text>
       <View style={styles.productDetailsView} >
         <Text style={styles.discountPercentage} >{product.discountPercentage}% off</Text>
         <StarRating
@@ -54,7 +56,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     resizeMode: 'cover',
-    borderRadius:10
+    borderRadius: 10
   },
   itemTitle: {
     fontSize: 14,

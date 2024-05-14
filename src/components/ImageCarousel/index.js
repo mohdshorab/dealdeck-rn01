@@ -3,24 +3,27 @@ import { View, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 're
 import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 
-const Carousel = ({ images, onPress }) => {
+const Carousel = ({ images, onPress, height, showsPagination,autoplay, showsButtons}) => {
   return (
-
-      <Swiper
-        autoplay
-        loop
-        height={160}
-        showsPagination={false}
-        autoplayTimeout={4.5}
-        onScrollAnimationEnd
-        loadMinimalLoader={<ActivityIndicator />}
-      >
-        {images.map((image, index) => (
-          <TouchableOpacity onPress={onPress} key={index} style={styles.slide}>
-              <Image source={image.image} style={styles.image} />
-          </TouchableOpacity>
-        ))}
-      </Swiper>
+    <Swiper
+    autoplay={autoplay ? autoplay : null} // Set autoplay based on the 'autoplay' prop
+      loop
+      height={height ? height : 160}
+      showsPagination={showsPagination ? showsPagination : false}
+      autoplayTimeout={3}
+      onScrollAnimationEnd
+      loadMinimalLoader={<ActivityIndicator />}
+      showsButtons={showsButtons ? true : false}
+    >
+      {images.map((image, index) => (
+        <TouchableOpacity onPress={onPress} key={index} style={styles.slide}>
+          {typeof image === 'string'
+            ? <Image source={{ uri: image }} style={styles.image} />
+            : <Image source={image.image} style={styles.image} />
+          }
+        </TouchableOpacity>
+      ))}
+    </Swiper>
   );
 };
 
@@ -38,7 +41,7 @@ const styles = StyleSheet.create({
   image: {
     width: '95%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: 10,
   },
 });
