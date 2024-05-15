@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.21.0",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/blur": "^4.3.2",
     "@react-native-community/netinfo": "^9.3.10",
     "@react-native-firebase/app": "^17.5.0",

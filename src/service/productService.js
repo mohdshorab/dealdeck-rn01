@@ -44,9 +44,9 @@ export const getProductsCategories = async () => {
 
 export const getProductsRandomly = async()=>{
   try{
-    // const randomLimit = Math.floor(Math.random()*90)+1;
+    const randomLimit = Math.floor(Math.random()*90)+1;
 
-    const response = await axios.get(`${baseUrl}/products?limit=6&skip=0`);
+    const response = await axios.get(`${baseUrl}/products?limit=6&skip=${randomLimit}`);
     return response.data;
   } catch(error){
     console.error('API Error:', error);
@@ -58,6 +58,16 @@ export const getProductsRandomly = async()=>{
 export const getProductsOfCategory = async (categoryName) => {
   try {
     const response = await axios.get(`${baseUrl}/products/category/${categoryName}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw new Error('Failed to fetch product categories from the API.');
+  }
+}
+
+export const searchTheProduct = async (productName) => {
+  try {
+    const response = await axios.get(`${baseUrl}/products//search?q=${productName}`);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-    SafeAreaView, Text, View, ScrollView, FlatList, StyleSheet, Image, TouchableOpacity, Platform
+    SafeAreaView, Text, View, ScrollView, FlatList, StyleSheet, Image, TouchableOpacity, Platform,
+    RefreshControl
 } from "react-native";
 import CustomHeader from "../../components/Header";
 import { useStore } from "../../store";
@@ -14,6 +15,7 @@ import { MasonryTiles } from "../../components/Mansory/masonryTiles";
 
 const HomeScreen = observer(({ navigation }) => {
     const { auth, products } = useStore();
+    const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
 
     useEffect(() => {
         products.loadProductsCategories()
@@ -26,12 +28,24 @@ const HomeScreen = observer(({ navigation }) => {
         image: CategoryImages[categoryName],
     }));
 
+    const handleRefresh = () => {
+        setRefreshing(true); // Set refreshing to true
+        // Call your refresh functions here
+        products.loadProductsCategories();
+        products.loadRandomProducts();
+        setRefreshing(false); // Set refreshing to false after the refresh is complete
+    };
+
     return (
         <SafeAreaView style={styles.container} >
             <CustomHeader title={'DealDeck'} FullHeader />
-            <ScrollView >
+            <ScrollView
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} title="Release to refresh"  />
+                }
+            >
                 <CustomSearchBar />
-                <Carousel images={carouselJson.images} autoplay={true}/>
+                <Carousel images={carouselJson.images} autoplay={true} />
                 <Text style={{ fontSize: 30, marginLeft: 10, marginBottom: 10, marginTop: 20 }} >Collections  </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {
@@ -64,7 +78,7 @@ const HomeScreen = observer(({ navigation }) => {
                             return (
                                 <View style={styles.rowContainer} key={item.id}>
                                     <MasonryTiles product={item} navigation={navigation} />
-                                    {nextItem && <MasonryTiles product={nextItem} index={index}  navigation={navigation} />}
+                                    {nextItem && <MasonryTiles product={nextItem} index={index} navigation={navigation} />}
                                 </View>
                             );
                         }

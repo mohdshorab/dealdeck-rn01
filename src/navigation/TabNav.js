@@ -3,6 +3,7 @@ import ProductDetail from '../screens/ProductDetail';
 import OrderDetail from '../screens/OrderDetails';
 import HomeScreen from '../screens/HomeScreen';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Categories from '../screens/Categories';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,8 +17,8 @@ export default TabNav = () => {
 
           if (route.name === 'Main') {
             iconName = focused ? 'home' : 'home';
-          } else if (route.name === 'Home') {
-            iconName = focused ? 'shopping-cart' : 'shopping-cart';
+          } else if (route.name === 'Categories') {
+            iconName = focused ? 'th' : 'th';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'cog' : 'cog';
           }
@@ -34,6 +35,11 @@ export default TabNav = () => {
         name="Main"
         component={HomeScreen}
         options={{ tabBarLabel: 'Home' }}
+      />
+         <Tab.Screen
+        name="Categories"
+        component={Categories}
+        options={{ tabBarLabel: 'Category' }}
       />
       <Tab.Screen
         name="Settings"
