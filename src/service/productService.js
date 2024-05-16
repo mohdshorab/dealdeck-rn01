@@ -74,3 +74,13 @@ export const searchTheProduct = async (productName) => {
     throw new Error('Failed to fetch product categories from the API.');
   }
 }
+
+export const getTheAd = async () => {
+  try {
+    const response = await axios.get(`https://api.escuelajs.co/api/v1/categories/2/products`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw new Error('Failed to fetch product categories from the API.');
+  }
+}

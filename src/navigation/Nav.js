@@ -8,6 +8,7 @@ import Profile from "../screens/Profile";
 import HomeScreen from "../screens/HomeScreen";
 import TabNav from "./TabNav";
 import ProductDetail from "../screens/ProductDetail";
+import Categories from "../screens/Categories";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ const unProtectedRoutes = [
 ];
 
 const protectedRoutes = [
+    { name: "logInForm", component: LogInForm },
     { name: "HomeScreen", component: HomeScreen },
     { name: "profile", component: Profile },
 ];
@@ -26,7 +28,7 @@ const AppStackNavigation = (isLoggedIn) => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ drawer: false, headerShown: false }} >
+            <Stack.Navigator initialRouteName={'TabNav'} screenOptions={{ drawer: false, headerShown: false }} >
                 {/* {isLoggedIn ? protectedRoutes.map((route) => (
                     <Stack.Screen
                         key={route.name}
@@ -45,8 +47,16 @@ const AppStackNavigation = (isLoggedIn) => {
                     component={TabNav}
                 />
                 <Stack.Screen
+                    name="Categories"
+                    component={Categories}
+                />
+                <Stack.Screen
                     name="Products"
                     component={ProductDetail}
+                />
+                <Stack.Screen
+                    name="logInForm"
+                    component={LogInForm}
                 />
             </Stack.Navigator>
         </NavigationContainer>

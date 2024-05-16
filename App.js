@@ -121,7 +121,7 @@ class App extends Component {
     return (
       <StoreProvider>
         <SafeAreaView style={styles.container} >
-          {showSplashScreen ? <FlashScreen /> : <AppStackNavigation isLoggedIn={true} />}
+          {showSplashScreen ? <FlashScreen /> : <AppStackNavigation isLoggedIn={false} />}
           <Toast />
           {this.showProgressView()}
         </SafeAreaView>

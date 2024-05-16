@@ -26,20 +26,12 @@ export default TabNav = () => {
           return <Icon name={iconName} size={size} color={color} />;
         },
       })}
-      tabBarOptions={{
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray',
-      }}
+
     >
       <Tab.Screen
         name="Main"
         component={HomeScreen}
-        options={{ tabBarLabel: 'Home' }}
-      />
-         <Tab.Screen
-        name="Categories"
-        component={Categories}
-        options={{ tabBarLabel: 'Category' }}
+        options={{ tabBarLabel: 'Home', unmountOnBlur: true }}
       />
       <Tab.Screen
         name="Settings"

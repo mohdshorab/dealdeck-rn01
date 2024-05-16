@@ -52,7 +52,7 @@ const LogInForm = observer(({ navigation }) => {
         //         ShowToast({ type: "error", text1: res?.message, color: "red" })
         //     }
         // }
-        navigation.navigate('mainScreen')
+        navigation.navigate('TabNav')
     }
 
 

@@ -1,8 +1,11 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly, searchTheProduct } from "../service/productService";
+import { getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly,searchTheProduct } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
 import { Alert } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const RECENTLY_VIEWED_PRODUCTS_KEY = 'recentlyViewedProducts';
+const MAX_RECENTLY_VIEWED_PRODUCTS = 6;
 export default class Products {
 
     @observable showLoader;
@@ -80,5 +83,43 @@ export default class Products {
         else Alert.alert('Got an error while fetching the data.')
     }
 
+
+    @action
+    getRecentlyViewedProducts = async () => {
+        try {
+            const storedProducts = await AsyncStorage.getItem(RECENTLY_VIEWED_PRODUCTS_KEY);
+            return storedProducts ? JSON.parse(storedProducts) : [];
+        } catch (error) {
+            console.error('Error retrieving recently viewed products:', error);
+            return [];
+        }
+    };
+
+    @action
+    addRecentlyViewedProduct = async (product) => {
+        try {
+            const recentlyViewedProducts = await this.getRecentlyViewedProducts();
+            const existingProductIndex = recentlyViewedProducts.findIndex(
+                (p) => p.id === product.id
+            );
+
+            if (existingProductIndex !== -1) {
+                // If the product already exists, move it to the start of the list
+                recentlyViewedProducts.splice(existingProductIndex, 1);
+            } else if (recentlyViewedProducts.length >= MAX_RECENTLY_VIEWED_PRODUCTS) {
+                // If the list is full, remove the oldest product
+                recentlyViewedProducts.pop();
+            }
+
+            const updatedProducts = [product, ...recentlyViewedProducts];
+
+            await AsyncStorage.setItem(
+                RECENTLY_VIEWED_PRODUCTS_KEY,
+                JSON.stringify(updatedProducts)
+            );
+        } catch (error) {
+            console.error('Error saving recently viewed product:', error);
+        }
+    };
 
 }

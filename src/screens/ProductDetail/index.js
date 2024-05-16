@@ -22,6 +22,10 @@ const ProductDetail = observer(({ route, navigation }) => {
         products.loadRandomProducts()
     }, [])
 
+    useEffect(() => {
+        products.addRecentlyViewedProduct(productData);
+    }, [productData]);
+
     const getSimilarProduct = async () => {
         setLoader(true);
         const res = await products.loadProductsOfCategory(productData.category);
@@ -34,28 +38,22 @@ const ProductDetail = observer(({ route, navigation }) => {
 
     const handleRefresh = () => {
         setLoader(true);
-        setRefreshing(true); // Set refreshing to true
-        // Call your refresh functions here
+        setRefreshing(true);
         getSimilarProduct();
         products.loadRandomProducts()
-        setRefreshing(false); // Set refreshing to false after the refresh is complete
+        setRefreshing(false); 
         setLoader(false);
     };
 
     const handlePincodeChange = (text) => {
-        // Remove non-numeric characters from the input
         const numericText = text.replace(/[^0-9]/g, '');
-
-        // Limit the input to 6 digits
         if (numericText.length <= 6) {
             setPincode(numericText);
         }
     };
 
     const handleCheckDelivery = () => {
-        // Assuming you have an API endpoint to check delivery availability
         const isDeliverable = checkDeliveryAvailability(pincode);
-
         if (isDeliverable) {
             Alert.alert('Success', 'Product is deliverable to your pincode.');
         } else {
@@ -63,10 +61,8 @@ const ProductDetail = observer(({ route, navigation }) => {
         }
     };
 
-    // Dummy function to simulate checking delivery availability
     const checkDeliveryAvailability = (pincode) => {
-        // Replace this with your actual logic to check delivery availability
-        return pincode === '123456';
+        return pincode === '110016';
     };
 
 
@@ -126,8 +122,8 @@ const ProductDetail = observer(({ route, navigation }) => {
                     </View>
                     <Text style={styles.descriptionText}>{productData.description}</Text>
                     <View style={[styles.straightLine, { borderBottomColor: 'black', }]} />
-                    <Text style={{ fontWeight: '600',  }} >Check the product availability at your pincode.</Text>
-                    <View style={{ flex: 1, flexDirection: "row", marginTop: 15,alignSelf:'center'  }} >
+                    <Text style={{ fontWeight: '600', }} >Check the product availability at your pincode.</Text>
+                    <View style={{ flex: 1, flexDirection: "row", marginTop: 15, alignSelf: 'center' }} >
                         <TextInput
                             style={{ width: 200, height: 40, borderWidth: 1, borderColor: 'gray', paddingHorizontal: 10 }}
                             keyboardType="numeric"
@@ -205,9 +201,6 @@ const ProductDetail = observer(({ route, navigation }) => {
                         })}
                     </ScrollView>
                     <View style={styles.straightLine} />
-
-
-
                     {/* Products You may like */}
                     <TouchableOpacity onPress={() => { }} >
                         <Text style={styles.similarProductsText} >Products you may like</Text>
@@ -238,9 +231,6 @@ const ProductDetail = observer(({ route, navigation }) => {
                             )
                         })}
                     </ScrollView>
-
-
-
                 </View>
             </ScrollView>
             <View style={styles.bottomSpacer} />
@@ -263,7 +253,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-
     },
     slide: {
         flex: 1,
@@ -277,15 +266,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     FixedBtn: {
-        // alignContent: 'center',
-        // flex: 1,
         flexDirection: 'row',
         width: '90%',
         backgroundColor: 'rgba(255, 255, 255, 0.7)', // Adjust as needed
-        // position: 'absolute',
-        // bottom: 0, // Adjust as needed
-        // left: 0,
-        // right: 0,
     },
     button: {
         flex: 1,
