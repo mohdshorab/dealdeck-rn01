@@ -1,124 +1,109 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 
-const CustomHeader = ({ title, showNotificationIcon, canGoBack, FullHeader }) => {
+const CustomHeader = ({ title, canGoBack, FullHeader, productDetail }) => {
     const navigation = useNavigation();
-
-    const handleNotificationPress = () => {
-        // navigate to the notification screen
-        navigation.navigate('Notifications');
-    };
-
-    
-
 
     const HomeHead = () => {
         return (
-            <View style={styles.header}>
-                <View style={styles.left}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Image source={require("../../assets/images/dealdeck_logo.png")} style={{ height: 30, width: 30, resizeMode: 'contain', borderRadius:35 }} />
+            <View style={{flexDirection: 'row', alignItems: 'center', }} >
+                <View style={styles.container}>
+                    <TouchableOpacity style={styles.iconContainer} >
+                        <Icon name="search" size={24} color="#00c0ff" style={styles.iconStyle} />
                     </TouchableOpacity>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search"
+                    />
                 </View>
-                <View style={styles.center}>
-                    <Text style={styles.title}>{title ? title : 'Deal Deck'}</Text>
-                </View>
-                <View style={styles.right}>
-                    {showNotificationIcon ? (
-                        <TouchableOpacity onPress={handleNotificationPress}>
-                            <Icon name="notifications-outline" size={24} color="white" />
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                            <Icon name="shopping-cart" size={24} color="white" />
-                        </TouchableOpacity>
-                    )}
-                </View>
+                    <Image source={require("../../assets/images/dealdeck_logo.png")} style={{ height: 50, width: 50, resizeMode: 'contain', borderRadius: 35 }} />
             </View>
         );
     }
 
-    const ProdDetailsHead = () => {
+    const Head = () => {
         return (
-            <View style={styles.prodDetailsHeader}>
+            <View style={[styles.HeaderContainer, { backgroundColor: 'white', }]}>
                 <View style={styles.left}>
                     {canGoBack ? (
-                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.prodDetailsBack}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Icon name="chevron-left" size={24} color="black" />
                         </TouchableOpacity>
                     ) : null}
                 </View>
-                <View style={styles.prodDetailsRight}>
-                    < View style={{ flexDirection: 'row', }} >
-                        <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={{ marginRight: 45 }} >
-                            <Icon name="heart" size={24} color="red" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                            <Icon name="share" size={24} color="black" />
+                {
+                    title ? <Text style={{ fontWeight: '400', fontSize: 25, }} > {title} </Text> : null
+                }
+                {productDetail ?
+                    <View style={styles.prodDetailsRight}>
+                        < View style={{ flexDirection: 'row', }} >
+                            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={{ marginRight: 45 }} >
+                                <Icon name="heart" size={24} color="red" />
+                            </TouchableOpacity>
+                            <Icon name="heart" size={24} color="gray" />
+                            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+                                <Icon name="share" size={24} color="black" />
+                            </TouchableOpacity>
+                        </View>
+                    </View> :
+                    <View style={styles.prodDetailsRight}>
+                        <TouchableOpacity onPress={() => { }} style={{ marginRight: 10 }} >
+                            <Icon name="search" size={24} color="#00c0ff" style={styles.iconStyle} />
                         </TouchableOpacity>
                     </View>
-                </View>
+                }
             </View>
         );
     }
 
     return (
-        FullHeader ? <HomeHead /> : <ProdDetailsHead />
+        FullHeader ? <HomeHead /> : <Head />
     );
 };
 
 export default CustomHeader;
 
 const styles = StyleSheet.create({
-    header: {
+    HeaderContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        backgroundColor: 'white',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        alignItems: 'center',
+        verticalAlign: 'middle',
+        height: 50,
         backgroundColor: '#00C0FF',
-        marginBottom: 15
-    },
-    prodDetailsHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 10,
         paddingHorizontal: 20,
-        backgroundColor: '#FFFFFF',
-        marginBottom: 15,
-    },
-    left: {
-        // flex: 1,
-        left: -10
-    },
-    center: {
-        flex: 3,
-        alignItems: 'center',
     },
     title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#fff'
+        fontWeight: '800',
+        fontSize: 25,
+        color: 'white'
     },
-    right: {
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        margin: 10,
+        marginBottom: 10,
+        width: '80%'
+    },
+    iconContainer: {
+        padding: 8,
+    },
+    filterIconContainer: {
+        // padding: 8,
+    },
+    searchInput: {
         flex: 1,
-        alignItems: 'flex-end',
+        height: 30,
     },
-    prodDetailsBack: {
-        borderRadius: 25,
-        // backgroundColor: '#C3E704',
-        height: 30, width: 30,
-        alignItems: 'center'
-    },
-    prodDetailsRight: {
-        flex: 1,
-        alignItems: 'flex-end',
-        // flexDirection: 'row'
+    iconStyle: {
+        marginRight: 15, marginTop: 4
     }
+
+
+
 });

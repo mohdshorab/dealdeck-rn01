@@ -8,25 +8,27 @@ import CustomHeader from "../../components/Header";
 import { useStore } from "../../store";
 import CustomSearchBar from "../../components/SearchBar/searchBar";
 import Carousel from "../../components/ImageCarousel";
-import { carouselJson } from "../../constants/carouselJson";
+import { carouselJson } from "../../constants/dummyJSONs";
 import { CategoryImages } from "../../constants/categoriesImage";
 import { observer } from "mobx-react";
 import { MasonryTiles } from "../../components/Mansory/masonryTiles";
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library you're using
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import SaleBanner from "../../components/SaleBanner";
 
 
 const HomeScreen = observer(({ navigation }) => {
     const { auth, products } = useStore();
-    const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
+    const [refreshing, setRefreshing] = useState(false); 
     const [isLoading, setLoader] = useState(false);
     const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
+    const [nextGenProducts, setNextGenProducts] = useState([]);
 
     useEffect(() => {
         setLoader(true)
         products.loadProductsCategories();
         products.loadRandomProducts();
         fetchRecentlyViewedProducts();
+        getTheNextGenProducts();
         console.log(products.randomProduct);
     }, [])
 
@@ -34,14 +36,23 @@ const HomeScreen = observer(({ navigation }) => {
     const fetchRecentlyViewedProducts = async () => {
         try {
             const product = await products.getRecentlyViewedProducts();
-            setRecentlyViewedProducts(product || []); // Use an empty array as a fallback
+            setRecentlyViewedProducts(product || []); 
         } catch (error) {
             console.error('Error fetching recently viewed products:', error);
-            setRecentlyViewedProducts([]); // Set an empty array in case of an error
+            setRecentlyViewedProducts([]);  
         }
-        setLoader(false)
     };
 
+    const getTheNextGenProducts = async () => {
+        try {
+            const res = await products.loadNextGenProduct();
+            setNextGenProducts(res);
+        }
+        catch (error) {
+            console.error('Error loading recently viewed products:', error);
+        }
+        setLoader(false)
+    }
 
     const categoryWithImages = products.productCategories.map(categoryName => ({
         name: categoryName,
@@ -50,13 +61,11 @@ const HomeScreen = observer(({ navigation }) => {
 
     const handleRefresh = () => {
         setLoader(true)
-        setRefreshing(true); // Set refreshing to true
-        // Call your refresh functions here
+        setRefreshing(true); 
         products.loadProductsCategories();
         products.loadRandomProducts();
         fetchRecentlyViewedProducts()
-        // getMostFrequentCategory();
-        setRefreshing(false); // Set refreshing to false after the refresh is complete
+        setRefreshing(false); 
         setLoader(false);
     };
 
@@ -68,28 +77,26 @@ const HomeScreen = observer(({ navigation }) => {
             </SafeAreaView>
         )
     }
+
     return (
         <SafeAreaView style={styles.container} >
             <CustomHeader title={'DealDeck'} FullHeader />
-            {/* <AdBox product={ads} /> */}
             <ScrollView
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} title="Release to refresh" />
                 }
             >
-                <CustomSearchBar />
-                <Carousel images={carouselJson.images} autoplay={true} />
+                <Carousel images={carouselJson.images} autoplay={true} showsPagination={true} />
                 <Text style={styles.collectionText} >Collections  </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {
-                        categoryWithImages.map((item) => {
+                        categoryWithImages.length > 0 && categoryWithImages.map((item) => {
                             const formattedName = item.name.replace(/-/, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
                             return (
                                 <TouchableOpacity
                                     key={item.name}
                                     style={styles.itemContainer}
                                     onPress={() => {
-                                        console.log('SSS', item.name)
                                         navigation.navigate('Categories', { category: item.name })
                                     }}
                                 >
@@ -108,11 +115,10 @@ const HomeScreen = observer(({ navigation }) => {
                     bgImage={require('../../assets/images/black-bg.jpg')}
                     floatingImage1={require('../../assets/images/legion_nobg.png')}
                     floatingImage2={require('../../assets/images/ROG_NOBG.png')}
+                    onPress={()=>{
+                        navigation.navigate('Categories', { category: 'laptops' })                        
+                    }}
                 />
-
-
-
-                {/* Recently viewed products snippet */}
                 {recentlyViewedProducts.length > 0 ?
                     <>
                         <Text style={styles.recentlyViewText}>
@@ -127,7 +133,7 @@ const HomeScreen = observer(({ navigation }) => {
                                 <TouchableOpacity
                                     onPress={
                                         () => {
-                                            navigation.navigate('Products', { productData: item })
+                                            navigation.navigate('Products', { productData: item, })
                                         }}
                                     style={[styles.productTile]}>
                                     <Image
@@ -147,34 +153,49 @@ const HomeScreen = observer(({ navigation }) => {
                         />
                     </> : null}
 
-
                 {/* New In products snippet */}
                 <View style={styles.NewInView} >
-                    <Text style={{ fontSize: 20, marginLeft: 10, fontWeight: "700" }} >New In</Text>
+                    <Text style={{ fontSize: 20, marginLeft: 10, fontWeight: "700" }} >Next Gen Products</Text>
+                    <TouchableOpacity>
+                        <Text style={{ color: '#51AF75', fontWeight: '700' }} >See all</Text>
+                    </TouchableOpacity>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {
+                        nextGenProducts.length > 0 && nextGenProducts.map((item) => {
+                            const formattedName = item.title.split(' ').length > 2 ? item.title.split(' ').slice(-2).join(' ') : item.title
+
+                            return (
+                                <TouchableOpacity
+                                    key={item.name}
+                                    style={styles.itemContainer}
+                                    onPress={() => {
+                                        console.log('SSS', item.title)
+                                        navigation.navigate('Categories', { category: item.title })
+                                    }}
+                                >
+                                    <View style={styles.imageContainer}>
+                                        <Image source={{ uri: item.images[0] }} style={styles.image} />
+                                    </View>
+                                    <Text style={styles.name}>{formattedName}</Text>
+                                </TouchableOpacity>
+                            )
+                        })}
+                </ScrollView>
+
+
+                <View style={styles.NewInView} >
+                    <Text style={{ fontSize: 20, marginLeft: 10, fontWeight: "700" }} >Products you may like</Text>
                     <TouchableOpacity>
                         <Text style={{ color: '#51AF75', fontWeight: '700' }} >See all</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.NewItemsList}>
-                    {/* {products.randomProduct.map((item, index) => {
-                        // Check if the current index is divisible by 2 to create pairs
-                        if (index % 2 === 0) {
-                            const nextItem = products.randomProduct[index + 1]; // Get the next item in the array
-                            return (
-                                <View style={styles.rowContainer} key={item.id}>
-                                    <MasonryTiles product={item} navigation={navigation} />
-                                    {nextItem && <MasonryTiles product={nextItem} index={index} navigation={navigation} />}
-                                </View>
-                            );
-                        }
-                        return null;
-                    })} */}
                     <View style={styles.NewItemsList}>
                         {products.randomProduct.map((item, index) => {
-                            // Check if the current index is divisible by 3 to create triplets
-                            if (index % 3 === 0) {
-                                const nextItem1 = products.randomProduct[index + 1]; // Get the next item in the array
-                                const nextItem2 = products.randomProduct[index + 2]; // Get the second next item in the array
+                             if (index % 3 === 0) {
+                                const nextItem1 = products.randomProduct[index + 1]; 
+                                const nextItem2 = products.randomProduct[index + 2];  
                                 return (
                                     <View style={styles.rowContainer} key={item.id}>
                                         <MasonryTiles product={item} navigation={navigation} />
@@ -186,8 +207,8 @@ const HomeScreen = observer(({ navigation }) => {
                             return null;
                         })}
                     </View>
-
                 </View>
+
             </ScrollView>
         </SafeAreaView >
     )
@@ -208,15 +229,14 @@ const styles = StyleSheet.create({
     },
     NewItemsList: {
         padding: 10,
+        paddingTop: 3
         // backgroundColor: '#ADD8E6'
     },
     itemContainer: {
         padding: 5,
         alignItems: 'center',
-        // marginHorizontal: 10,
-        // backgroundColor: '#F6F6F6',
         borderRadius: 10,
-
+        marginLeft: 10
     },
     imageContainer: {
         width: 50,
@@ -251,9 +271,9 @@ const styles = StyleSheet.create({
     },
     productTile: {
         padding: 10,
-        borderRadius: 5,
+        borderRadius: 20,
         // alignItems: 'center',
-        backgroundColor: '#fff',
+        // backgroundColor: '#EAEDFF',
         margin: 10,
         borderWidth: 1,
         width: 175,
@@ -294,7 +314,7 @@ const styles = StyleSheet.create({
         width: "95%",
         paddingTop: 5,
     },
-    recentlyViewText: { fontSize: 20, marginLeft: 10, fontWeight: "700", marginTop:5 },
+    recentlyViewText: { fontSize: 20, marginLeft: 10, fontWeight: "700", marginTop: 5 },
     NewInView: {
         flexDirection: "row",
         alignItems: "center",

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Animated, Image, TouchableOpacity } from 'react-native';
 
 //Add one more prop which accepts the category and nav to the screen with products of that category
-const SaleBanner = ({saleText, sloganText, discountText, bgImage, floatingImage1, floatingImage2}) => {
+const SaleBanner = ({saleText, sloganText, discountText, bgImage, floatingImage1, floatingImage2, floatingImage1Styles,floatingImage2Styles,onPress}) => {
     const animatedColors = useRef(new Animated.Value(0)).current;
 
     const startColorAnimation = () => {
@@ -32,7 +32,7 @@ const SaleBanner = ({saleText, sloganText, discountText, bgImage, floatingImage1
     });
 // saleText, sloganText, discountText, bgImage, floatingImage1, floatingImage2
     return (
-        <TouchableOpacity>
+        <TouchableOpacity style={{backgroundColor: 'white'}} onPress={onPress} >
         <ImageBackground
             source={bgImage}
             style={styles.bannerContainer}
@@ -50,12 +50,12 @@ const SaleBanner = ({saleText, sloganText, discountText, bgImage, floatingImage1
             {/* <View style={styles.imageContainer}> */}
             <Image
                 source={floatingImage1}
-                style={[styles.floatingImage, styles.topImage, { height: 120, width: 120 }]}
+                style={[styles.floatingImage, styles.topImage, { height: 120, width: 120 },floatingImage1Styles]}
             />
             {/* </View> */}
             <Image
                 source={floatingImage2}
-                style={[styles.floatingImage, styles.bottomImage, { height: 100, width: 100 }]}
+                style={[styles.floatingImage, styles.bottomImage,  { height: 100, width: 100 }, floatingImage2Styles]}
             />
         </ImageBackground>
         </TouchableOpacity>

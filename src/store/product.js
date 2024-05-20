@@ -1,5 +1,5 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly,searchTheProduct } from "../service/productService";
+import { fetchTheNextGenProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly,searchTheProduct } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
 import { Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -121,5 +121,11 @@ export default class Products {
             console.error('Error saving recently viewed product:', error);
         }
     };
+
+    @action
+    loadNextGenProduct = async () => {
+        const res = await fetchTheNextGenProduct();
+        if (res && res?.length) return res;
+    }
 
 }

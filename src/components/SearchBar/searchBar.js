@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: 10,
         margin: 5,
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     filterIconContainer: {
-        padding: 8,
+        // padding: 8,
     },
     searchInput: {
         flex: 1,

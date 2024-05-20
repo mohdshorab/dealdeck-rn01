@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ProductDetail from '../screens/ProductDetail';
 import OrderDetail from '../screens/OrderDetails';
 import HomeScreen from '../screens/HomeScreen';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Categories from '../screens/Categories';
 
 const Tab = createBottomTabNavigator();
@@ -10,7 +10,7 @@ const Tab = createBottomTabNavigator();
 export default TabNav = () => {
   return (
     <Tab.Navigator
-      screenOptions={        ({ route }) => ({
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
@@ -19,8 +19,8 @@ export default TabNav = () => {
             iconName = focused ? 'home' : 'home';
           } else if (route.name === 'Categories') {
             iconName = focused ? 'th' : 'th';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'cog' : 'cog';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -37,6 +37,11 @@ export default TabNav = () => {
         name="Settings"
         component={OrderDetail}
         options={{ tabBarLabel: 'Orders' }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={OrderDetail}
+        options={{tabBarShowLabel:false }}
       />
     </Tab.Navigator>
   );

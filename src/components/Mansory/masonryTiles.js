@@ -14,7 +14,7 @@ export const MasonryTiles = ({ product, index, navigation }) => {
 
   return (
     <TouchableOpacity style={[styles.itemContainer, notEvenIndex && styles.evenItemContainer]}
-      onPress={() => navigation.navigate('Products', { productData: product })}
+      onPress={() => navigation.push('Products', { productData: product })}
     >
       <Image source={{ uri: product.thumbnail }} style={styles.itemImage} />
       {isBestseller && <View style={styles.shadowContainer}>
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: '50%',
     padding: 10,
+    // paddingLeft:0,
     backgroundColor: "#fff",
     borderWidth: 0.2,
     // borderColor:'#999999',
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     bottom: 62,
-    left: 10,
+    left: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.8)', // Add a semi-transparent background to the rating container
     padding: 2, // Add some padding around the rating stars
     borderRadius: 4, // Add a border radius for a rounded appearance
