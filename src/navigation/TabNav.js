@@ -3,7 +3,8 @@ import ProductDetail from '../screens/ProductDetail';
 import OrderDetail from '../screens/OrderDetails';
 import HomeScreen from '../screens/HomeScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Categories from '../screens/Categories';
+import ProductsOfCategory from '../screens/ProductsOfCategory';
+import Category from '../screens/Category';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,8 +18,8 @@ export default TabNav = () => {
 
           if (route.name === 'Main') {
             iconName = focused ? 'home' : 'home';
-          } else if (route.name === 'Categories') {
-            iconName = focused ? 'th' : 'th';
+          } else if (route.name === 'Category') {
+            iconName = focused ? 'apps-sharp' : 'apps-sharp';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person';
           }
@@ -34,9 +35,9 @@ export default TabNav = () => {
         options={{ tabBarLabel: 'Home', unmountOnBlur: true }}
       />
       <Tab.Screen
-        name="Settings"
-        component={OrderDetail}
-        options={{ tabBarLabel: 'Orders' }}
+        name="Category"
+        component={Category}
+        options={{ tabBarLabel: 'Category' }}
       />
       <Tab.Screen
         name="Profile"

@@ -8,7 +8,7 @@ import Profile from "../screens/Profile";
 import HomeScreen from "../screens/HomeScreen";
 import TabNav from "./TabNav";
 import ProductDetail from "../screens/ProductDetail";
-import Categories from "../screens/Categories";
+import ProductsOfCategory from "../screens/ProductsOfCategory";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,7 +48,7 @@ const AppStackNavigation = (isLoggedIn) => {
                 />
                 <Stack.Screen
                     name="Categories"
-                    component={Categories}
+                    component={ProductsOfCategory}
                 />
                 <Stack.Screen
                     name="Products"

@@ -1,10 +1,24 @@
 import React from 'react';
-import { View, Image, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import Swiper from 'react-native-swiper';
 
-const Carousel = ({ images, onPress, height, showsPagination, autoplay, showsButtons }) => {
+const Carousel = ({
+  images,
+  onPress,
+  height,
+  showsPagination,
+  autoplay,
+  showsButtons,
+}) => {
   return (
-    <View style={{height:200, width: '100%', backgroundColor: 'white',  }} >
+    <View style={{height: 200, width: '100%', backgroundColor: 'white'}}>
       <Swiper
         autoplay={autoplay ? autoplay : null} // Set autoplay based on the 'autoplay' prop
         loop
@@ -14,14 +28,14 @@ const Carousel = ({ images, onPress, height, showsPagination, autoplay, showsBut
         onScrollAnimationEnd
         loadMinimalLoader={<ActivityIndicator />}
         showsButtons={showsButtons ? true : false}
-        index={1}
-      >
+        index={1}>
         {images.map((image, index) => (
           <TouchableOpacity onPress={onPress} key={index} style={styles.slide}>
-            {typeof image === 'string'
-              ? <Image source={{ uri: image }} style={styles.image} />
-              : <Image source={image.image} style={styles.image} />
-            }
+            {typeof image === 'string' ? (
+              <Image source={{uri: image}} style={styles.image} />
+            ) : (
+              <Image source={image.image} style={styles.image} />
+            )}
           </TouchableOpacity>
         ))}
       </Swiper>
@@ -38,7 +52,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   image: {
     width: '95%',
