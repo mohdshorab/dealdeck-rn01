@@ -14,7 +14,7 @@ export const MasonryTiles = ({ product, index, navigation }) => {
   return (
     <TouchableOpacity
       style={[styles.itemContainer, notEvenIndex && styles.evenItemContainer]}
-      onPress={() => navigation.push('Products', { productData: product })}>
+      onPress={() => navigation.push('ProductDetail', { productData: product })}>
       <Image source={{ uri: product.thumbnail }} style={styles.itemImage} />
       {isBestseller && (
         <View style={styles.shadowContainer}>
@@ -24,7 +24,7 @@ export const MasonryTiles = ({ product, index, navigation }) => {
         </View>
       )}
       <View style={styles.ratingContainer}>
-        <Text> {product.rating}</Text>
+        <Text style={{color: 'green', fontWeight:'500'}} > {product.rating}</Text>
         <StarRating
           disabled={true}
           maxStars={1}
@@ -61,8 +61,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderWidth: 0.2,
     marginRight: 10, // Add margin only if the index is even,'
-    borderTopRightRadius: 10,
-    borderBottomLeftRadius: 10
 
   },
   evenItemContainer: {
@@ -72,8 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderWidth: 0.2,
     marginRight: 10, // Add margin only if the index is even,'
-    borderTopRightRadius: 10,
-    borderBottomLeftRadius: 10
   },
   itemImage: {
     width: '100%',

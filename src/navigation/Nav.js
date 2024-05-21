@@ -9,6 +9,7 @@ import HomeScreen from "../screens/HomeScreen";
 import TabNav from "./TabNav";
 import ProductDetail from "../screens/ProductDetail";
 import ProductsOfCategory from "../screens/ProductsOfCategory";
+import { ProductsYouMayLike } from "../screens/ProductsYouMayLike";
 
 const Stack = createNativeStackNavigator();
 
@@ -47,11 +48,15 @@ const AppStackNavigation = (isLoggedIn) => {
                     component={TabNav}
                 />
                 <Stack.Screen
-                    name="Categories"
+                    name="ProductsYouMayLike"
+                    component={ProductsYouMayLike}
+                />
+                <Stack.Screen
+                    name="ProductsOfCategory"
                     component={ProductsOfCategory}
                 />
                 <Stack.Screen
-                    name="Products"
+                    name="ProductDetail"
                     component={ProductDetail}
                 />
                 <Stack.Screen

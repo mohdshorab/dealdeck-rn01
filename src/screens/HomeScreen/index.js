@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   Text,
@@ -14,17 +14,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import CustomHeader from '../../components/Header';
-import {useStore} from '../../store';
+import { useStore } from '../../store';
 import Carousel from '../../components/ImageCarousel';
-import {carouselJson} from '../../constants/dummyJSONs';
-import {CategoryImages} from '../../constants/categoriesImage';
-import {observer} from 'mobx-react';
-import {MasonryTiles} from '../../components/Mansory/masonryTiles';
+import { carouselJson } from '../../constants/dummyJSONs';
+import { CategoryImages } from '../../constants/categoriesImage';
+import { observer } from 'mobx-react';
+import { MasonryTiles } from '../../components/Mansory/masonryTiles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
 
-const HomeScreen = observer(({navigation}) => {
-  const {auth, products} = useStore();
+const HomeScreen = observer(({ navigation }) => {
+  const { auth, products } = useStore();
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setLoader] = useState(false);
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
@@ -54,7 +54,7 @@ const HomeScreen = observer(({navigation}) => {
       const res = await products.loadNextGenProduct();
       setNextGenProducts(res);
     } catch (error) {
-      console.error('Error loading recently viewed products:', error);
+      console.error('Error loading Next Gen products:', error);
     }
     setLoader(false);
   };
@@ -112,12 +112,12 @@ const HomeScreen = observer(({navigation}) => {
                     key={item.name}
                     style={styles.itemContainer}
                     onPress={() => {
-                      navigation.navigate('Categories', {
+                      navigation.navigate('ProductsOfCategory', {
                         category: item.name,
                       });
                     }}>
                     <View style={styles.imageContainer}>
-                      <Image source={{uri: item.image}} style={styles.image} />
+                      <Image source={{ uri: item.image }} style={styles.image} />
                     </View>
                     <Text style={styles.name}>{formattedName}</Text>
                   </TouchableOpacity>
@@ -142,14 +142,14 @@ const HomeScreen = observer(({navigation}) => {
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => (
+              renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('Products', {productData: item});
+                    navigation.navigate('ProductDetail', { productData: item });
                   }}
                   style={[styles.productTile]}>
                   <Image
-                    source={{uri: item.thumbnail}}
+                    source={{ uri: item.thumbnail }}
                     style={styles.productImage}
                     resizeMode="contain"
                   />
@@ -186,7 +186,7 @@ const HomeScreen = observer(({navigation}) => {
           floatingImage1={require('../../assets/images/legion_nobg.png')}
           floatingImage2={require('../../assets/images/ROG_NOBG.png')}
           onPress={() => {
-            navigation.navigate('Categories', {category: 'laptops'});
+            navigation.navigate('ProductsOfCategory', { category: 'laptops' });
           }}
         />
         {/* New In products snippet */}
@@ -201,7 +201,7 @@ const HomeScreen = observer(({navigation}) => {
             Next Gen Products
           </Text>
           <TouchableOpacity>
-            <Text style={{color: '#51AF75', fontWeight: '700'}}>See all</Text>
+            <Text style={{ color: '#51AF75', fontWeight: '700' }}>See all</Text>
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -218,11 +218,11 @@ const HomeScreen = observer(({navigation}) => {
                   style={styles.itemContainer}
                   onPress={() => {
                     console.log('SSS', item.title);
-                    navigation.navigate('Categories', {category: item.title});
+                    navigation.navigate('ProductsOfCategory', { category: item.title });
                   }}>
                   <View style={styles.imageContainer}>
                     <Image
-                      source={{uri: item.images[0]}}
+                      source={{ uri: item.images[0] }}
                       style={styles.image}
                     />
                   </View>
@@ -250,8 +250,8 @@ const HomeScreen = observer(({navigation}) => {
             }}>
             Products you may like
           </Text>
-          <TouchableOpacity>
-            <Text style={{color: '#51AF75', fontWeight: '700'}}>See all</Text>
+          <TouchableOpacity onPress={()=>navigation.navigate('ProductsYouMayLike')} >
+            <Text style={{ color: '#51AF75', fontWeight: '700' }}>See all</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.NewItemsList}>
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
-  collectionText: {fontSize: 20, margin: 10, fontWeight: '700', color: 'black'},
+  collectionText: { fontSize: 20, margin: 10, fontWeight: '700', color: 'black' },
   recentlyViewText: {
     fontSize: 20,
     marginLeft: 10,

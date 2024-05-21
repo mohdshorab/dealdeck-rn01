@@ -273,7 +273,7 @@ const ProductDetail = observer(({route, navigation}) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.push('Products', {productData: item});
+                    navigation.push('ProductDetail', {productData: item});
                   }}
                   style={{
                     marginRight: 10,

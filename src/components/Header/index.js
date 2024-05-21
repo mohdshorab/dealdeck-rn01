@@ -17,7 +17,7 @@ const CustomHeader = ({title, canGoBack, FullHeader, productDetail}) => {
 
   const HomeHead = () => {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: 'white'}}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.iconContainer}>
             <Icon
@@ -29,6 +29,7 @@ const CustomHeader = ({title, canGoBack, FullHeader, productDetail}) => {
           </TouchableOpacity>
           <TextInput style={styles.searchInput} placeholder="Search" />
         </View>
+        <TouchableOpacity onPress={()=>{navigation.navigate('TabNav')}} >
         <Image
           source={require('../../assets/images/dealdeck_logo.png')}
           style={{
@@ -38,6 +39,7 @@ const CustomHeader = ({title, canGoBack, FullHeader, productDetail}) => {
             borderRadius: 35,
           }}
         />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -117,9 +119,6 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     padding: 8,
-  },
-  filterIconContainer: {
-    // padding: 8,
   },
   searchInput: {
     flex: 1,

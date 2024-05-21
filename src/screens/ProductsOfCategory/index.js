@@ -55,11 +55,13 @@ const ProductsOfCategory = observer(({route, navigation}) => {
     );
   }
 
+  const bgImage = category == 'laptops' || 'smartphones' ? 'https://img.freepik.com/free-vector/paper-style-white-monochrome-background_23-2149014827.jpg' : 'https://images.unsplash.com/photo-1620503374956-c942862f0372?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGNvbG9yJTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D';
+
   return (
     <SafeAreaView style={{backgroundColor: 'white'}}>
       <ImageBackground
         source={{
-          uri: 'https://images.unsplash.com/photo-1620503374956-c942862f0372?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGNvbG9yJTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D',
+          uri: bgImage, 
         }}>
         <CustomHeader
           title={category.charAt(0).toUpperCase() + category.slice(1)}
@@ -96,7 +98,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
                     key={item.name}
                     style={styles.itemContainer}
                     onPress={() => {
-                      navigation.navigate('Products', {productData: item});
+                      navigation.navigate('ProductDetail', {productData: item});
                     }}>
                     <View style={styles.imageContainer}>
                       <Image
@@ -153,6 +155,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
               })}
             </View>
           </View>
+          <View style={{marginBottom:40}} />
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>

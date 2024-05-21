@@ -40,7 +40,7 @@ export default TabNav = () => {
         options={{ tabBarLabel: 'Category' }}
       />
       <Tab.Screen
-        name="Profile"
+        name="OrderDetail"
         component={OrderDetail}
         options={{tabBarShowLabel:false }}
       />
