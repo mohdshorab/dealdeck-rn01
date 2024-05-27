@@ -17,9 +17,10 @@ import FlashScreen from './src/screens/FlashScreen';
 import AppStackNavigation from './src/navigation/Nav';
 import Toast from 'react-native-toast-message';
 import { StoreProvider } from './src/store';
-import firebase from 'firebase/app';
+import NetInfo from '@react-native-community/netinfo';
 import { stores } from './src/store';
 import codePush from "react-native-code-push";
+import ShowToast from './src/components/Toast/toast';
 
 
 
@@ -29,6 +30,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
+    this.internet = null;
     this.state = {
       showSplashScreen: true,
       progress: false,
@@ -40,11 +42,25 @@ class App extends Component {
     await stores.products.init().then(() => {
       setTimeout(() => {
         this.setState({ showSplashScreen: false });
-      }, 2000); // 2-second delay
+      }, 3000); // 3-second delay
+    });
+
+    this.internet = NetInfo.addEventListener((state) => {
+      console.log('checkstate', state.isConnected, state);
+      const text1 = state?.isConnected ? 'You are connected with internet' : 'Disconnected'
+      const type = state?.isConnected ? 'success' : 'error';
+      ShowToast({ type: type, text1: text1, color: type == 'error' ? "red" : 'green', })
+      if (state.isConnected && !stores.auth.isNetworkAvailable) {
+        this.syncData();
+      }
+      if (state.isConnected) {
+        this.syncCodePush();
+      }
+      stores.auth.setNetworkAvailability(state.isConnected);
     });
     this.syncCodePush();
   }
-  
+
 
   codePushStatusDidChange(syncStatus) {
     switch (syncStatus) {
@@ -85,7 +101,7 @@ class App extends Component {
       progress: true,
       downloadProgress: progress.receivedBytes / progress.totalBytes,
     });
-  }  
+  }
 
 
   syncCodePush() {
@@ -114,7 +130,7 @@ class App extends Component {
       </Modal>
     );
   }
-  
+
 
   render() {
     const { showSplashScreen } = this.state;

@@ -9,8 +9,8 @@ const ShowToast = (props) => {
             position: 'top',
             text1Style: { color: props?.color },
             autoHide: true,
-            visibilityTime: 1500,
-            topOffset: Platform.OS === 'ios' ? 40 : 0,
+            visibilityTime: 2000,
+            topOffset: Platform.OS === 'ios' ? 50 : 0,
             onHide:props.onHide
         })
 

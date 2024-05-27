@@ -8,7 +8,6 @@ import {
   ScrollView,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-
 const Carousel = ({
   images,
   onPress,
@@ -18,7 +17,7 @@ const Carousel = ({
   showsButtons,
 }) => {
   return (
-    <View style={{height: 200, width: '100%', backgroundColor: 'white'}}>
+    <View style={{ height: 200, width: '100%', backgroundColor: 'white' }}>
       <Swiper
         autoplay={autoplay ? autoplay : null} // Set autoplay based on the 'autoplay' prop
         loop
@@ -32,7 +31,7 @@ const Carousel = ({
         {images.map((image, index) => (
           <TouchableOpacity onPress={onPress} key={index} style={styles.slide}>
             {typeof image === 'string' ? (
-              <Image source={{uri: image}} style={styles.image} />
+              <Image source={{ uri: image }} style={styles.image} />
             ) : (
               <Image source={image.image} style={styles.image} />
             )}
@@ -44,10 +43,6 @@ const Carousel = ({
 };
 
 const styles = StyleSheet.create({
-  // carouselContainer: {
-  //   // height: '300',
-  //   marginBottom: 20,
-  // },
   slide: {
     flex: 1,
     justifyContent: 'center',
@@ -56,7 +51,7 @@ const styles = StyleSheet.create({
   image: {
     width: '95%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: 10,
   },
 });

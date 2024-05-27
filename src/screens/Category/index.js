@@ -17,7 +17,7 @@ const Category = observer(({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <CustomHeader title={'DealDeck'} FullHeader />
+            <CustomHeader titleOnHead={'Category'} navigation={navigation} />
             <FlatList
                 data={categoriesName}
                 renderItem={renderItem}

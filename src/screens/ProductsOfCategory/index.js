@@ -15,7 +15,6 @@ import {useStore} from '../../store';
 import {observer} from 'mobx-react';
 import CustomHeader from '../../components/Header';
 import {MasonryTiles} from '../../components/Mansory/masonryTiles';
-import SaleBanner from '../../components/SaleBanner';
 // eslint-disable-next-line no-unused-vars
 import {categoriesName, imageUrls} from '../../constants/dummyJSONs';
 
@@ -38,6 +37,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
   };
 
   const CategoryImage = () => {
+    console.log('CATEGORY', category)
     const imageSrc = imageUrls[category] || imageUrls.default;
 
     return <Image source={{uri: imageSrc}} style={styles.stateicImageBanner} />;
@@ -46,9 +46,9 @@ const ProductsOfCategory = observer(({route, navigation}) => {
   if (isLoading) {
     return (
       <SafeAreaView>
-        <CustomHeader
-          title={category.charAt(0).toUpperCase() + category.slice(1)}
-          canGoBack
+        <CustomHeader 
+          titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
+          navigation={navigation}
         />
         <ActivityIndicator size={'large'} />
       </SafeAreaView>
@@ -64,8 +64,8 @@ const ProductsOfCategory = observer(({route, navigation}) => {
           uri: bgImage, 
         }}>
         <CustomHeader
-          title={category.charAt(0).toUpperCase() + category.slice(1)}
-          canGoBack
+        navigation={navigation}
+          titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
         />
         <ScrollView
           style={{
@@ -87,7 +87,6 @@ const ProductsOfCategory = observer(({route, navigation}) => {
                 const formattedName = item.title
                   .replace(/-/, ' ')
                   .replace(/\b\w/g, match => match.toUpperCase());
-
                 const words = formattedName.split(' ');
                 const lastTwoWords = words.slice(-2).join(' ');
 

@@ -97,6 +97,7 @@ export const imageUrls = {
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkRK6btaXaMkTWnaAkQAgirORsVSQrRt_tCToMVTEt_tuOnZoqqjSmgqPWs6vE5KihY3Q&usqp=CAU',
   lighting:
     'https://img.freepik.com/free-vector/light-equipment-store-3d-realistic-ad-banner-template_1441-3538.jpg',
+    vehicle:'https://marketplace.canva.com/EAFvqoseFfE/2/0/1600w/canva-black-and-orange-modern-car-sale-banner-VDeMyUck004.jpg',
   default:
     'https://img.freepik.com/premium-vector/mega-sale-banner-with-red-ribbon-illustration_275806-126.jpg',
 };

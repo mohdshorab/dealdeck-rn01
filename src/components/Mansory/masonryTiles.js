@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     position: 'absolute',
-    bottom: 64,
+    bottom: 66,
     left: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 2,

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   SafeAreaView,
@@ -16,15 +16,15 @@ import {
 import StarRating from 'react-native-star-rating';
 import CustomHeader from '../../components/Header';
 import Carousel from '../../components/ImageCarousel';
-import {useStore} from '../../store';
+import { useStore } from '../../store';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library you're using
-import {observer} from 'mobx-react';
-import {MasonryTiles} from '../../components/Mansory/masonryTiles';
+import { observer } from 'mobx-react';
+import { MasonryTiles } from '../../components/Mansory/masonryTiles';
 import SaleBanner from '../../components/SaleBanner';
 
-const ProductDetail = observer(({route, navigation}) => {
-  const {products} = useStore();
-  const {productData} = route.params;
+const ProductDetail = observer(({ route, navigation }) => {
+  const { products, cart } = useStore();
+  const { productData } = route.params;
   const [similarProducts, setSimilarProducts] = useState([]);
   const [pincode, setPincode] = useState('');
   const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
@@ -85,14 +85,14 @@ const ProductDetail = observer(({route, navigation}) => {
   if (showLoader) {
     return (
       <SafeAreaView>
-        <CustomHeader canGoBack />
+        <CustomHeader showCart canGoBack navigation={navigation} />
         <ActivityIndicator size={'large'} />
       </SafeAreaView>
     );
   }
   return (
     <SafeAreaView style={styles.container}>
-      <CustomHeader canGoBack productDetail />
+      <CustomHeader count={cart.cartCount} showCart canGoBack productDetail titleOnHead={productData.title} navigation={navigation} />
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -135,7 +135,7 @@ const ProductDetail = observer(({route, navigation}) => {
             <View style={styles.priceView}>
               <View>
                 <View
-                  style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                  style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                   <Icon name="long-arrow-down" size={15} color="green" />
                   <Text style={styles.discountPercentage}>
                     {productData.discountPercentage.toFixed(0)}%{' '}
@@ -146,7 +146,7 @@ const ProductDetail = observer(({route, navigation}) => {
                     {(
                       productData.price -
                       productData.price *
-                        (productData.discountPercentage.toFixed(0) / 100)
+                      (productData.discountPercentage.toFixed(0) / 100)
                     ).toFixed(0)}{' '}
                   </Text>
                 </View>
@@ -163,8 +163,8 @@ const ProductDetail = observer(({route, navigation}) => {
               {productData.description}
             </Text>
           </View>
-          <View style={[styles.straightLine, {borderBottomColor: 'black'}]} />
-          <Text style={{fontWeight: '600', marginTop: 10, color: 'black'}}>
+          <View style={styles.straightLine} />
+          <Text style={{ fontWeight: '600', marginTop: 0, color: 'black' }}>
             Check the product availability at your pincode.
           </Text>
           <View
@@ -203,8 +203,8 @@ const ProductDetail = observer(({route, navigation}) => {
 
           <View style={styles.optionContainer}>
             {productData.category !== 'smartphones' ||
-            'laptops' ||
-            'furniture' ? (
+              'laptops' ||
+              'furniture' ? (
               <View style={styles.option}>
                 <Icon name="undo" size={25} color="blue" style={styles.icon} />
                 <Text style={styles.optionText}>10 days return</Text>
@@ -236,33 +236,21 @@ const ProductDetail = observer(({route, navigation}) => {
               <Text style={styles.optionText}>Premium Sure</Text>
             </View>
           </View>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderBottomColor: 'grey',
-              marginVertical: 15,
-              shadowOpacity: 1,
-            }}
-          />
+          <View style={styles.straightLine} />
 
           {productData.category !== 'smartphones' ||
-          'laptops' ||
-          'furniture' ? (
-            <Text style={{alignSelf: 'center', color: 'black'}}>
-              1 Year Manufacturing Warranty Know More
-            </Text>
+            'laptops' ||
+            'furniture' ? (
+            <>
+              <Text style={{ alignSelf: 'center', color: 'black' }}>
+                1 Year Manufacturing Warranty Know More
+              </Text>
+              <View style={styles.straightLine} />
+            </>
           ) : null}
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderBottomColor: 'grey',
-              marginVertical: 15,
-              shadowOpacity: 1,
-            }}
-          />
 
           {/* SIMILAR PRODUCTS */}
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => { }}>
             <Text style={styles.similarProductsText}>Similar Products</Text>
           </TouchableOpacity>
           <ScrollView
@@ -273,7 +261,7 @@ const ProductDetail = observer(({route, navigation}) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.push('ProductDetail', {productData: item});
+                    navigation.push('ProductDetail', { productData: item });
                   }}
                   style={{
                     marginRight: 10,
@@ -283,7 +271,7 @@ const ProductDetail = observer(({route, navigation}) => {
                     padding: 5,
                   }}>
                   <Image
-                    source={{uri: item.thumbnail}}
+                    source={{ uri: item.thumbnail }}
                     style={styles.similarProductImage}
                   />
                   <Text style={styles.similarProductBrand}>{item.brand}</Text>
@@ -320,11 +308,11 @@ const ProductDetail = observer(({route, navigation}) => {
               right: -25,
             }}
             floatingImage2={require('../../assets/images/cc-2-removebg-preview.png')}
-            floatingImage2Styles={{bottom: -40, left: -22}}
+            floatingImage2Styles={{ bottom: -40, left: -22 }}
           />
 
           {/* New In products snippet */}
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => { }}>
             <Text style={styles.similarProductsText}>
               Products you may like
             </Text>
@@ -368,11 +356,15 @@ const ProductDetail = observer(({route, navigation}) => {
       </ScrollView>
       <View style={styles.bottomSpacer} />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.yellowButton]}>
+        <TouchableOpacity
+          onPress={() => {
+            cart.addItemToCart(productData)
+          }}
+          style={[styles.button, styles.yellowButton]}>
           <Text style={styles.buttonText}>Add to cart</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.redButton]}>
-          <Text style={[styles.buttonText, {color: 'white'}]}>Buy Now</Text>
+          <Text style={[styles.buttonText, { color: 'white' }]}>Buy Now</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -435,22 +427,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black'
   },
-  subContainer: {marginTop: '10%', width: '95%', alignSelf: 'center'},
-  brandView: {flex: 1, flexDirection: 'row'},
-  moreProductText: {fontWeight: 'bold', fontSize: 15, color: 'grey'},
-  BrandNameText: {fontWeight: 'bold', fontSize: 15, color: 'black'},
-  productTitle: {fontWeight: 'bold', fontSize: 25, color: 'black'},
-  starRatingView: {width: 55, flex: 1, flexDirection: 'row', marginTop: 2},
+  subContainer: { marginTop: '10%', width: '95%', alignSelf: 'center' },
+  brandView: { flex: 1, flexDirection: 'row' },
+  moreProductText: { fontWeight: 'bold', fontSize: 15, color: 'grey' },
+  BrandNameText: { fontWeight: 'bold', fontSize: 15, color: 'black' },
+  productTitle: { fontWeight: 'bold', fontSize: 25, color: 'black' },
+  starRatingView: { width: 55, flex: 1, flexDirection: 'row', marginTop: 2 },
   straightLine: {
     borderWidth: 0.5,
     borderBottomColor: 'grey',
-    marginTop: 15,
+    marginVertical: 15,
     shadowOpacity: 1,
   },
-  bottomSpacer: {marginVertical: 15, shadowOpacity: 1, height: 20},
-  similarProductBrand: {fontSize: 13, marginTop: 5, color: 'black'},
-  similarProductTitle: {fontSize: 13, fontWeight: '500', color: 'black'},
-  similarProductPrice: {color: 'black', fontWeight: '800'},
+  bottomSpacer: { marginVertical: 15, shadowOpacity: 1, height: 20 },
+  similarProductBrand: { fontSize: 13, marginTop: 5, color: 'black' },
+  similarProductTitle: { fontSize: 13, fontWeight: '500', color: 'black' },
+  similarProductPrice: { color: 'black', fontWeight: '800' },
   similarProductRatingView: {
     flex: 1,
     flexDirection: 'row',
@@ -476,9 +468,9 @@ const styles = StyleSheet.create({
     color: '#506AE6',
     fontWeight: 'bold',
   },
-  emiText: {fontSize: 15, color: 'black'},
-  priceText: {fontWeight: 'bold', fontSize: 18, color: 'black'},
-  ratingText: {color: 'green'},
+  emiText: { fontSize: 15, color: 'black' },
+  priceText: { fontWeight: 'bold', fontSize: 18, color: 'black' },
+  ratingText: { color: 'green' },
   priceView: {
     padding: 5,
     flex: 1,
@@ -500,7 +492,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingTop: 3,
   },
-  similarProductsContainer: {flex: 1, flexDirection: 'row'},
+  similarProductsContainer: { flex: 1, flexDirection: 'row' },
   similarProductImage: {
     height: 140,
     width: 110,
@@ -523,7 +515,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
   },
-  discountPercentage: {fontWeight: '500', fontSize: 15, color: 'black'},
+  discountPercentage: { fontWeight: '500', fontSize: 15, color: 'black' },
   mrpText: {
     fontWeight: '500',
     fontSize: 15,

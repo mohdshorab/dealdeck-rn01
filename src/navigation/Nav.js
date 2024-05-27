@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import LogInForm from "../screens/LogIn/login";
 import SignUpForm from "../screens/SignUp/signUpForm";
 import Profile from "../screens/Profile";
@@ -10,62 +9,40 @@ import TabNav from "./TabNav";
 import ProductDetail from "../screens/ProductDetail";
 import ProductsOfCategory from "../screens/ProductsOfCategory";
 import { ProductsYouMayLike } from "../screens/ProductsYouMayLike";
+import { CartScreen } from "../screens/Cart";
 
 const Stack = createNativeStackNavigator();
 
 const unProtectedRoutes = [
-    { name: "logInForm", component: LogInForm },
-    { name: "signUpForm", component: SignUpForm },
+  { name: "logInForm", component: LogInForm },
+  { name: "signUpForm", component: SignUpForm },
 ];
 
 const protectedRoutes = [
-    { name: "logInForm", component: LogInForm },
-    { name: "HomeScreen", component: HomeScreen },
-    { name: "profile", component: Profile },
+  { name: "Home", component: TabNav },
+  { name: "ProductsYouMayLike", component: ProductsYouMayLike },
+  { name: "ProductsOfCategory", component: ProductsOfCategory },
+  { name: "ProductDetail", component: ProductDetail },
+  { name: "profile", component: Profile },
+  { name: "CartScreen", component: CartScreen}
 ];
 
-const AppStackNavigation = (isLoggedIn) => {
-    const initialRouteName = isLoggedIn ? 'mainScreen' : 'logInForm';
 
-    return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName={'TabNav'} screenOptions={{ drawer: false, headerShown: false }} >
-                {/* {isLoggedIn ? protectedRoutes.map((route) => (
-                    <Stack.Screen
-                        key={route.name}
-                        name={route.name}
-                        component={route.component}
-                    />
-                )) : unProtectedRoutes.map((route) => (
-                    <Stack.Screen
-                        key={route.name}
-                        name={route.name}
-                        component={route.component}
-                    />
-                ))} */}
-                <Stack.Screen
-                    name="TabNav"
-                    component={TabNav}
-                />
-                <Stack.Screen
-                    name="ProductsYouMayLike"
-                    component={ProductsYouMayLike}
-                />
-                <Stack.Screen
-                    name="ProductsOfCategory"
-                    component={ProductsOfCategory}
-                />
-                <Stack.Screen
-                    name="ProductDetail"
-                    component={ProductDetail}
-                />
-                <Stack.Screen
-                    name="logInForm"
-                    component={LogInForm}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
-    )
-}
+const AppStackNavigation = (isLoggedIn) => {
+  const initialRouteName = isLoggedIn ? "Home" : "logInForm";
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName={initialRouteName}
+        screenOptions={{ headerShown: false }}
+      >
+        {protectedRoutes.map(({ name, component }) => (
+          <Stack.Screen key={name} name={name} component={component} />
+        ))}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 export default AppStackNavigation;

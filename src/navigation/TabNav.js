@@ -1,49 +1,72 @@
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ProductDetail from '../screens/ProductDetail';
 import OrderDetail from '../screens/OrderDetails';
 import HomeScreen from '../screens/HomeScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
-import ProductsOfCategory from '../screens/ProductsOfCategory';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Category from '../screens/Category';
 
 const Tab = createBottomTabNavigator();
 
-export default TabNav = () => {
+const tabScreens = [
+  {
+    name: 'HomeScreen',
+    component: HomeScreen,
+    label: 'Home',
+    icon: 'home',
+    unmountOnBlur: true,
+  },
+  {
+    name: 'Category',
+    component: Category,
+    label: 'Category',
+    icon: 'apps',
+  },
+  {
+    name: 'OrderDetail',
+    component: OrderDetail,
+    label: 'Orders',
+    icon: 'shopping-cart',
+  },
+];
+
+const TabNav = () => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'Main') {
-            iconName = focused ? 'home' : 'home';
-          } else if (route.name === 'Category') {
-            iconName = focused ? 'apps-sharp' : 'apps-sharp';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person';
-          }
-
-          return <Icon name={iconName} size={size} color={color} />;
+        tabBarStyle: {
+          height: 60,
+          paddingHorizontal: 10,
+          paddingTop: 5,
+          paddingBottom: 5,
+          backgroundColor: '#fff',
+          borderTopWidth: 0.5,
+          borderTopColor: '#e0e0e0',
         },
-      })}
-
+        tabBarActiveTintColor: '#ff6600',
+        tabBarInactiveTintColor: '#888',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          marginBottom: 5,
+        },
+      }}
     >
-      <Tab.Screen
-        name="Main"
-        component={HomeScreen}
-        options={{ tabBarLabel: 'Home', unmountOnBlur: true }}
-      />
-      <Tab.Screen
-        name="Category"
-        component={Category}
-        options={{ tabBarLabel: 'Category' }}
-      />
-      <Tab.Screen
-        name="OrderDetail"
-        component={OrderDetail}
-        options={{tabBarShowLabel:false }}
-      />
+      {tabScreens.map(({ name, component, label, icon, unmountOnBlur }) => (
+        <Tab.Screen
+          key={name}
+          name={name}
+          component={component}
+          options={{
+            tabBarLabel: label,
+            unmountOnBlur,
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name={icon} color={color} size={size} />
+            ),
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 };
+
+export default TabNav;

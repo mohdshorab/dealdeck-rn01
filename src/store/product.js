@@ -60,7 +60,8 @@ export default class Products {
     @action
     loadProductsCategories = async () => {
         const res = await getProductsCategories();
-        (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : {}
+        console.log('RESP',res);
+        (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : null
     }
 
     @action

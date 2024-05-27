@@ -1,131 +1,135 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  TextInput,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, TextInput } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useStore } from '../../store';
+import { observer } from 'mobx-react';
 
-const CustomHeader = ({title, canGoBack, FullHeader, productDetail}) => {
-  const navigation = useNavigation();
+const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart }) => {
+  const { cart } = useStore();
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
-  const HomeHead = () => {
-    return (
-      <View style={{flexDirection: 'row', alignItems: 'center', backgroundColor: 'white'}}>
-        <View style={styles.container}>
-          <TouchableOpacity style={styles.iconContainer}>
-            <Icon
-              name="search"
-              size={24}
-              color="#00c0ff"
-              style={styles.iconStyle}
-            />
+  const handleSearchIconPress = () => {
+    setIsSearchBarVisible(true);
+    setSearchText('');
+  };
+
+  const handleSearchBlur = () => {
+    setIsSearchBarVisible(false);
+  };
+
+  const handleSearchTextChange = (text) => {
+    setSearchText(text);
+  };
+
+  return (
+    <View style={styles.container}>
+      {showFullHead ? (
+        <>
+          <Image
+            source={require('../../assets/images/dealdeck_logo.png')}
+            style={{
+              height: 40,
+              width: 40,
+              resizeMode: 'contain',
+              borderRadius: 35,
+            }}
+          />
+          {/* Input Bar */}
+          <View style={styles.inputContainer}>
+            <Icon name="search" size={24} color="#000" />
+            <Text style={styles.inputPlaceholder}>Search items</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
+            <Icon name="shopping-cart" size={24} color="#000" />
+            <Text>{cart.cartItems.length}</Text>
           </TouchableOpacity>
-          <TextInput style={styles.searchInput} placeholder="Search" />
-        </View>
-        <TouchableOpacity onPress={()=>{navigation.navigate('TabNav')}} >
-        <Image
-          source={require('../../assets/images/dealdeck_logo.png')}
-          style={{
-            height: 50,
-            width: 50,
-            resizeMode: 'contain',
-            borderRadius: 35,
-          }}
-        />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+        </>
+      ) : (
+        < View style={[styles.productDetailHeader, { justifyContent: showCart ? 'space-between' : null }]}>
 
-  const Head = () => {
-    return (
-      <View style={[styles.HeaderContainer, {backgroundColor: 'white'}]}>
-        <View style={styles.left}>
-          {canGoBack ? (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="chevron-left" size={24} color="black" />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-        {title ? (
-          <Text style={{fontWeight: 'bold', fontSize: 25,     color: 'black'        }}> {title} </Text>
-        ) : null}
-        {productDetail ? (
-          <View style={styles.prodDetailsRight}>
-            <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Cart')}
-                style={{marginRight: 45}}>
-                <Icon name="heart" size={24} color="red" />
-              </TouchableOpacity>
-              <Icon name="heart" size={24} color="gray" />
-              <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                <Icon name="share" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-back-ios" size={20} color="#000" />
+          </TouchableOpacity>
+          <View style={styles.titleContainer}>
+            <Text style={styles.productName}>{titleOnHead}</Text>
           </View>
-        ) : (
-          <View style={styles.prodDetailsRight}>
-            <TouchableOpacity onPress={() => {}} style={{marginRight: 10}}>
-              <Icon
-                name="search"
-                size={24}
-                color="#00c0ff"
-                style={styles.iconStyle}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    );
-  };
-
-  return FullHeader ? <HomeHead /> : <Head />;
-};
-
-export default CustomHeader;
+          {showCart ?
+            (
+              <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
+                <Icon name="shopping-cart" size={24} color="#000" />
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: -5,
+                    fontWeight: 'bold',
+                    backgroundColor: 'red',
+                    borderRadius: 10,
+                    width: 15,
+                    alignItems: 'center'
+                  }
+                  }
+                >
+                  <Text style={{color:'white', fontWeight: 'bold', fontSize:12}} >{cart.cartItems.length}</Text>
+                </View>
+              </TouchableOpacity>
+            )
+            : null}
+        </View>
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
-  HeaderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    verticalAlign: 'middle',
-    height: 50,
-    backgroundColor: '#00C0FF',
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontWeight: '800',
-    fontSize: 25,
-    color: 'white',
-  },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    margin: 10,
-    marginBottom: 10,
-    width: '80%',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  iconContainer: {
-    padding: 8,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flex: 1,
+    marginHorizontal: 16,
+  },
+  inputPlaceholder: {
+    marginLeft: 8,
+    color: '#000',
   },
   searchInput: {
     flex: 1,
-    color: 'black'
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: '#000',
   },
-  iconStyle: {
-    marginRight: 15,
-    marginTop: 4,
+  productDetailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignContent: 'flex-start',
+    flex: 1,
+  },
+  productName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: 16,
   },
 });
+
+export default CustomHeader;

@@ -1,11 +1,13 @@
 import React from "react";
 import Products from "./product";
 import AuthStore from "./auth";
+import CartStore from "./cart";
 class Store{
     constructor(){
         // this.DealdeckStore, These properties hold the instances of the individual stores.
         this.products = new Products(this);
         this.auth = new AuthStore(this);
+        this.cart = new CartStore(this);
     }
 }
 // The stores object is created as an instance of the Store class.

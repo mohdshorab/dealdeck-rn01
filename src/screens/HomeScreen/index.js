@@ -59,10 +59,13 @@ const HomeScreen = observer(({ navigation }) => {
     setLoader(false);
   };
 
-  const categoryWithImages = products.productCategories.map(categoryName => ({
-    name: categoryName,
-    image: CategoryImages[categoryName],
-  }));
+  const categoryWithImages = products.productCategories.map(item => (
+    {
+      name: item.name,
+      image: CategoryImages[item.slug],
+      slug: item.slug
+    }
+  ));
 
   const handleRefresh = () => {
     setLoader(true);
@@ -77,7 +80,7 @@ const HomeScreen = observer(({ navigation }) => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <CustomHeader title={'DealDeck'} FullHeader />
+        <CustomHeader showFullHead navigation={navigation} />
         <ActivityIndicator size={'large'} />
       </SafeAreaView>
     );
@@ -85,7 +88,7 @@ const HomeScreen = observer(({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CustomHeader title={'DealDeck'} FullHeader />
+      <CustomHeader showFullHead navigation={navigation} />
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -104,22 +107,19 @@ const HomeScreen = observer(({ navigation }) => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {categoryWithImages.length > 0 &&
               categoryWithImages.map(item => {
-                const formattedName = item.name
-                  .replace(/-/, ' ')
-                  .replace(/\b\w/g, match => match.toUpperCase());
                 return (
                   <TouchableOpacity
                     key={item.name}
                     style={styles.itemContainer}
                     onPress={() => {
                       navigation.navigate('ProductsOfCategory', {
-                        category: item.name,
+                        category: item.slug,
                       });
                     }}>
                     <View style={styles.imageContainer}>
                       <Image source={{ uri: item.image }} style={styles.image} />
                     </View>
-                    <Text style={styles.name}>{formattedName}</Text>
+                    <Text style={styles.name}>{item.name}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -250,7 +250,7 @@ const HomeScreen = observer(({ navigation }) => {
             }}>
             Products you may like
           </Text>
-          <TouchableOpacity onPress={()=>navigation.navigate('ProductsYouMayLike')} >
+          <TouchableOpacity onPress={() => navigation.navigate('ProductsYouMayLike')} >
             <Text style={{ color: '#51AF75', fontWeight: '700' }}>See all</Text>
           </TouchableOpacity>
         </View>

@@ -89,7 +89,7 @@ const SignUpForm = ({ navigation }) => {
         else if (!isPhoneEmpty && !isPhoneValid) { ShowToast({ type: "error", text1: "Inavlid phone number.", color: "red" }) }
         else if (!isPasswordEmpty && !isValidPassword) { ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" }) }
         else if (!isEmailEmpty && !isPasswordEmpty && !isFnameEmpty && !isPhoneEmpty && isValidEmail && isValidPassword && isFnameValid && isPhoneValid && doesPassMatch) {
-            const res = await Auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
+            const res = await auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
             if (res?.status === "success") {
                 toggleModal();
             } else ShowToast({ type: "error", text1: res?.message, color: "red" })
