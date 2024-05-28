@@ -21,7 +21,12 @@ import NetInfo from '@react-native-community/netinfo';
 import { stores } from './src/store';
 import codePush from "react-native-code-push";
 import ShowToast from './src/components/Toast/toast';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
+GoogleSignin.configure({
+  webClientId: '244754131896-gpf8hsp80krih26ibl8uifnktl742tt6.apps.googleusercontent.com',
+  iosClientId:'244754131896-m4uqtcvk34u32dv7h4mkjg4aj4489pgc.apps.googleusercontent.com'
+});
 
 
 let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };

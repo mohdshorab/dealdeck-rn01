@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import LogInForm from "../screens/LogIn/login";
-import SignUpForm from "../screens/SignUp/signUpForm";
+import SignUpForm from "../screens/SignUp";
 import Profile from "../screens/Profile";
 import HomeScreen from "../screens/HomeScreen";
 import TabNav from "./TabNav";
@@ -19,6 +19,8 @@ const unProtectedRoutes = [
 ];
 
 const protectedRoutes = [
+  { name: "logInForm", component: LogInForm },
+  { name: "signUpForm", component: SignUpForm },
   { name: "Home", component: TabNav },
   { name: "ProductsYouMayLike", component: ProductsYouMayLike },
   { name: "ProductsOfCategory", component: ProductsOfCategory },
@@ -34,7 +36,7 @@ const AppStackNavigation = (isLoggedIn) => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={initialRouteName}
+        initialRouteName={'logInForm'}
         screenOptions={{ headerShown: false }}
       >
         {protectedRoutes.map(({ name, component }) => (

@@ -9,7 +9,6 @@ export const checkUserExistOrNotInFSTore = async (email, password) => {
             .where('password', '==', password)
             .get();
         if (!querySnapshot.empty) {
-            // User exists
             const userData = querySnapshot.docs[0].data(); // Assuming there's only one user with the given email and password
             return userData;
         } else {
@@ -28,7 +27,7 @@ export const loginWithEmailAndPassword = async (data) => {
 
         if (userDoc) {
             const userId = userDoc.id;
-            userDoc.isLoggedIn = true; 
+            userDoc.isLoggedIn = true;
             // Create a new object in the "loggedInUsers" collection with the additional "status" key
             await firestore().collection('loggedInUsers').add(userDoc);
             return { ...userDoc, status: 'success' };
@@ -44,12 +43,14 @@ export const loginWithEmailAndPassword = async (data) => {
 export const registerUserToFirestore = async (user) => {
     const { selectedImageURI, firstName, lastName, email, phone, passwordAgain } = user;
     const userExist = await checkUserExistOrNotInFSTore(email, passwordAgain);
-    const usersCollection = firestore().collection('users');
+    const usersCollection = firestore().collection('Users');
+    console.log('usersCollection:', usersCollection);
     const querySnapshot = await usersCollection.get();
-    const newId = querySnapshot.size + 1;
+    let newId = 0;
+    newId = querySnapshot.size + 1;
+    console.log('usersCollection:', newId);
 
     if (userExist) {
-        console.log('user exist', userExist);
         return { status: 'exist' };
     }
     const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
@@ -62,6 +63,8 @@ export const registerUserToFirestore = async (user) => {
             password: passwordAgain,
             avatar: selectedImageURI,
             fullname: firstName + '' + lastName,
+            fname: firstName,
+            lname: lastName,
             mobile: phone,
         },
         username: firstName,
@@ -69,12 +72,10 @@ export const registerUserToFirestore = async (user) => {
         updatedAt: null,
         isLoggedIn: false,
     }
-    console.log('New user detail :', newUser);
-
     try {
+        console.log('DEBUG');
         // Add the new user object to Firestore with an automatically generated document ID
-        await usersCollection.doc(newId.toString()).add(newUser);
-        // console.log('docref',docRef);
+        await usersCollection.doc(newId.toString()).set(newUser);
         return { ...newUser, status: 'success' };
     } catch (error) {
         console.log('Error registering user:', error);

@@ -8,8 +8,6 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Platform,
-  ImageBackground,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
@@ -24,19 +22,28 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
 
 const HomeScreen = observer(({ navigation }) => {
-  const { auth, products } = useStore();
+  const { products } = useStore();
   const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setLoader] = useState(false);
+  const [isLoading, setLoader] = useState(true);
+  const [error, setError] = useState('');
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
   const [nextGenProducts, setNextGenProducts] = useState([]);
 
   useEffect(() => {
-    setLoader(true);
-    products.loadProductsCategories();
-    products.loadRandomProducts();
-    fetchRecentlyViewedProducts();
-    getTheNextGenProducts();
-    console.log(products.randomProduct);
+    const loadData = async () => {
+      try {
+        await products.loadProductsCategories();
+        await products.loadRandomProducts();
+        await fetchRecentlyViewedProducts();
+        await getNextGenProducts();
+      } catch (err) {
+        setError('Unable to fetch data');
+      } finally {
+        setLoader(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const fetchRecentlyViewedProducts = async () => {
@@ -45,43 +52,57 @@ const HomeScreen = observer(({ navigation }) => {
       setRecentlyViewedProducts(product || []);
     } catch (error) {
       console.error('Error fetching recently viewed products:', error);
-      setRecentlyViewedProducts([]);
+      setError('Unable to fetch data');
     }
   };
 
-  const getTheNextGenProducts = async () => {
+  const getNextGenProducts = async () => {
     try {
       const res = await products.loadNextGenProduct();
       setNextGenProducts(res);
     } catch (error) {
       console.error('Error loading Next Gen products:', error);
+      setError('Unable to fetch data');
     }
-    setLoader(false);
   };
 
-  const categoryWithImages = products.productCategories.map(item => (
-    {
-      name: item.name,
-      image: CategoryImages[item.slug],
-      slug: item.slug
-    }
-  ));
+  const categoryWithImages = products.productCategories.map(item => ({
+    name: item.name,
+    image: CategoryImages[item.slug],
+    slug: item.slug
+  }));
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setLoader(true);
     setRefreshing(true);
-    products.loadProductsCategories();
-    products.loadRandomProducts();
-    fetchRecentlyViewedProducts();
-    setRefreshing(false);
-    setLoader(false);
+    try {
+      await products.loadProductsCategories();
+      await products.loadRandomProducts();
+      await fetchRecentlyViewedProducts();
+    } catch (err) {
+      setError('Unable to fetch data');
+    } finally {
+      setRefreshing(false);
+      setLoader(false);
+    }
   };
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <CustomHeader showFullHead navigation={navigation} />
-        <ActivityIndicator size={'large'} />
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <CustomHeader showFullHead navigation={navigation} />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -91,52 +112,34 @@ const HomeScreen = observer(({ navigation }) => {
       <CustomHeader showFullHead navigation={navigation} />
       <ScrollView
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            title="Release to refresh"
-          />
-        }>
-        <Carousel
-          images={carouselJson.images}
-          autoplay={true}
-          showsPagination={true}
-        />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <Carousel images={carouselJson.images} autoplay showsPagination />
         <View>
           <Text style={styles.collectionText}>Collections</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {categoryWithImages.length > 0 &&
-              categoryWithImages.map(item => {
-                return (
-                  <TouchableOpacity
-                    key={item.name}
-                    style={styles.itemContainer}
-                    onPress={() => {
-                      navigation.navigate('ProductsOfCategory', {
-                        category: item.slug,
-                      });
-                    }}>
-                    <View style={styles.imageContainer}>
-                      <Image source={{ uri: item.image }} style={styles.image} />
-                    </View>
-                    <Text style={styles.name}>{item.name}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-          </ScrollView>
+          {categoryWithImages.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {categoryWithImages.map(item => (
+                <TouchableOpacity
+                  key={item.name}
+                  style={styles.itemContainer}
+                  onPress={() => navigation.navigate('ProductsOfCategory', { category: item.slug })}
+                >
+                  <View style={styles.imageContainer}>
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  </View>
+                  <Text style={styles.name}>{item.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.errorText}>Unable to fetch collections</Text>
+          )}
         </View>
-        {/* <View
-          style={{
-            height: 3,
-            backgroundColor: 'gray',
-            alignSelf: 'center',
-            width: '100%',
-            marginVertical: 5,
-          }}
-        /> */}
         {recentlyViewedProducts.length > 0 ? (
           <>
-            <Text style={styles.recentlyViewText}>Recently viewed Items</Text>
+            <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
             <FlatList
               data={recentlyViewedProducts}
               horizontal
@@ -144,69 +147,44 @@ const HomeScreen = observer(({ navigation }) => {
               keyExtractor={item => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('ProductDetail', { productData: item });
-                  }}
-                  style={[styles.productTile]}>
-                  <Image
-                    source={{ uri: item.thumbnail }}
-                    style={styles.productImage}
-                    resizeMode="contain"
-                  />
+                  onPress={() => navigation.navigate('ProductDetail', { productData: item })}
+                  style={styles.productTile}
+                >
+                  <Image source={{ uri: item.thumbnail }} style={styles.productImage} resizeMode="contain" />
                   <Text style={styles.productName}>{item.title}</Text>
                   <Text style={styles.productBrand}>{item.brand}</Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      alignSelf: 'center',
-                    }}>
-                    <Text style={styles.productPrice}>${item.price} </Text>
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.productPrice}>${item.price}</Text>
                     <Icon name="chevron-right" color="green" size={13} />
                     <Text style={styles.productDiscountPrice}>
-                      {' '}
-                      ${' '}
-                      {(
-                        item.price -
-                        (item.price * item.discountPercentage) / 100
-                      ).toFixed(0)}
+                      ${(item.price - (item.price * item.discountPercentage) / 100).toFixed(0)}
                     </Text>
                   </View>
                 </TouchableOpacity>
               )}
             />
           </>
-        ) : null}
+        ) : (
+          <Text style={styles.errorText}>Unable to fetch recently viewed items</Text>
+        )}
         <SaleBanner
-          saleText={'Laptop Sale'}
-          sloganText={'Unleash Your Productivity, Anywhere'}
-          discountText={'Up to 50% OFF'}
+          saleText="Laptop Sale"
+          sloganText="Unleash Your Productivity, Anywhere"
+          discountText="Up to 50% OFF"
           bgImage={require('../../assets/images/black-bg.jpg')}
           floatingImage1={require('../../assets/images/legion_nobg.png')}
           floatingImage2={require('../../assets/images/ROG_NOBG.png')}
-          onPress={() => {
-            navigation.navigate('ProductsOfCategory', { category: 'laptops' });
-          }}
+          onPress={() => navigation.navigate('ProductsOfCategory', { category: 'laptops' })}
         />
-        {/* New In products snippet */}
-        <View style={styles.NewInView}>
-          <Text
-            style={{
-              fontSize: 20,
-              marginLeft: 10,
-              fontWeight: '700',
-              color: 'black',
-            }}>
-            Next Gen Products
-          </Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Next Gen Products</Text>
           <TouchableOpacity>
-            <Text style={{ color: '#51AF75', fontWeight: '700' }}>See all</Text>
+            <Text style={styles.seeAllText}>See all</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {nextGenProducts.length > 0 &&
-            nextGenProducts.map(item => {
+        {nextGenProducts && nextGenProducts.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {nextGenProducts.map(item => {
               const formattedName =
                 item.title.split(' ').length > 2
                   ? item.title.split(' ').slice(-2).join(' ')
@@ -216,46 +194,31 @@ const HomeScreen = observer(({ navigation }) => {
                 <TouchableOpacity
                   key={item.name}
                   style={styles.itemContainer}
-                  onPress={() => {
-                    console.log('SSS', item.title);
-                    navigation.navigate('ProductsOfCategory', { category: item.title });
-                  }}>
+                  onPress={() => navigation.navigate('ProductsOfCategory', { category: item.title })}
+                >
                   <View style={styles.imageContainer}>
-                    <Image
-                      source={{ uri: item.images[0] }}
-                      style={styles.image}
-                    />
+                    <Image source={{ uri: item.images[0] }} style={styles.image} />
                   </View>
                   <Text style={styles.name}>{formattedName}</Text>
                 </TouchableOpacity>
               );
             })}
-        </ScrollView>
-        <View
-          style={{
-            height: 3,
-            backgroundColor: 'gray',
-            alignSelf: 'center',
-            width: '100%',
-            marginVertical: 5,
-          }}
-        />
-        <View style={styles.NewInView}>
-          <Text
-            style={{
-              fontSize: 20,
-              marginLeft: 10,
-              fontWeight: '700',
-              color: 'black',
-            }}>
-            Products you may like
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ProductsYouMayLike')} >
-            <Text style={{ color: '#51AF75', fontWeight: '700' }}>See all</Text>
+          </ScrollView>
+        ) : (
+          <>
+            <Text style={styles.errorText}>Unable to fetch Next Gen products</Text>
+            <Text style={[styles.errorText, color='green']}>Refresh to retry</Text>
+          </>
+        )}
+        <View style={styles.divider} />
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Products you may like</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ProductsYouMayLike')}>
+            <Text style={styles.seeAllText}>See all</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.NewItemsList}>
-          <View style={styles.NewItemsList}>
+        {products.randomProduct.length > 0 ? (
+          <View style={styles.newItemsList}>
             {products.randomProduct.map((item, index) => {
               if (index % 3 === 0) {
                 const nextItem1 = products.randomProduct[index + 1];
@@ -263,27 +226,17 @@ const HomeScreen = observer(({ navigation }) => {
                 return (
                   <View style={styles.rowContainer} key={item.id}>
                     <MasonryTiles product={item} navigation={navigation} />
-                    {nextItem1 && (
-                      <MasonryTiles
-                        product={nextItem1}
-                        index={index}
-                        navigation={navigation}
-                      />
-                    )}
-                    {nextItem2 && (
-                      <MasonryTiles
-                        product={nextItem2}
-                        index={index}
-                        navigation={navigation}
-                      />
-                    )}
+                    {nextItem1 && <MasonryTiles product={nextItem1} navigation={navigation} />}
+                    {nextItem2 && <MasonryTiles product={nextItem2} navigation={navigation} />}
                   </View>
                 );
               }
               return null;
             })}
           </View>
-        </View>
+        ) : (
+          <Text style={styles.errorText}>Unable to fetch products you may like</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -294,10 +247,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  NewItemsList: {
-    padding: 10,
-    paddingTop: 3,
-    // backgroundColor: '#ADD8E6'
+  collectionText: {
+    fontSize: 20,
+    margin: 10,
+    fontWeight: '700',
+    color: 'black',
+  },
+  recentlyViewedText: {
+    fontSize: 20,
+    marginLeft: 10,
+    fontWeight: '700',
+    marginTop: 5,
+    color: 'black',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
   },
   itemContainer: {
     padding: 5,
@@ -321,11 +292,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10, // Adjust the spacing between rows if needed
-  },
   productTile: {
     padding: 10,
     borderRadius: 20,
@@ -341,44 +307,55 @@ const styles = StyleSheet.create({
   productName: {
     fontWeight: 'bold',
     marginTop: 5,
-    flex: 1,
-    flexWrap: 'wrap',
     textAlign: 'center',
-    color: '#2D333A',
     color: 'black',
+  },
+  productBrand: {
+    fontWeight: 'bold',
+    marginTop: 5,
+    textAlign: 'center',
+    color: 'black',
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  productPrice: {
+    color: 'green',
+    textDecorationLine: 'line-through',
+    marginTop: 2,
   },
   productDiscountPrice: {
     color: 'green',
     marginTop: 2,
   },
-  productPrice: {
-    color: 'green',
-    marginTop: 2,
-    textDecorationLine: 'line-through',
-  },
-  productBrand: {
-    fontWeight: 'bold',
-    marginTop: 5,
-    flex: 1,
-    flexWrap: 'wrap',
-    textAlign: 'center',
-    color: 'black',
-  },
-  collectionText: { fontSize: 20, margin: 10, fontWeight: '700', color: 'black' },
-  recentlyViewText: {
-    fontSize: 20,
-    marginLeft: 10,
-    fontWeight: '700',
-    marginTop: 5,
-    color: 'black',
-  },
-  NewInView: {
+  sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    width: '95%',
-    marginTop: 20,
-    marginBottom: 5,
+    padding: 10,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'black',
+  },
+  seeAllText: {
+    color: 'blue',
+  },
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    marginVertical: 10,
+  },
+  newItemsList: {
+    padding: 10,
+    paddingTop: 3,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
 });
 

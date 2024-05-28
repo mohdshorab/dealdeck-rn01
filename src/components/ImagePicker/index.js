@@ -34,8 +34,6 @@ const ImagePickerComponent = ({ onSelectImage }) => {
 
   const handleSelectFromGallery = async () => {
     try {
-
-
       const result = await launchImageLibrary(options);
       if (result?.assets) {
         const res = `data:image/jpeg;base64,${result?.assets[0]?.base64}`;

@@ -17,7 +17,7 @@ export const ProductsYouMayLike = observer(({ navigation }) => {
                         navigation.push('ProductDetail', { productData: products.randomProduct[0] })
                     }}
                     style={{
-                        height: 300, borderRadius: 10, borderWidth: 1, marginBottom: 25,
+                        height: 300, borderRadius: 10, borderWidth: 1, marginBottom: 25, padding:10, 
                     }} >
                     <Image source={{ uri: products.randomProduct[0].thumbnail }} style={{ height: 200, width: '100%', borderTopLeftRadius: 25, borderTopRightRadius: 25 }} resizeMode="cover" />
                     <Text style={{ fontWeight: 'bold', alignSelf: 'center', color: 'black', fontSize: 20, marginVertical: 10 }} >{products.randomProduct[0].title}</Text>

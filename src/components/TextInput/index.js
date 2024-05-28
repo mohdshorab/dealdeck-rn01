@@ -17,6 +17,8 @@ const CustomTextInput = ({ placeholder, onChangeText, value,style={},  backgroun
             secureTextEntry={secureTextEntry ? secureTextEntry : false}
             scrollEnabled={false}
             keyboardType={keyboardType}
+            autoCapitalize='none'
+            placeholderTextColor={'black'}
         />
     );
 };

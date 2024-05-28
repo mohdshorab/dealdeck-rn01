@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useStore } from '../../store';
 import { observer } from 'mobx-react';
 
-const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart }) => {
+const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart, titleStyle }) => {
   const { cart } = useStore();
   const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -42,7 +42,19 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
             <Icon name="shopping-cart" size={24} color="#000" />
-            <Text>{cart.cartItems.length}</Text>
+            <Text
+              style={{
+                position: 'absolute',
+                top: -10,
+                right: -5,
+                fontWeight: 'bold',
+                backgroundColor: 'red',
+                borderRadius: 10,
+                width: 15,
+                alignItems: 'center',
+                paddingLeft: 4
+              }}
+            >{cart.cartItems.length}</Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -52,30 +64,31 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
             <Icon name="arrow-back-ios" size={20} color="#000" />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
-            <Text style={styles.productName}>{titleOnHead}</Text>
+            <Text style={[styles.productName, titleStyle]}>{titleOnHead}</Text>
           </View>
-          {showCart ?
-            (
-              <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
-                <Icon name="shopping-cart" size={24} color="#000" />
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: -10,
-                    right: -5,
-                    fontWeight: 'bold',
-                    backgroundColor: 'red',
-                    borderRadius: 10,
-                    width: 15,
-                    alignItems: 'center'
-                  }
-                  }
-                >
-                  <Text style={{color:'white', fontWeight: 'bold', fontSize:12}} >{cart.cartItems.length}</Text>
-                </View>
-              </TouchableOpacity>
-            )
-            : null}
+          {
+            showCart ?
+              (
+                <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
+                  <Icon name="shopping-cart" size={24} color="#000" />
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: -10,
+                      right: -5,
+                      fontWeight: 'bold',
+                      backgroundColor: 'red',
+                      borderRadius: 10,
+                      width: 15,
+                      alignItems: 'center'
+                    }
+                    }
+                  >
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart.cartItems.length}</Text>
+                  </View>
+                </TouchableOpacity>
+              )
+              : null}
         </View>
       )}
     </View>

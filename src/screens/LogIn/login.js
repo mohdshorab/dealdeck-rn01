@@ -1,6 +1,12 @@
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import {
-    Image, StyleSheet, TouchableOpacity, View, Text, KeyboardAvoidingView, ScrollView
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+    Text,
+    ScrollView,
+    Alert
 } from "react-native";
 import CustomTextInput from "../../components/TextInput";
 import dealdeck_logo from '../../assets/images/dealdeck_logo.png';
@@ -9,7 +15,6 @@ import Icon from 'react-native-vector-icons/Entypo';
 import { SafeAreaView } from "react-native-safe-area-context";
 import GooglePNG from '../../assets/images/GooglePNG.png';
 import PhonePNG from '../../assets/images/PhonePNG.png';
-import ShowToast from "../../components/Toast/toast";
 import { useStore } from "../../store";
 import { observer } from 'mobx-react';
 
@@ -17,114 +22,113 @@ const LogInForm = observer(({ navigation }) => {
     const { auth } = useStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showEmailWarning, setShowEmailWarning] = useState(false);
-    const [showPasswordWarning, setShowPasswordWarning] = useState(false);
+    const [emailWarning, setEmailWarning] = useState('');
+    const [passwordWarning, setPasswordWarning] = useState('');
 
     const handleEmailChange = (text) => {
         setEmail(text);
-        setShowEmailWarning(false); // Update showEmailWarning to false on input change
+        setEmailWarning('');
     };
 
     const handlePasswordChange = (text) => {
         setPassword(text);
-        setShowPasswordWarning(false); // Update showEmailWarning to false on input change
+        setPasswordWarning('');
     };
 
-    const inputValidation = async () => {
-        // const isEmailEmpty = email.trim() === '';
-        // const isPasswordEmpty = password.trim() === '';
-        // setShowEmailWarning(isEmailEmpty);
-        // setShowPasswordWarning(isPasswordEmpty);
-        // const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
-        // const isValidEmail = mailReg.test(email);
-        // const isValidPassword = passReg.test(password);
-        // if (!isEmailEmpty && !isPasswordEmpty && !isValidEmail) {
-        //     ShowToast({ type: "error", text1: "Inavlid email", color: "red" })
-        // } else if (!showPasswordWarning && !isEmailEmpty && !isValidPassword) {
-        //     ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" })
-        // } else if (!showEmailWarning && !showPasswordWarning && isValidEmail && isValidPassword) {
-        //     const res = await auth.login({ email, password });
-        //     if (res?.status === "success") {
-        //         console.log('res', res);
-        //         navigation.navigate('mainScreen')
-        //     } else {
-        //         ShowToast({ type: "error", text1: res?.message, color: "red" })
-        //     }
-        // }
-        navigation.navigate('TabNav')
-    }
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email) && !/\s/.test(email);
+    };
 
+    const inputValidation = () => {
+        let valid = true;
+
+        if (!email) {
+            setEmailWarning('Email is empty');
+            valid = false;
+        } else if (!validateEmail(email)) {
+            setEmailWarning('Please enter a correct email');
+            valid = false;
+        }
+
+        if (!password) {
+            setPasswordWarning('Password is empty');
+            valid = false;
+        }
+
+        if (valid) {
+
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
-                <View style={{ alignItems: "center", marginTop: 25 }} >
+                <View style={styles.logoContainer}>
                     <Image style={styles.dealDeackLogo} source={dealdeck_logo} />
                 </View>
-                <View style={{ paddingHorizontal: 25 }} >
-                    <Text style={{ fontSize: 28, fontWeight: '500', color: '#00C0FF', marginBottom: 30 }} >Login</Text>
-                    {showEmailWarning && (
-                        <Text style={styles.warningText}>Email is empty</Text>
-                    )}
-                    <View style={{ flexDirection: 'row', borderBottomColor: "#00C0FF", borderBottomWidth: 1, paddingBottom: 0, marginBottom: 28 }} >
-                        <Icon name="mail" size={24} color="#00c0ff" style={{ marginRight: 15, marginTop: 4 }} />
+                <View style={styles.formContainer}>
+                    <Text style={styles.loginText}>Login</Text>
+                    {emailWarning ? (
+                        <Text style={styles.warningText}>{emailWarning}</Text>
+                    ) : null}
+                    <View style={styles.inputContainer}>
+                        <Icon name="mail" size={24} color="#00c0ff" style={styles.inputIcon} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
                             placeholder={"e-mail"}
                             value={email}
                             onChangeText={handleEmailChange}
                             keyboardType={'email-address'}
-                            style={{ flex: 1, paddingVertical: 0, }}
+                            style={styles.inputField}
                         />
                     </View>
-                    {showPasswordWarning && (
-                        <Text style={styles.warningText}>Password is empty</Text>
-                    )}
-                    <View style={{ flexDirection: 'row', borderBottomColor: "#00C0FF", borderBottomWidth: 1, paddingBottom: 0, marginBottom: 5 }} >
-                        <Icon name="lock" size={24} color="#00c0ff" style={{ marginRight: 15, marginTop: 4 }} />
+                    {passwordWarning ? (
+                        <Text style={styles.warningText}>{passwordWarning}</Text>
+                    ) : null}
+                    <View style={styles.inputContainer}>
+                        <Icon name="lock" size={24} color="#00c0ff" style={styles.inputIcon} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
                             placeholder={"password"}
                             value={password}
                             onChangeText={handlePasswordChange}
-                            secureTextEntry={!auth.showPassword ? true : false}
-                            style={{ flex: 1, paddingVertical: 0, }}
+                            secureTextEntry={!auth.showPassword}
+                            style={styles.inputField}
                         />
-                        <TouchableOpacity onPress={() => auth.showPassword ? auth.willShowPassword(false) : auth.willShowPassword(true)}>
-                            {auth.showPassword ? <Icon name="eye" color="#808080" style={{ marginRight: 10 }} size={17} />
-                                : <Icon name="eye-with-line" color="#808080" style={{ marginRight: 10 }} size={17} />}
+                        <TouchableOpacity onPress={() => auth.willShowPassword(!auth.showPassword)}>
+                            {auth.showPassword ? (
+                                <Icon name="eye" color="#808080" style={styles.eyeIcon} size={17} />
+                            ) : (
+                                <Icon name="eye-with-line" color="#808080" style={styles.eyeIcon} size={17} />
+                            )}
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity >
-                        <Text style={{ color: '#000', fontWeight: '500', alignSelf: "flex-end" }} >Forgot password?</Text>
+                    <TouchableOpacity>
+                        <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                     </TouchableOpacity>
                     <CustomButton
                         title={"Log-In"}
-                        onPress={() => inputValidation()}
-                        buttonStyle={{ height: 30, paddingleft: 10, marginTop: 15 }}
-                        textStyle={{ fontSize: 18, }}
+                        onPress={inputValidation}
+                        buttonStyle={styles.loginButton}
+                        textStyle={styles.loginButtonText}
                     />
-                    <Text style={{ textAlign: "center", marginBottom: 30, marginTop: 30 }} >Or Login with...</Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', }} >
-                        <TouchableOpacity style={{ borderColor: '#ddd', borderWidth: 2, borderRadius: 10, paddingHorizontal: 30, paddingVertical: 10 }} >
-                            <Image source={GooglePNG} style={{ height: 40, width: 40, resizeMode: "cover" }} />
-                            <Text>Google</Text>
+                    <Text style={styles.orText}>Or Login with...</Text>
+                    <View style={styles.socialLoginContainer}>
+                        <TouchableOpacity style={styles.socialLoginButton} onPress={()=> auth.googleSignIn()} >
+                            <Image source={GooglePNG} style={styles.socialLoginIcon} />
+                            <Text style={{color: 'black'}} >Google</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ borderColor: '#ddd', borderWidth: 2, borderRadius: 10, paddingHorizontal: 30, paddingVertical: 10 }} >
-                            <Image source={PhonePNG} style={{ height: 40, width: 40, resizeMode: "cover" }} />
-                            <Text style={{ paddingTop: 10 }} >Mobile</Text>
+                        <TouchableOpacity style={styles.socialLoginButton} onPress={()=> navigation.navigate('Home')}>
+                            <Image source={PhonePNG} style={styles.socialLoginIcon} />
+                            <Text style={styles.mobileText}>Mobile</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={{ alignSelf: "center", flexDirection: 'row', marginTop: 80 }}>
-                        <Text style={{ fontWeight: 300, fontSize: 15 }} >New to the App?  </Text>
-                        <TouchableOpacity onPress={() => {
-                            navigation.navigate('signUpForm')
-                        }} >
-                            <Text style={{ color: "#00C0FF", fontSize: 15 }} >
-                                Register Yourself Here.
-                            </Text>
+                    <View style={styles.registerContainer}>
+                        <Text style={styles.registerText}>New to the App?  </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('signUpForm')}>
+                            <Text style={styles.registerLink}>Register Yourself Here.</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -132,11 +136,16 @@ const LogInForm = observer(({ navigation }) => {
         </SafeAreaView>
     )
 });
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
         backgroundColor: "#fff",
+    },
+    logoContainer: {
+        alignItems: "center",
+        marginTop: 25
     },
     dealDeackLogo: {
         height: 200,
@@ -144,15 +153,95 @@ const styles = StyleSheet.create({
         resizeMode: "cover",
         alignSelf: "center"
     },
-
+    formContainer: {
+        paddingHorizontal: 25
+    },
+    loginText: {
+        fontSize: 28,
+        fontWeight: '500',
+        color: '#00C0FF',
+        marginBottom: 30
+    },
     warningText: {
         color: 'red',
         fontSize: 12,
         marginTop: 5,
     },
+    inputContainer: {
+        flexDirection: 'row',
+        borderBottomColor: "#00C0FF",
+        borderBottomWidth: 1,
+        paddingBottom: 0,
+        marginBottom: 28
+    },
+    inputIcon: {
+        marginRight: 15,
+        marginTop: 4
+    },
+    inputField: {
+        flex: 1,
+        paddingVertical: 0,
+    },
+    eyeIcon: {
+        marginRight: 10
+    },
+    forgotPasswordText: {
+        color: '#000',
+        fontWeight: '500',
+        alignSelf: "flex-end"
+    },
+    loginButton: {
+        height: 30,
+        paddingLeft: 10,
+        marginTop: 15
+    },
+    loginButtonText: {
+        fontSize: 18,
+    },
+    orText: {
+        textAlign: "center",
+        marginBottom: 30,
+        marginTop: 30,
+        color:'black'
+    },
+    socialLoginContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+    },
+    socialLoginButton: {
+        borderColor: '#ddd',
+        borderWidth: 2,
+        borderRadius: 10,
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+        height: 150,
+        width: 150,
+        alignItems: 'center'
+    },
+    socialLoginIcon: {
+        height: 80,
+        width: 80,
+        resizeMode: "cover",
+        marginVertical: 10
+    },
+    mobileText: {
+        paddingTop: 10,
+        color: 'black'
+    },
+    registerContainer: {
+        alignSelf: "center",
+        flexDirection: 'row',
+        marginTop: 80
+    },
+    registerText: {
+        fontWeight: '300',
+        fontSize: 15,
+        color: 'black'
+    },
+    registerLink: {
+        color: "#00C0FF",
+        fontSize: 15
+    }
 });
-
-
-
 
 export default LogInForm;

@@ -1,5 +1,6 @@
 import { action, makeAutoObservable, observable } from "mobx";
 import { loginWithEmailAndPassword, registerUserToFirestore } from "../service/authServices";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export default class AuthStore {
 
@@ -9,7 +10,6 @@ export default class AuthStore {
     @observable notificationList
     @observable showPassword
     @observable isLoggedIn
-    @observable showLoader
 
     constructor(store) {
         this.store = store;
@@ -25,7 +25,6 @@ export default class AuthStore {
         this.isLogout = false;
         this.notificationList = [];
         this.isLoggedIn = true;
-        this.showLoader = false;
     }
 
     @action
@@ -35,20 +34,15 @@ export default class AuthStore {
 
     @action
     login = async (data) => {
-        this.showLoader = true;
         const res = await loginWithEmailAndPassword(data);
         if (res?.status === 'success') {
             this.profileData = res;
-            this.isLoggedIn = true;
-            this.showLoader = false;
             return res;
         }
         if (res?.status === false) {
-            this.showLoader = false;
-            return { message: "Please check your email and password, or try sign-up"};
+            return { message: "Please check your email and password, or try sign-up" };
         }
         if (res?.status === 'error') {
-            this.showLoader = false;
             return { message: 'Error encountered, Please connect with @dealdeck team' }
         }
 
@@ -56,14 +50,44 @@ export default class AuthStore {
 
     @action
     registerUser = async (data) => {
-        this.showLoader = true;
         const res = await registerUserToFirestore(data);
         if (res?.status === 'success') {
-            this.showLoader = false;
             return res;
         }
-        if (res?.status === 'exist') { this.showLoader = false; return { message: 'User already exist, please login.' } }
-        if (res?.status === 'error') { { this.showLoader = false; return { message: 'Error encountered, Please connect with @dealdeck team' } } }
+        if (res?.status === 'exist') { return { message: 'User already exist, please login.' } }
+        if (res?.status === 'error') { return { message: 'Error encountered, Please connect with @dealdeck team' } }
+    }
+
+    @action
+    googleSignIn = async () => {
+        try {
+            await GoogleSignin.hasPlayServices();
+            await GoogleSignin.signIn().then(async (result) => {
+                this.email = result.user.email;
+                console.log("Google SSO Response ===> ", result);
+                if (response.status == 1) {
+                    console.log('SIGNEDIN')
+                }
+                else {
+                    this.isLoading = false
+                    console.log('Revoking access and signin out');
+                    GoogleSignin.revokeAccess();
+                    await GoogleSignin.signOut();
+                }
+            });
+        } catch (error) {
+            showAlert(`${error}`);
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                console.log('User cancelled the login flow !');
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                console.log('in-progress !');
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                console.log('Google play services not available or outdated !');
+            } else {
+                console.log(error)
+                this.isLoading = false
+            }
+        }
     }
 
 }

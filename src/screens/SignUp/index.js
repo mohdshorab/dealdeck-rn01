@@ -1,6 +1,7 @@
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView, Text, ScrollView, TouchableOpacity, View, Image, StyleSheet,
+    ActivityIndicator,
 } from "react-native";
 import Icon from 'react-native-vector-icons/Entypo';
 import CustomTextInput from "../../components/TextInput";
@@ -11,218 +12,216 @@ import GooglePNG from '../../assets/images/GooglePNG.png';
 import PhonePNG from '../../assets/images/PhonePNG.png';
 import ShowToast from "../../components/Toast/toast";
 import CustomModal from "../../components/Modal/customModal";
-
+import CustomHeader from "../../components/Header";
+import CustomLoader from "../../components/CustomLoader";
 
 const SignUpForm = ({ navigation }) => {
     const { auth } = useStore();
+    const [showLoader, setShowLoader] = useState(false);
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [phone, setPhone] = useState('');
-    const [passwordAgain, setPasswordAgain] = useState('')
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        phone: '',
+        passwordAgain: '',
+        firstName: '',
+        lastName: '',
+    });
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImageURI, setSelectedImageURI] = useState(null);
-    const [showEmailEmptyWarning, setShowEmailEmptyWarning] = useState(false);
-    const [showFnameEmptyWarning, setShowFnameWarning] = useState(false);
-    const [passDontMatchWarning, setPassDontMatchWarning] = useState(false);
-    const [showPhoneWarning, setShowPhoneWarning] = useState(false);
-    const [showPasswordWarning, setShowPasswordWarning] = useState(false);
-    const [showRePass, setshowRePass] = useState(false)
+    const [warnings, setWarnings] = useState({
+        showEmailEmptyWarning: false,
+        showFnameEmptyWarning: false,
+        passDontMatchWarning: false,
+        showPhoneWarning: false,
+        showPasswordWarning: false,
+    });
+    const [showRePass, setShowRePass] = useState(false);
 
-    const handleEmailChange = (text) => {
-        setEmail(text);
-        setShowEmailEmptyWarning(false); // Update showEmailWarning to false on input change
+    const handleInputChange = (field, value) => {
+        setFormData(prevState => ({
+            ...prevState,
+            [field]: value,
+        }));
+        setWarnings(prevState => ({
+            ...prevState,
+            [`${field}Warning`]: false,
+        }));
     };
-
-    const handleFirstNameChange = (text) => {
-        setFirstName(text);
-        setShowFnameWarning(false);
-    };
-
-    const handlePasswordChange = (text) => {
-        setPassword(text);
-        setShowPasswordWarning(false); // Update showEmailWarning to false on input change
-    };
-
-    const handlePasswordAgainChange = (text) => {
-        setPasswordAgain(text);
-        if (password === passwordAgain) { setPassDontMatchWarning(false) };
-    };
-
-    const handlePhoneChange = (text) => {
-        setPhone(text);
-        setShowPhoneWarning(false);
-    };
-
 
     const handleImageSelect = (imageURI) => {
         setSelectedImageURI(imageURI);
     };
 
     const toggleModal = () => {
-        setModalVisible(true);
+        setModalVisible(!modalVisible);
     };
 
     const inputValidation = async () => {
+        const { firstName, email, phone, password, passwordAgain, lastName } = formData;
         const isFnameEmpty = firstName.trim() === '';
         const isPhoneEmpty = phone.trim() === '';
         const isEmailEmpty = email.trim() === '';
         const isPasswordEmpty = password.trim() === '';
-        setShowEmailEmptyWarning(isEmailEmpty);
-        setShowPasswordWarning(isPasswordEmpty);
-        setShowFnameWarning(isFnameEmpty);
-        setShowPhoneWarning(isPhoneEmpty);
+
+        setWarnings({
+            showEmailEmptyWarning: isEmailEmpty,
+            showPasswordWarning: isPasswordEmpty,
+            showFnameEmptyWarning: isFnameEmpty,
+            showPhoneWarning: isPhoneEmpty,
+        });
+
         const fnameReg = /^[A-Za-z ]{1,10}$/;
         const mailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passReg = /^(?=.*[0-9a-zA-Z!@#$%^&*()-_=+~])[0-9a-zA-Z!@#$%^&*()-_=+~]{8,12}$/;
         const phoneReg = /^(?!0)\d{10}$/;
-        const doesPassMatch = (password === passwordAgain)
+        const doesPassMatch = (password === passwordAgain);
         const isFnameValid = fnameReg.test(firstName);
         const isPhoneValid = phoneReg.test(phone);
         const isValidEmail = mailReg.test(email);
         const isValidPassword = passReg.test(password);
-        if (!selectedImageURI) { ShowToast({ type: "error", text1: "Please upload you image.", color: "red" }) }
-        else if (!isFnameEmpty && !isFnameValid) { ShowToast({ type: "error", text1: "Inavlid name.", color: "red" }) }
-        else if (!isEmailEmpty && !isValidEmail) { ShowToast({ type: "error", text1: "Inavlid email.", color: "red" }) }
-        else if (!isPhoneEmpty && !isPhoneValid) { ShowToast({ type: "error", text1: "Inavlid phone number.", color: "red" }) }
-        else if (!isPasswordEmpty && !isValidPassword) { ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" }) }
-        else if (!isEmailEmpty && !isPasswordEmpty && !isFnameEmpty && !isPhoneEmpty && isValidEmail && isValidPassword && isFnameValid && isPhoneValid && doesPassMatch) {
-            const res = await auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
-            if (res?.status === "success") {
-                toggleModal();
-            } else ShowToast({ type: "error", text1: res?.message, color: "red" })
 
+        if (!selectedImageURI) {
+            ShowToast({ type: "error", text1: "Please upload your image.", color: "red" });
+        } else if (!isFnameEmpty && !isFnameValid) {
+            ShowToast({ type: "error", text1: "Invalid name.", color: "red" });
+        } else if (!isEmailEmpty && !isValidEmail) {
+            ShowToast({ type: "error", text1: "Invalid email.", color: "red" });
+        } else if (!isPhoneEmpty && !isPhoneValid) {
+            ShowToast({ type: "error", text1: "Invalid phone number.", color: "red" });
+        } else if (!isPasswordEmpty && !isValidPassword) {
+            ShowToast({ type: "error", text1: "Password must be at least 8 characters long", color: "red" });
+        } else if (!doesPassMatch) {
+            setWarnings(prevState => ({
+                ...prevState,
+                passDontMatchWarning: true,
+            }));
+        } else if (isValidEmail && isValidPassword && isFnameValid && isPhoneValid && doesPassMatch) {
+            setShowLoader(true);
+            if (lastName == null || '') lastName == 'NA';
+            const res = await auth.registerUser({ selectedImageURI, firstName, lastName , email, phone, passwordAgain });
+            if (res?.status === "success") {
+                setShowLoader(false)
+                toggleModal();
+            } else {
+                setShowLoader(false)
+                ShowToast({ type: "error", text1: res?.message, color: "red" });
+            }
         }
-    }
+    };
 
     return (
-        <SafeAreaView style={styles.container} >
-            <ScrollView scrollEnabled={false} >
-                <TouchableOpacity onPress={() => navigation.goBack()} >
-                    <Icon name="chevron-thin-left" size={25} style={styles.thinLeftIcon} />
-                </TouchableOpacity>
-                <View style={styles.body} >
-                    <Text style={styles.signUpText} >SIGN UP</Text>
-                    <Text style={styles.knowAboutText} >Let us know about yourself.</Text>
-                    <View style={styles.imagePicker} >
+        <SafeAreaView style={styles.container}>
+            <CustomHeader titleOnHead={'Register Yourself'} navigation={navigation} titleStyle={{ color: '#00C0FF' }} />
+            <CustomLoader show={showLoader} />
+            <ScrollView scrollEnabled={false}>
+                <View style={styles.body}>
+                    <Text style={styles.knowAboutText}>Let us know about yourself.</Text>
+                    <View style={styles.imagePicker}>
                         <Text style={styles.uploadImageText}>Upload your image</Text>
                         <ImagePickerComponent onSelectImage={handleImageSelect} />
                     </View>
-                    {showFnameEmptyWarning && (
+                    {warnings.showFnameEmptyWarning && (
                         <Text style={styles.warningText}>First name can't be empty</Text>
                     )}
-                    <View style={!showFnameEmptyWarning ? styles.userNameView : [styles.userNameView, { marginTop: 5 }]} >
-                        <View style={!showEmailEmptyWarning ? styles.firstNameView : [styles.firstNameView, { marginBottom: 10 }]} >
+                    <View style={!warnings.showFnameEmptyWarning ? styles.userNameView : [styles.userNameView, { marginTop: 5 }]}>
+                        <View style={!warnings.showEmailEmptyWarning ? styles.firstNameView : [styles.firstNameView, { marginBottom: 10 }]}>
                             <Icon name="user" size={24} color="#00c0ff" style={styles.icon} />
                             <CustomTextInput
                                 backgroundColor={"#fff"}
                                 placeholder={"First name"}
-                                value={firstName}
-                                onChangeText={handleFirstNameChange}
-                                style={{ flex: 1, paddingVertical: 0, }}
+                                value={formData.firstName}
+                                onChangeText={(text) => handleInputChange('firstName', text)}
+                                style={styles.customTextInput}
                             />
                         </View>
-                        <View style={{ width: 10 }} />
-                        <View style={!showEmailEmptyWarning ? styles.lastNameView : [styles.lastNameView, { marginBottom: 10 }]} >
+                        <View style={styles.spacing} />
+                        <View style={!warnings.showEmailEmptyWarning ? styles.lastNameView : [styles.lastNameView, { marginBottom: 10 }]}>
                             <CustomTextInput
                                 backgroundColor={"#fff"}
                                 placeholder={"Last name (optional)"}
-                                value={lastName}
-                                onChangeText={setLastName}
-                                style={{ flex: 1, paddingVertical: 0, }}
+                                value={formData.lastName}
+                                onChangeText={(text) => handleInputChange('lastName', text)}
+                                style={styles.customTextInput}
                             />
                         </View>
                     </View>
-                    {showEmailEmptyWarning && <Text style={styles.warningText}>Email can't be empty</Text>}
-                    <View style={styles.emailView} >
+                    {warnings.showEmailEmptyWarning && <Text style={styles.warningText}>Email can't be empty</Text>}
+                    <View style={styles.emailView}>
                         <Icon name="mail" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
                             placeholder={"e-mail"}
-                            value={email}
-                            onChangeText={handleEmailChange}
+                            value={formData.email}
+                            onChangeText={(text) => handleInputChange('email', text)}
                             keyboardType={'email-address'}
-                            style={{ flex: 1, paddingVertical: 0, }}
+                            style={styles.customTextInput}
                         />
                     </View>
-                    {showPhoneWarning && <Text style={styles.warningText}>Phone can't be empty.</Text>}
-                    <View style={styles.phoneView} >
+                    {warnings.showPhoneWarning && <Text style={styles.warningText}>Phone can't be empty.</Text>}
+                    <View style={styles.phoneView}>
                         <Icon name="phone" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
                             placeholder={"Mobile"}
-                            value={phone}
-                            onChangeText={handlePhoneChange}
+                            value={formData.phone}
+                            onChangeText={(text) => handleInputChange('phone', text)}
                             keyboardType={'number-pad'}
-                            style={{ flex: 1, paddingVertical: 0, }}
+                            style={styles.customTextInput}
                         />
                     </View>
-
-
-                    {showPasswordWarning && (
+                    {warnings.showPasswordWarning && (
                         <Text style={styles.warningText}>Password can't be empty</Text>
                     )}
-                    {passDontMatchWarning && (<Text style={styles.warningText}>Password isn't matching.</Text>)}
-                    <View style={styles.passView} >
+                    {warnings.passDontMatchWarning && (<Text style={styles.warningText}>Password isn't matching.</Text>)}
+                    <View style={styles.passView}>
                         <Icon name="lock" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
                             placeholder={"password"}
-                            value={password}
-                            onChangeText={handlePasswordChange}
+                            value={formData.password}
+                            onChangeText={(text) => handleInputChange('password', text)}
                             secureTextEntry={true}
-                            style={{ flex: 1, paddingVertical: 0, }}
+                            style={styles.customTextInput}
                         />
                     </View>
-                    {passDontMatchWarning &&
-                        <Text style={styles.warningText}>Password can't be empty</Text>
-                    }
-                    {!password ? <View /> :
-                        <View style={styles.passAgain} >
+                    {!formData.password ? <View /> :
+                        <View style={styles.passAgain}>
                             <Icon name="lock" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                             <CustomTextInput
                                 backgroundColor={"#fff"}
                                 placeholder={"Re-enter to verify your password."}
-                                value={passwordAgain}
-                                onChangeText={handlePasswordAgainChange}
-                                secureTextEntry={!showRePass ? true : false}
-                                style={{ flex: 1, paddingVertical: 0, }}
+                                value={formData.passwordAgain}
+                                onChangeText={(text) => handleInputChange('passwordAgain', text)}
+                                secureTextEntry={!showRePass}
+                                style={styles.customTextInput}
                             />
-                            <TouchableOpacity onPress={() => showRePass ? setshowRePass(false) : setshowRePass(true)}>
-                                {showRePass ? <Icon name="eye" color="#808080" style={{ marginRight: 10 }} size={17} />
-                                    : <Icon name="eye-with-line" color="#808080" style={{ marginRight: 10 }} size={17} />}
+                            <TouchableOpacity onPress={() => setShowRePass(!showRePass)}>
+                                <Icon name={showRePass ? "eye" : "eye-with-line"} color="#808080" style={styles.eyeIcon} size={17} />
                             </TouchableOpacity>
                         </View>
                     }
-
-
                     <CustomButton
                         title={"Sign Up"}
-                        onPress={() => inputValidation()}
-                        buttonStyle={{ height: 30, paddingleft: 10, marginTop: 15 }}
-                        textStyle={{ fontSize: 18, }}
+                        onPress={inputValidation}
+                        buttonStyle={styles.customButton}
+                        textStyle={styles.customButtonText}
                     />
-                    <Text style={styles.signUpWithText} >Or Sign-up with...</Text>
-                    <View style={styles.googleMobileIcon} >
-                        <TouchableOpacity style={styles.googlePhoneTouchable} >
+                    <Text style={styles.signUpWithText}>Or Sign-up with...</Text>
+                    <View style={styles.googleMobileIcon}>
+                        <TouchableOpacity style={styles.googlePhoneTouchable}>
                             <Image source={GooglePNG} style={styles.googlePhonePNG} />
-                            <Text>Google</Text>
+                            <Text style={{color: 'black'}} >Google</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.googlePhoneTouchable} >
+                        <TouchableOpacity style={styles.googlePhoneTouchable}>
                             <Image source={PhonePNG} style={styles.googlePhonePNG} />
-                            <Text style={{ paddingTop: 10 }} >Mobile</Text>
+                            <Text style={styles.mobileText}>Mobile</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.bottomRowView}>
-                        <Text style={{ fontWeight: 300, fontSize: 15 }} >Already registered, </Text>
-                        <TouchableOpacity onPress={() => {
-                            // navigation.navigate('logInForm')
-                            navigation.goBack();
-
-                        }} >
-                            <Text style={{ color: "#00C0FF", fontSize: 15 }} >
+                        <Text style={styles.alreadyRegisteredText}>Already registered, </Text>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Text style={styles.loginText}>
                                 Login here.
                             </Text>
                         </TouchableOpacity>
@@ -240,8 +239,8 @@ const SignUpForm = ({ navigation }) => {
                 proceedFurther={() => navigation.goBack()}
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 export default SignUpForm;
 
@@ -253,7 +252,8 @@ const styles = StyleSheet.create({
         marginBottom: 25,
     },
     body: {
-        paddingHorizontal: 25,
+        paddingHorizontal: 20,
+        marginVertical: 35
     },
     signUpText: {
         fontSize: 28,
@@ -265,11 +265,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '300',
         color: '#00C0FF',
-        marginBottom: 20
+        marginBottom: 20,
+        alignSelf: 'center'
     },
     imagePicker: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: 'space-between',
+        marginTop: 20
     },
     uploadImageText: {
         fontSize: 15,
@@ -280,7 +283,8 @@ const styles = StyleSheet.create({
     userNameView: {
         flex: 1,
         flexDirection: 'row',
-        marginTop: 20
+        marginVertical: 10,
+        marginTop: 25
     },
     firstNameView: {
         flexDirection: 'row',
@@ -307,7 +311,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderBottomColor: "#00C0FF",
         borderBottomWidth: 1,
-        paddingBottom: 0,
         marginBottom: 15
     },
     phoneView: {
@@ -334,7 +337,8 @@ const styles = StyleSheet.create({
     signUpWithText: {
         textAlign: "center",
         marginBottom: 10,
-        marginTop: 10
+        marginTop: 10,
+        color: 'black'
     },
     googleMobileIcon: {
         flexDirection: 'row',
@@ -345,12 +349,16 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 10,
         paddingHorizontal: 30,
-        paddingVertical: 10
+        paddingVertical: 10,
+        height: 150,
+        width: '40%',
+        alignItems: 'center'
     },
     googlePhonePNG: {
-        height: 40,
-        width: 40,
-        resizeMode: "cover"
+        height: 80,
+        width: 80,
+        resizeMode: "cover",
+        marginVertical: 10
     },
     bottomRowView: {
         alignSelf: "center",
@@ -363,6 +371,35 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 5,
     },
-
-
-})
+    customTextInput: {
+        flex: 1,
+        paddingVertical: 0,
+    },
+    spacing: {
+        width: 10,
+    },
+    eyeIcon: {
+        marginRight: 10,
+    },
+    customButton: {
+        height: 30,
+        paddingLeft: 10,
+        marginTop: 15,
+    },
+    customButtonText: {
+        fontSize: 18,
+    },
+    mobileText: {
+        paddingTop: 10,
+        color: 'black'
+    },
+    alreadyRegisteredText: {
+        fontWeight: '300',
+        fontSize: 15,
+        color: 'black'
+    },
+    loginText: {
+        color: "#00C0FF",
+        fontSize: 15,
+    },
+});
