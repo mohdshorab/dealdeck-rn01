@@ -61,7 +61,7 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
         < View style={[styles.productDetailHeader, { justifyContent: showCart ? 'space-between' : null }]}>
 
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-back-ios" size={20} color="#000" />
+            <Icon name="arrow-back-ios" size={20} color="#4a4b4d" />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={[styles.productName, titleStyle]}>{titleOnHead}</Text>
@@ -133,9 +133,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 18,
+    color: '#4a4b4d',
+    textAlign: 'center',
+    fontWeight: '600',
   },
   titleContainer: {
     flexDirection: 'row',

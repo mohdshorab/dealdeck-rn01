@@ -10,6 +10,7 @@ import ProductDetail from "../screens/ProductDetail";
 import ProductsOfCategory from "../screens/ProductsOfCategory";
 import { ProductsYouMayLike } from "../screens/ProductsYouMayLike";
 import { CartScreen } from "../screens/Cart";
+import Forgotpass from "../screens/ForgotPassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,8 @@ const protectedRoutes = [
   { name: "ProductsOfCategory", component: ProductsOfCategory },
   { name: "ProductDetail", component: ProductDetail },
   { name: "profile", component: Profile },
-  { name: "CartScreen", component: CartScreen}
+  { name: "CartScreen", component: CartScreen },
+  { name: 'Forgotpass', component: Forgotpass }
 ];
 
 

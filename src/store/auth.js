@@ -1,6 +1,8 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { loginWithEmailAndPassword, registerUserToFirestore } from "../service/authServices";
+import { checkUserExistOrNotInFSTore, checkUserExistOrNotInFSToreForGoogleSignIn, loginWithEmailAndPassword, registerUserToFirestore, updateUserObject } from "../service/authServices";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import moment from 'moment';
+import { generateDeviceId } from "../utils";
 
 export default class AuthStore {
 
@@ -40,6 +42,7 @@ export default class AuthStore {
             return res;
         }
         if (res?.status === false) {
+            console.log('res status', res)
             return { message: "Please check your email and password, or try sign-up" };
         }
         if (res?.status === 'error') {
@@ -49,45 +52,137 @@ export default class AuthStore {
     }
 
     @action
-    registerUser = async (data) => {
-        const res = await registerUserToFirestore(data);
-        if (res?.status === 'success') {
-            return res;
-        }
-        if (res?.status === 'exist') { return { message: 'User already exist, please login.' } }
-        if (res?.status === 'error') { return { message: 'Error encountered, Please connect with @dealdeck team' } }
-    }
-
-    @action
     googleSignIn = async () => {
         try {
             await GoogleSignin.hasPlayServices();
-            await GoogleSignin.signIn().then(async (result) => {
-                this.email = result.user.email;
-                console.log("Google SSO Response ===> ", result);
-                if (response.status == 1) {
-                    console.log('SIGNEDIN')
-                }
-                else {
-                    this.isLoading = false
-                    console.log('Revoking access and signin out');
-                    GoogleSignin.revokeAccess();
-                    await GoogleSignin.signOut();
-                }
-            });
+            const result = await GoogleSignin.signIn();
+            console.log(result)
+            await this.updateGoogleUserOnFS(result.user)
+            return { message: 'success' };
         } catch (error) {
-            showAlert(`${error}`);
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                console.log('User cancelled the login flow !');
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                console.log('in-progress !');
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                console.log('Google play services not available or outdated !');
+            console.log('Error during Google Sign-In:', error);
+            GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+            return { message: 'Unable to perform signin' };
+        }
+    };
+
+    @action
+    updateGoogleUserOnFS = async (googleUser) => {
+        const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+        const deviceId = generateDeviceId(); // Generate a unique device ID
+        try {
+            const userSnapshot = await checkUserExistOrNotInFSToreForGoogleSignIn(googleUser.email);
+            if (userSnapshot.empty) {
+                const newId = userSnapshot.size + 1;
+                const newUserObject = {
+                    id: newId,
+                    user: {
+                        email: googleUser.email,
+                        password: '',
+                        avatar: googleUser.photo,
+                        fname: googleUser.givenName,
+                        lname: googleUser.familyName,
+                        mobile: '',
+                    },
+                    noOfLoggedInDevices: 1,
+                    loggedInDevices: [
+                        {
+                            deviceId:deviceId,
+                            loginMethod: 'google',
+                            loginTime: currentTime,
+                            loginCount: 1,
+                        },
+                    ],
+                    savedProducts: [],
+                    favProducts: [],
+                    savedCards: [],
+                    savedAddresses: [],
+                    username: googleUser.givenName,
+                    createdAt: currentTime,
+                    updatedAt: null,
+                    authProvider: 'google',
+                    googleId: googleUser.id,
+                };
+                const res = await registerUserToFirestore(newUserObject);
+                return res;
             } else {
-                console.log(error)
-                this.isLoading = false
+                const res = await updateUserObject(userSnapshot, deviceId);
+                if (res?.status === 'success') {
+                    return res;
+                }
+                if (res?.status === 'error') {
+                    return { message: 'Error, Please connect with @dealdeck team' };
+                }
+            }
+        } catch (error) {
+            console.log('Error during Google Sign-In:', error);
+            return { message: 'Error, Please connect with @dealdeck' };
+        }
+    };
+
+
+
+    @action
+    registerUser = async (data) => {
+        const { selectedImageURI, firstName, lastName, email, phone, passwordAgain } = data;
+        const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+        const deviceId = generateDeviceId(); // Generate a unique device ID
+        const userSnapshot = await checkUserExistOrNotInFSTore(email, passwordAgain);
+        try {
+
+            if (userSnapshot.empty) {
+                const newId = userSnapshot.size + 1;
+                const newUserObject = {
+                    id: newId,
+                    user: {
+                        email,
+                        password: passwordAgain,
+                        avatar: selectedImageURI,
+                        fname: firstName,
+                        lname: lastName,
+                        mobile: phone,
+                    },
+                    noOfLoggedInDevices: 1,
+                    loggedInDevices: [
+                        {
+                            deviceId,
+                            loginMethod: 'email',
+                            loginTime: currentTime,
+                            loginCount: 1,
+                        },
+                    ],
+                    savedProducts: [],
+                    favProducts: [],
+                    savedCards: [],
+                    savedAddresses: [],
+                    username: firstName,
+                    createdAt: currentTime,
+                    updatedAt: null,
+                    authProvider: 'email',
+                    googleId: '',
+                };
+                const res = await registerUserToFirestore(newUserObject);
+                if (res?.status === 'success') {
+                    return res;
+                }
+                if (res?.status === 'exist') {
+                    return { message: 'User already exists, please log in.' };
+                }
+                if (res?.status === 'error') {
+                    return { message: 'Error, Please connect with @dealdeck' };
+                }
+            }
+            else {
+                return { status: 'exist' };
             }
         }
-    }
+        catch (error) {
+            console.log('Error during Google Sign-In:', error);
+            return { message: 'Error, Please connect with @dealdeck' };
+        }
+
+
+    };
 
 }

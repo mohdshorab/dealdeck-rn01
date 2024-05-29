@@ -4,9 +4,9 @@ export default class CartStore {
 
 
     constructor(store) {
-        this.store = store; 
+        this.store = store;
         makeAutoObservable(this);
-      }
+    }
 
     @observable cartCount = 0;
     @observable.shallow cartItems = [];
@@ -31,7 +31,7 @@ export default class CartStore {
 
     @computed
     get cartItemsCount() {
-      return this.cartItems.length;
+        return this.cartItems.length;
     }
 
     @action

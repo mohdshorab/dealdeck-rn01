@@ -1,7 +1,6 @@
-#import "AppDelegate.h"
-
-#import <React/RCTBundleURLProvider.h>
 #import <Firebase.h>
+#import "AppDelegate.h"
+#import <React/RCTBundleURLProvider.h>
 #import <CodePush/CodePush.h>
 
 

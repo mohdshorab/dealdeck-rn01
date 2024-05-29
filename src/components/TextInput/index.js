@@ -1,13 +1,15 @@
 import React from 'react';
-import { TextInput, StyleSheet, ScrollView } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Dimensions } from 'react-native';
 
 
-const CustomTextInput = ({ placeholder, onChangeText, value,style={},  backgroundColor, secureTextEntry,keyboardType }) => {
+const CustomTextInput = ({ label,placeholder, onChangeText, value,style={}, labelStyle={}, backgroundColor, secureTextEntry,keyboardType,placeholderTextColor }) => {
     const screenWidth = Dimensions.get('window').width;
 
 
     return (
+        <>
+        {label && <Text style={labelStyle} >{label}</Text>}
         <TextInput
             multiline={false}
             placeholder={placeholder}
@@ -18,24 +20,19 @@ const CustomTextInput = ({ placeholder, onChangeText, value,style={},  backgroun
             scrollEnabled={false}
             keyboardType={keyboardType}
             autoCapitalize='none'
-            placeholderTextColor={'black'}
+            placeholderTextColor={placeholderTextColor? placeholderTextColor :'black'}
         />
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     input: {
         height: 30,
-        // borderBottomColor: '#00c0ff',
-        // borderWidth: 1,
-        // borderRadius: 7,
-        // borderBottomWidth: 1 ,
         borderColor: '#00c0ff',
-        // backgroundColor: '#E0E0E0',
-        // borderStyle: 'solid',
-        // color: '#000',
+        color: 'black',
         fontWeight: '400',
-        // paddingVertical:0, marginRight:0, marginLeft:0,
+        // 4a4b4d
     },
 });
 

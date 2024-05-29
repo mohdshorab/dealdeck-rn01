@@ -17,6 +17,7 @@ import GooglePNG from '../../assets/images/GooglePNG.png';
 import PhonePNG from '../../assets/images/PhonePNG.png';
 import { useStore } from "../../store";
 import { observer } from 'mobx-react';
+import ShowToast from "../../components/Toast/toast";
 
 const LogInForm = observer(({ navigation }) => {
     const { auth } = useStore();
@@ -40,7 +41,7 @@ const LogInForm = observer(({ navigation }) => {
         return emailRegex.test(email) && !/\s/.test(email);
     };
 
-    const inputValidation = () => {
+    const inputValidation = async () => {
         let valid = true;
 
         if (!email) {
@@ -57,9 +58,16 @@ const LogInForm = observer(({ navigation }) => {
         }
 
         if (valid) {
-
+            const res = await auth.login({ email, password })
         }
     };
+
+    const googleSignIn = async () => {
+        const res = await auth.googleSignIn();
+        if (res.message == 'success')
+            navigation.navigate('Home')
+        else ShowToast({ type: "error", text1: res.message, color: "red" });
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -104,7 +112,7 @@ const LogInForm = observer(({ navigation }) => {
                             )}
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={()=>navigation.navigate('Forgotpass')} >
                         <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                     </TouchableOpacity>
                     <CustomButton
@@ -115,11 +123,11 @@ const LogInForm = observer(({ navigation }) => {
                     />
                     <Text style={styles.orText}>Or Login with...</Text>
                     <View style={styles.socialLoginContainer}>
-                        <TouchableOpacity style={styles.socialLoginButton} onPress={()=> auth.googleSignIn()} >
+                        <TouchableOpacity style={styles.socialLoginButton} onPress={() => googleSignIn()} >
                             <Image source={GooglePNG} style={styles.socialLoginIcon} />
-                            <Text style={{color: 'black'}} >Google</Text>
+                            <Text style={{ color: 'black' }} >Google</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.socialLoginButton} onPress={()=> navigation.navigate('Home')}>
+                        <TouchableOpacity style={styles.socialLoginButton} onPress={() => navigation.navigate('Home')}>
                             <Image source={PhonePNG} style={styles.socialLoginIcon} />
                             <Text style={styles.mobileText}>Mobile</Text>
                         </TouchableOpacity>
@@ -202,7 +210,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 30,
         marginTop: 30,
-        color:'black'
+        color: 'black'
     },
     socialLoginContainer: {
         flexDirection: 'row',
@@ -231,7 +239,7 @@ const styles = StyleSheet.create({
     registerContainer: {
         alignSelf: "center",
         flexDirection: 'row',
-        marginTop: 80
+        marginTop: 20
     },
     registerText: {
         fontWeight: '300',
