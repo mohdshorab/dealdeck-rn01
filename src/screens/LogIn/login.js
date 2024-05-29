@@ -59,6 +59,8 @@ const LogInForm = observer(({ navigation }) => {
 
         if (valid) {
             const res = await auth.login({ email, password })
+            console.log(res)
+            if(res?.status == 'success') navigation.navigate('Home')
         }
     };
 
@@ -84,7 +86,7 @@ const LogInForm = observer(({ navigation }) => {
                         <Icon name="mail" size={24} color="#00c0ff" style={styles.inputIcon} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
-                            placeholder={"e-mail"}
+                            placeholder={"email"}
                             value={email}
                             onChangeText={handleEmailChange}
                             keyboardType={'email-address'}
@@ -112,11 +114,11 @@ const LogInForm = observer(({ navigation }) => {
                             )}
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={()=>navigation.navigate('Forgotpass')} >
+                    <TouchableOpacity onPress={() => navigation.navigate('Forgotpass')} >
                         <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                     </TouchableOpacity>
                     <CustomButton
-                        title={"Log-In"}
+                        title={"LogIn"}
                         onPress={inputValidation}
                         buttonStyle={styles.loginButton}
                         textStyle={styles.loginButtonText}
@@ -189,14 +191,15 @@ const styles = StyleSheet.create({
     inputField: {
         flex: 1,
         paddingVertical: 0,
+        color: '#4a4b4d'
     },
     eyeIcon: {
         marginRight: 10
     },
     forgotPasswordText: {
-        color: '#000',
+        color: '#4a4b4d',
         fontWeight: '500',
-        alignSelf: "flex-end"
+        alignSelf: "flex-end",
     },
     loginButton: {
         height: 30,
@@ -210,7 +213,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 30,
         marginTop: 30,
-        color: 'black'
+        color: '#4a4b4d',
     },
     socialLoginContainer: {
         flexDirection: 'row',
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
     registerText: {
         fontWeight: '300',
         fontSize: 15,
-        color: 'black'
+        color: '#4a4b4d',
     },
     registerLink: {
         color: "#00C0FF",

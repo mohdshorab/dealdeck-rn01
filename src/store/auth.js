@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { checkUserExistOrNotInFSTore, checkUserExistOrNotInFSToreForGoogleSignIn, loginWithEmailAndPassword, registerUserToFirestore, updateUserObject } from "../service/authServices";
+import { getTheQuerySnapshot, getTheQuerySnapshotOfGoogleUsers, loginWithEmailAndPassword, registerUserEmailPassToFirestore, updateUserObject, updateGoogleUserObject, registerGoogleUserToFirestore } from "../service/authServices";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import moment from 'moment';
 import { generateDeviceId } from "../utils";
@@ -36,16 +36,22 @@ export default class AuthStore {
 
     @action
     login = async (data) => {
-        const res = await loginWithEmailAndPassword(data);
-        if (res?.status === 'success') {
-            this.profileData = res;
-            return res;
+        try {
+            const deviceId = generateDeviceId(); // Generate a unique device ID
+            const userSnapshot = await getTheQuerySnapshot(data.email, data.password);
+            if (!userSnapshot.empty) {
+                const res = await loginWithEmailAndPassword(userSnapshot, deviceId);
+                if (res?.status === 'success') {
+                    this.profileData = res;
+                    return res;
+                }
+                if (res?.status === false) {
+                    return { message: "Please check your email and password, or try sign-up" };
+                }
+            }
         }
-        if (res?.status === false) {
-            console.log('res status', res)
-            return { message: "Please check your email and password, or try sign-up" };
-        }
-        if (res?.status === 'error') {
+        catch (error) {
+            console.log(error)
             return { message: 'Error encountered, Please connect with @dealdeck team' }
         }
 
@@ -72,26 +78,24 @@ export default class AuthStore {
         const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
         const deviceId = generateDeviceId(); // Generate a unique device ID
         try {
-            const userSnapshot = await checkUserExistOrNotInFSToreForGoogleSignIn(googleUser.email);
+            const userSnapshot = await getTheQuerySnapshotOfGoogleUsers(googleUser.email);
             if (userSnapshot.empty) {
                 const newId = userSnapshot.size + 1;
                 const newUserObject = {
                     id: newId,
                     user: {
                         email: googleUser.email,
-                        password: '',
                         avatar: googleUser.photo,
                         fname: googleUser.givenName,
                         lname: googleUser.familyName,
                         mobile: '',
                     },
-                    noOfLoggedInDevices: 1,
+                    noOfLoggedInDevices: 0,
                     loggedInDevices: [
                         {
-                            deviceId:deviceId,
-                            loginMethod: 'google',
+                            deviceId: deviceId,
                             loginTime: currentTime,
-                            loginCount: 1,
+                            loginCount: 0,
                         },
                     ],
                     savedProducts: [],
@@ -104,10 +108,10 @@ export default class AuthStore {
                     authProvider: 'google',
                     googleId: googleUser.id,
                 };
-                const res = await registerUserToFirestore(newUserObject);
+                const res = await registerGoogleUserToFirestore(newUserObject);
                 return res;
             } else {
-                const res = await updateUserObject(userSnapshot, deviceId);
+                const res = await updateGoogleUserObject(userSnapshot, deviceId);
                 if (res?.status === 'success') {
                     return res;
                 }
@@ -128,9 +132,8 @@ export default class AuthStore {
         const { selectedImageURI, firstName, lastName, email, phone, passwordAgain } = data;
         const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
         const deviceId = generateDeviceId(); // Generate a unique device ID
-        const userSnapshot = await checkUserExistOrNotInFSTore(email, passwordAgain);
+        const userSnapshot = await getTheQuerySnapshot(email, passwordAgain);
         try {
-
             if (userSnapshot.empty) {
                 const newId = userSnapshot.size + 1;
                 const newUserObject = {
@@ -143,13 +146,12 @@ export default class AuthStore {
                         lname: lastName,
                         mobile: phone,
                     },
-                    noOfLoggedInDevices: 1,
+                    noOfLoggedInDevices: 0,
                     loggedInDevices: [
                         {
                             deviceId,
-                            loginMethod: 'email',
                             loginTime: currentTime,
-                            loginCount: 1,
+                            loginCount: 0,
                         },
                     ],
                     savedProducts: [],
@@ -160,9 +162,8 @@ export default class AuthStore {
                     createdAt: currentTime,
                     updatedAt: null,
                     authProvider: 'email',
-                    googleId: '',
                 };
-                const res = await registerUserToFirestore(newUserObject);
+                const res = await registerUserEmailPassToFirestore(newUserObject);
                 if (res?.status === 'success') {
                     return res;
                 }
