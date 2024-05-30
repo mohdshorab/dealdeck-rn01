@@ -3,7 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import OrderDetail from '../screens/OrderDetails';
 import HomeScreen from '../screens/HomeScreen';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FeatherIcon from 'react-native-vector-icons/Feather'
 import Category from '../screens/Category';
+import Profile from '../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +21,13 @@ const tabScreens = [
     name: 'Category',
     component: Category,
     label: 'Category',
-    icon: 'apps',
+    icon: 'grid',
+  },
+  {
+    name: 'Profile',
+    component: Profile,
+    label: 'Profile',
+    icon: 'user',
   },
   {
     name: 'OrderDetail',
@@ -35,7 +43,7 @@ const TabNav = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: 60,
+          height: 50,
           paddingHorizontal: 10,
           paddingTop: 5,
           paddingBottom: 5,
@@ -43,12 +51,9 @@ const TabNav = () => {
           borderTopWidth: 0.5,
           borderTopColor: '#e0e0e0',
         },
-        tabBarActiveTintColor: '#ff6600',
+        tabBarActiveTintColor: '#01BDFB',
         tabBarInactiveTintColor: '#888',
-        tabBarLabelStyle: {
-          fontSize: 12,
-          marginBottom: 5,
-        },
+        tabBarShowLabel: false,
       }}
     >
       {tabScreens.map(({ name, component, label, icon, unmountOnBlur }) => (
@@ -60,7 +65,7 @@ const TabNav = () => {
             tabBarLabel: label,
             unmountOnBlur,
             tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name={icon} color={color} size={size} />
+              <FeatherIcon name={icon} color={color} size={size} />
             ),
           }}
         />

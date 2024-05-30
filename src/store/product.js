@@ -1,5 +1,5 @@
 import { observable, action, makeAutoObservable } from "mobx";
-import { fetchTheNextGenProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly,searchTheProduct } from "../service/productService";
+import { fetchTheNextGenProduct, fetchTheSponsoredProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly, searchTheProduct } from "../service/productService";
 import { isNull, isUndefined } from 'lodash';
 import { Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,8 @@ export default class Products {
     @observable products;
     @observable productCategories;
     @observable randomProduct;
+    @observable recentlyViewedProducts;
+    @observable sponsoredItem;
 
 
     @action
@@ -20,6 +22,8 @@ export default class Products {
         this.products = {};
         this.productCategories = [];
         this.randomProduct = [];
+        this.recentlyViewedProducts = [];
+        this.sponsoredItem = {};
     }
 
     constructor(store) {
@@ -31,11 +35,11 @@ export default class Products {
     @action
     init = async () => {
         try {
-            // this.showLoader = true;
             await Promise.allSettled([
-                this.loadProducts,
+                this.loadAllProducts,
                 this.loadProductsCategories,
-                this.loadRandomProducts
+                this.loadRandomProducts,
+                this.getRecentlyViewedProducts,
             ])
                 .then((results) => {
                     results.forEach(element => {
@@ -50,7 +54,7 @@ export default class Products {
     }
 
     @action
-    loadProducts = async () => {
+    loadAllProducts = async () => {
         const res = await getAllProducts();
         if (!isNull(res.products) && !isUndefined(res.products)) {
             this.products = res.products;
@@ -60,7 +64,6 @@ export default class Products {
     @action
     loadProductsCategories = async () => {
         const res = await getProductsCategories();
-        console.log('RESP',res);
         (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : null
     }
 
@@ -83,6 +86,7 @@ export default class Products {
         if (res && res?.products.length) return res.products;
         else Alert.alert('Got an error while fetching the data.')
     }
+
 
 
     @action
@@ -128,5 +132,16 @@ export default class Products {
         const res = await fetchTheNextGenProduct();
         if (res && res?.length) return res;
     }
+
+    @action
+    loadTheSponsoredItem = async () => {
+        try{
+            const res = await fetchTheSponsoredProduct();
+this.sponsoredItem ={data:'none'}        }
+        catch(e){
+            console.error('Error fetching sponsored product:', error);   
+        }
+    }
+
 
 }

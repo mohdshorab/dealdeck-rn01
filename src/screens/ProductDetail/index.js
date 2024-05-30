@@ -12,6 +12,7 @@ import {
   RefreshControl,
   TextInput,
   Button,
+  Modal,
 } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import CustomHeader from '../../components/Header';
@@ -92,7 +93,7 @@ const ProductDetail = observer(({ route, navigation }) => {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <CustomHeader count={cart.cartCount} showCart canGoBack productDetail titleOnHead={productData.title} navigation={navigation} />
+      <CustomHeader count={cart.cartCount} showCart canGoBack productDetail titleOnHead={productData.title.split(" ").splice(-3).join(" ")} navigation={navigation} />
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -105,13 +106,13 @@ const ProductDetail = observer(({ route, navigation }) => {
           images={productData.images}
           showsPagination
           height={200}
-          showsButtons={true}
+        // showsButtons={true}
         />
         <View style={styles.subContainer}>
+          <View style={styles.straightLine} />
           <View
             style={{
-              backgroundColor: '#EAEDFF',
-              paddingVertical: 10,
+              // paddingVertical: 10,
               borderRadius: 10,
             }}>
             <View style={styles.brandView}>
@@ -127,37 +128,36 @@ const ProductDetail = observer(({ route, navigation }) => {
                 maxStars={5}
                 rating={productData.rating}
                 starSize={16}
-                fullStarColor={'green'}
+                fullStarColor={'black'}
               />
-              <Text> . </Text>
-              <Text style={styles.ratingText}>{productData.rating} </Text>
+              <TouchableOpacity>
+                <Text style={styles.ratingText}>{productData.reviews.length} ratings</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.priceView}>
-              <View>
-                <View
-                  style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                  <Icon name="long-arrow-down" size={15} color="green" />
-                  <Text style={styles.discountPercentage}>
-                    {productData.discountPercentage.toFixed(0)}%{' '}
-                  </Text>
-                  <Text style={styles.mrpText}>$ {productData.price} </Text>
-                  <Text style={styles.priceText}>
-                    $
-                    {(
-                      productData.price -
-                      productData.price *
-                      (productData.discountPercentage.toFixed(0) / 100)
-                    ).toFixed(0)}{' '}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.emiView}>
-                <Text style={styles.emiText}>EMI starts from</Text>
-                <Text style={styles.emiText}> ${emi} </Text>
-                <TouchableOpacity style={styles.infoButton}>
-                  <Icon name="info" size={12} color="green" />
-                </TouchableOpacity>
-              </View>
+            {/* <View style={styles.priceView}> */}
+            <View style={styles.emiView}>
+              <Text style={styles.emiText}>EMI starts from</Text>
+              <Text style={styles.emiText}> ${emi} </Text>
+              <TouchableOpacity style={styles.infoButton}>
+                <Icon name="info" size={12} color="green" />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}>
+              <Icon name="long-arrow-down" size={15} color="green" />
+              <Text style={styles.discountPercentage}>
+                {productData.discountPercentage.toFixed(0)}%{' '}
+              </Text>
+              <Text style={styles.mrpText}>$ {productData.price} </Text>
+              <Text style={styles.priceText}>
+                $
+                {(
+                  productData.price -
+                  productData.price *
+                  (productData.discountPercentage.toFixed(0) / 100)
+                ).toFixed(0)}{' '}
+              </Text>
+              {/* </View> */}
             </View>
             <Text style={styles.descriptionText}>
               {productData.description}
@@ -202,26 +202,10 @@ const ProductDetail = observer(({ route, navigation }) => {
           <View style={styles.straightLine} />
 
           <View style={styles.optionContainer}>
-            {productData.category !== 'smartphones' ||
-              'laptops' ||
-              'furniture' ? (
-              <View style={styles.option}>
-                <Icon name="undo" size={25} color="blue" style={styles.icon} />
-                <Text style={styles.optionText}>10 days return</Text>
-              </View>
-            ) : (
-              <View style={styles.option}>
-                <Icon
-                  name="truck"
-                  size={25}
-                  color="black"
-                  style={styles.icon}
-                />
-                <Text style={styles.optionText}>
-                  7 days service center replacement
-                </Text>
-              </View>
-            )}
+            <View style={styles.option}>
+              <Icon name="times-circle" size={25} color="blue" style={styles.icon} />
+              <Text style={styles.optionText}>{productData.returnPolicy}</Text>
+            </View>
             <View style={styles.option}>
               <Icon
                 name="money"
@@ -232,8 +216,8 @@ const ProductDetail = observer(({ route, navigation }) => {
               <Text style={styles.optionText}>Cash on delivery</Text>
             </View>
             <View style={styles.option}>
-              <Icon name="star" size={25} color="blue" style={styles.icon} />
-              <Text style={styles.optionText}>Premium Sure</Text>
+              <Icon name="truck" size={25} color="blue" style={styles.icon} />
+              <Text style={styles.optionText}>{productData.shippingInformation}</Text>
             </View>
           </View>
           <View style={styles.straightLine} />
@@ -242,9 +226,17 @@ const ProductDetail = observer(({ route, navigation }) => {
             'laptops' ||
             'furniture' ? (
             <>
-              <Text style={{ alignSelf: 'center', color: 'black' }}>
-                1 Year Manufacturing Warranty Know More
-              </Text>
+              <View style={{ justifyContent: 'space-evenly', flexDirection: 'row' }} >
+                <Text style={{ alignSelf: 'center', color: '#4a4b4d', fontWeight: 'bold', borderWidth: 0.5, padding: 2 }}>
+                  {productData.brand}
+                </Text>
+                <Text style={{ alignSelf: 'center', color: 'black' }}>
+                  {productData.warrantyInformation}
+                </Text>
+                <Text style={{ alignSelf: 'center', color: 'black' }}>
+                  Know More
+                </Text>
+              </View>
               <View style={styles.straightLine} />
             </>
           ) : null}
@@ -425,14 +417,15 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 12,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
+    marginTop: 5
   },
   subContainer: { marginTop: '10%', width: '95%', alignSelf: 'center' },
   brandView: { flex: 1, flexDirection: 'row' },
   moreProductText: { fontWeight: 'bold', fontSize: 15, color: 'grey' },
   BrandNameText: { fontWeight: 'bold', fontSize: 15, color: 'black' },
   productTitle: { fontWeight: 'bold', fontSize: 25, color: 'black' },
-  starRatingView: { width: 55, flex: 1, flexDirection: 'row', marginTop: 2 },
+  starRatingView: { flex: 1, flexDirection: 'row', marginTop: 2 },
   straightLine: {
     borderWidth: 0.5,
     borderBottomColor: 'grey',
@@ -465,12 +458,12 @@ const styles = StyleSheet.create({
   descriptionText: {
     marginTop: 10,
     fontSize: 15,
-    color: '#506AE6',
+    color: '#4a4b4d',
     fontWeight: 'bold',
   },
   emiText: { fontSize: 15, color: 'black' },
   priceText: { fontWeight: 'bold', fontSize: 18, color: 'black' },
-  ratingText: { color: 'green' },
+  ratingText: { color: 'black', marginLeft: 10 },
   priceView: {
     padding: 5,
     flex: 1,
@@ -503,17 +496,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: 10,
   },
   buttonContainer: {
-    flex: 1,
+    // flex: 1,
     flexDirection: 'row',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    alignContent: 'space-between',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    
+    // position: 'absolute',
+    // bottom: 0,
+    // width: '100%',
+    // justifyContent: 'space-evenly',
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
   },
   discountPercentage: { fontWeight: '500', fontSize: 15, color: 'black' },
   mrpText: {

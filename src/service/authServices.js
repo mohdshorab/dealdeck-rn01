@@ -133,7 +133,7 @@ export const updateGoogleUserObject = async (userSnapshot, deviceId) => {
             loggedInDevices: userData.loggedInDevices,
             noOfLoggedInDevices: userData.noOfLoggedInDevices,
         });
-        return { status: 'success', userData };
+        return { ...userData, status: 'success' };
     }
     catch (error) {
         console.log('Error updating user:', error);

@@ -55,13 +55,13 @@ class App extends Component {
       const text1 = state?.isConnected ? 'You are connected with internet' : 'Disconnected'
       const type = state?.isConnected ? 'success' : 'error';
       ShowToast({ type: type, text1: text1, color: type == 'error' ? "red" : 'green', })
-      if (state.isConnected && !stores.auth.isNetworkAvailable) {
-        this.syncData();
-      }
+      // if (state.isConnected && !stores.auth.isNetworkAvailable) {
+      //   this.syncData();
+      // }
       if (state.isConnected) {
         this.syncCodePush();
       }
-      stores.auth.setNetworkAvailability(state.isConnected);
+      // stores.auth.setNetworkAvailability(state.isConnected);
     });
     this.syncCodePush();
   }

@@ -137,7 +137,7 @@ const HomeScreen = observer(({ navigation }) => {
             <Text style={styles.errorText}>Unable to fetch collections</Text>
           )}
         </View>
-        {recentlyViewedProducts.length > 0 ? (
+        {recentlyViewedProducts && recentlyViewedProducts.length > 0 ? (
           <>
             <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
             <FlatList
@@ -151,8 +151,8 @@ const HomeScreen = observer(({ navigation }) => {
                   style={styles.productTile}
                 >
                   <Image source={{ uri: item.thumbnail }} style={styles.productImage} resizeMode="contain" />
-                  <Text style={styles.productName}>{item.title}</Text>
                   <Text style={styles.productBrand}>{item.brand}</Text>
+                  <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
                   <View style={styles.priceContainer}>
                     <Text style={styles.productPrice}>${item.price}</Text>
                     <Icon name="chevron-right" color="green" size={13} />
@@ -176,40 +176,6 @@ const HomeScreen = observer(({ navigation }) => {
           floatingImage2={require('../../assets/images/ROG_NOBG.png')}
           onPress={() => navigation.navigate('ProductsOfCategory', { category: 'laptops' })}
         />
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Next Gen Products</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
-        {nextGenProducts && nextGenProducts.length > 0 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {nextGenProducts.map(item => {
-              const formattedName =
-                item.title.split(' ').length > 2
-                  ? item.title.split(' ').slice(-2).join(' ')
-                  : item.title;
-
-              return (
-                <TouchableOpacity
-                  key={item.name}
-                  style={styles.itemContainer}
-                  onPress={() => navigation.navigate('ProductsOfCategory', { category: item.title })}
-                >
-                  <View style={styles.imageContainer}>
-                    <Image source={{ uri: item.images[0] }} style={styles.image} />
-                  </View>
-                  <Text style={styles.name}>{formattedName}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        ) : (
-          <>
-            <Text style={styles.errorText}>Unable to fetch Next Gen products</Text>
-            <Text style={[styles.errorText, color='green']}>Refresh to retry</Text>
-          </>
-        )}
         <View style={styles.divider} />
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Products you may like</Text>
@@ -273,14 +239,13 @@ const styles = StyleSheet.create({
   itemContainer: {
     padding: 5,
     alignItems: 'center',
-    borderRadius: 10,
-    marginLeft: 10,
+    marginLeft: 15,
   },
   imageContainer: {
-    width: 50,
+    width: 70,
     height: 70,
-    borderRadius: 40,
     overflow: 'hidden',
+    borderRadius: 50
   },
   image: {
     width: '100%',
@@ -291,13 +256,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'center',
     color: 'black',
+    fontWeight: '500',
+    fontSize: 12
   },
   productTile: {
     padding: 10,
     borderRadius: 20,
     margin: 10,
     borderWidth: 1,
-    width: 175,
+    width: 150,
     borderColor: '#999999',
   },
   productImage: {
@@ -306,15 +273,14 @@ const styles = StyleSheet.create({
   },
   productName: {
     fontWeight: 'bold',
-    marginTop: 5,
     textAlign: 'center',
     color: 'black',
   },
   productBrand: {
     fontWeight: 'bold',
-    marginTop: 5,
+    marginTop: 2,
     textAlign: 'center',
-    color: 'black',
+    color: '#4a4b4d',
   },
   priceContainer: {
     flexDirection: 'row',

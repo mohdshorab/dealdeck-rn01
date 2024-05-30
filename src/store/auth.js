@@ -62,7 +62,6 @@ export default class AuthStore {
         try {
             await GoogleSignin.hasPlayServices();
             const result = await GoogleSignin.signIn();
-            console.log(result)
             await this.updateGoogleUserOnFS(result.user)
             return { message: 'success' };
         } catch (error) {
@@ -100,8 +99,10 @@ export default class AuthStore {
                     ],
                     savedProducts: [],
                     favProducts: [],
+                    recentlyViewedProducts: [],
                     savedCards: [],
                     savedAddresses: [],
+                    orderedProducts: [],
                     username: googleUser.givenName,
                     createdAt: currentTime,
                     updatedAt: null,
@@ -109,14 +110,13 @@ export default class AuthStore {
                     googleId: googleUser.id,
                 };
                 const res = await registerGoogleUserToFirestore(newUserObject);
+                this.profileData = res;
                 return res;
             } else {
                 const res = await updateGoogleUserObject(userSnapshot, deviceId);
                 if (res?.status === 'success') {
+                    this.profileData = res;
                     return res;
-                }
-                if (res?.status === 'error') {
-                    return { message: 'Error, Please connect with @dealdeck team' };
                 }
             }
         } catch (error) {
@@ -156,8 +156,10 @@ export default class AuthStore {
                     ],
                     savedProducts: [],
                     favProducts: [],
+                    recentlyViewedProducts: [],
                     savedCards: [],
                     savedAddresses: [],
+                    orderedProducts: [],
                     username: firstName,
                     createdAt: currentTime,
                     updatedAt: null,

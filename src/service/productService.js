@@ -84,3 +84,14 @@ export const fetchTheNextGenProduct = async () => {
     throw new Error('Failed to fetch product categories from the API.');
   }
 }
+
+export const fetchTheSponsoredProduct = async () => {
+  try {
+    const response = await axios.get(`https://dummyjson.com/products/1`);
+    return response.data
+  }
+  catch (e) {
+    console.error('API Error:', error);
+    throw new Error('Failed to fetch product categories from the API.');
+  }
+}

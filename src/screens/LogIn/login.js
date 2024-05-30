@@ -20,7 +20,7 @@ import { observer } from 'mobx-react';
 import ShowToast from "../../components/Toast/toast";
 
 const LogInForm = observer(({ navigation }) => {
-    const { auth } = useStore();
+    const { auth, products } = useStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailWarning, setEmailWarning] = useState('');
@@ -42,32 +42,36 @@ const LogInForm = observer(({ navigation }) => {
     };
 
     const inputValidation = async () => {
-        let valid = true;
+        // let valid = true;
 
-        if (!email) {
-            setEmailWarning('Email is empty');
-            valid = false;
-        } else if (!validateEmail(email)) {
-            setEmailWarning('Please enter a correct email');
-            valid = false;
-        }
+        // if (!email) {
+        //     setEmailWarning('Email is empty');
+        //     valid = false;
+        // } else if (!validateEmail(email)) {
+        //     setEmailWarning('Please enter a correct email');
+        //     valid = false;
+        // }
 
-        if (!password) {
-            setPasswordWarning('Password is empty');
-            valid = false;
-        }
+        // if (!password) {
+        //     setPasswordWarning('Password is empty');
+        //     valid = false;
+        // }
 
-        if (valid) {
-            const res = await auth.login({ email, password })
-            console.log(res)
-            if(res?.status == 'success') navigation.navigate('Home')
-        }
+        // if (valid) {
+        //     const res = await auth.login({ email, password })
+        //     if (res?.status == 'success') {
+                await products.init()
+                navigation.navigate('Home')
+            // }
+        // }
     };
 
     const googleSignIn = async () => {
         const res = await auth.googleSignIn();
-        if (res.message == 'success')
+        if (res.message == 'success') {
+            await products.init()
             navigation.navigate('Home')
+        }
         else ShowToast({ type: "error", text1: res.message, color: "red" });
     }
 

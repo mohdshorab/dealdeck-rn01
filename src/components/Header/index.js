@@ -37,8 +37,8 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
           />
           {/* Input Bar */}
           <View style={styles.inputContainer}>
+            <TextInput style={styles.inputPlaceholder} value='Search products' />
             <Icon name="search" size={24} color="#000" />
-            <Text style={styles.inputPlaceholder}>Search items</Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
             <Icon name="shopping-cart" size={24} color="#000" />
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flex: 1,
     marginHorizontal: 16,
+    justifyContent: 'space-between'
   },
   inputPlaceholder: {
     marginLeft: 8,
