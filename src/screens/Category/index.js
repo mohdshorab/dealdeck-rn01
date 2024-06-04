@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     categoryContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        height:120,
+        height:100,
         marginVertical:10,
         borderRadius: 20,
         width:'95%',

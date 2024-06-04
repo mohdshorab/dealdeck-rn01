@@ -44,11 +44,11 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    await stores.products.init().then(() => {
+    // await stores.products.init().then(() => {
       setTimeout(() => {
         this.setState({ showSplashScreen: false });
       }, 3000); // 3-second delay
-    });
+    // });
 
     this.internet = NetInfo.addEventListener((state) => {
       console.log('checkstate', state.isConnected, state);

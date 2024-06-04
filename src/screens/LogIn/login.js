@@ -20,7 +20,7 @@ import { observer } from 'mobx-react';
 import ShowToast from "../../components/Toast/toast";
 
 const LogInForm = observer(({ navigation }) => {
-    const { auth, products } = useStore();
+    const { auth, products, cart } = useStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailWarning, setEmailWarning] = useState('');
@@ -42,34 +42,36 @@ const LogInForm = observer(({ navigation }) => {
     };
 
     const inputValidation = async () => {
-        // let valid = true;
+        let valid = true;
 
-        // if (!email) {
-        //     setEmailWarning('Email is empty');
-        //     valid = false;
-        // } else if (!validateEmail(email)) {
-        //     setEmailWarning('Please enter a correct email');
-        //     valid = false;
-        // }
+        if (!email) {
+            setEmailWarning('Email is empty');
+            valid = false;
+        } else if (!validateEmail(email)) {
+            setEmailWarning('Please enter a correct email');
+            valid = false;
+        }
 
-        // if (!password) {
-        //     setPasswordWarning('Password is empty');
-        //     valid = false;
-        // }
+        if (!password) {
+            setPasswordWarning('Password is empty');
+            valid = false;
+        }
 
-        // if (valid) {
-        //     const res = await auth.login({ email, password })
-        //     if (res?.status == 'success') {
-                await products.init()
-                navigation.navigate('Home')
-            // }
-        // }
+        if (valid) {
+            const res = await auth.login({ email, password })
+            if (res) {
+                await products.init(auth.profileData);
+                await cart.init(auth.profileData)
+                navigation.navigate('Home');
+            }
+        }
     };
 
     const googleSignIn = async () => {
         const res = await auth.googleSignIn();
-        if (res.message == 'success') {
+        if (res?.status) {
             await products.init()
+            console.log('profileData',auth.profileData)
             navigation.navigate('Home')
         }
         else ShowToast({ type: "error", text1: res.message, color: "red" });
@@ -133,7 +135,12 @@ const LogInForm = observer(({ navigation }) => {
                             <Image source={GooglePNG} style={styles.socialLoginIcon} />
                             <Text style={{ color: 'black' }} >Google</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.socialLoginButton} onPress={() => navigation.navigate('Home')}>
+                        <TouchableOpacity style={styles.socialLoginButton} onPress={async () => {
+                            await products.init(auth.profileData)
+
+                            navigation.navigate('Home')
+
+                        }}>
                             <Image source={PhonePNG} style={styles.socialLoginIcon} />
                             <Text style={styles.mobileText}>Mobile</Text>
                         </TouchableOpacity>

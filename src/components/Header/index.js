@@ -41,8 +41,8 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
             <Icon name="search" size={24} color="#000" />
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
-            <Icon name="shopping-cart" size={24} color="#000" />
-            <Text
+            <Icon name="shopping-cart" size={24} color="#4a4b4d" />
+            <View
               style={{
                 position: 'absolute',
                 top: -10,
@@ -51,10 +51,12 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
                 backgroundColor: 'red',
                 borderRadius: 10,
                 width: 15,
-                alignItems: 'center',
-                paddingLeft: 4
-              }}
-            >{cart.cartItems.length}</Text>
+                alignItems: 'center'
+              }
+              }
+            >
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart?.cartItems?.length}</Text>
+            </View>
           </TouchableOpacity>
         </>
       ) : (
@@ -70,7 +72,7 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
             showCart ?
               (
                 <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
-                  <Icon name="shopping-cart" size={24} color="#000" />
+                  <Icon name="shopping-cart" size={24} color="#4a4b4d" />
                   <View
                     style={{
                       position: 'absolute',
@@ -84,7 +86,7 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
                     }
                     }
                   >
-                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart.cartItems.length}</Text>
+                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart?.cartItems?.length}</Text>
                   </View>
                 </TouchableOpacity>
               )

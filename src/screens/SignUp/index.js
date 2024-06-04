@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
     SafeAreaView, Text, ScrollView, TouchableOpacity, View, Image, StyleSheet,
     ActivityIndicator,
+    KeyboardAvoidingView,
 } from "react-native";
 import Icon from 'react-native-vector-icons/Entypo';
 import CustomTextInput from "../../components/TextInput";
@@ -99,8 +100,8 @@ const SignUpForm = ({ navigation }) => {
         } else if (isValidEmail && isValidPassword && isFnameValid && isPhoneValid && doesPassMatch) {
             setShowLoader(true);
             if (lastName == null || '') lastName == 'NA';
-            const res = await auth.registerUser({ selectedImageURI, firstName, lastName , email, phone, passwordAgain });
-            if (res?.status === "success") {
+            const res = await auth.registerUser({ selectedImageURI, firstName, lastName, email, phone, passwordAgain });
+            if (res?.status === true) {
                 setShowLoader(false)
                 toggleModal();
             } else {
@@ -129,7 +130,7 @@ const SignUpForm = ({ navigation }) => {
                             <Icon name="user" size={24} color="#00c0ff" style={styles.icon} />
                             <CustomTextInput
                                 backgroundColor={"#fff"}
-                                placeholder={"First name"}
+                                placeholder={"first name"}
                                 value={formData.firstName}
                                 onChangeText={(text) => handleInputChange('firstName', text)}
                                 style={styles.customTextInput}
@@ -139,7 +140,7 @@ const SignUpForm = ({ navigation }) => {
                         <View style={!warnings.showEmailEmptyWarning ? styles.lastNameView : [styles.lastNameView, { marginBottom: 10 }]}>
                             <CustomTextInput
                                 backgroundColor={"#fff"}
-                                placeholder={"Last name (optional)"}
+                                placeholder={"last name (optional)"}
                                 value={formData.lastName}
                                 onChangeText={(text) => handleInputChange('lastName', text)}
                                 style={styles.customTextInput}
@@ -151,7 +152,7 @@ const SignUpForm = ({ navigation }) => {
                         <Icon name="mail" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
-                            placeholder={"e-mail"}
+                            placeholder={"email"}
                             value={formData.email}
                             onChangeText={(text) => handleInputChange('email', text)}
                             keyboardType={'email-address'}
@@ -163,7 +164,7 @@ const SignUpForm = ({ navigation }) => {
                         <Icon name="phone" size={24} color="#00c0ff" style={[styles.icon, { marginTop: 4 }]} />
                         <CustomTextInput
                             backgroundColor={"#fff"}
-                            placeholder={"Mobile"}
+                            placeholder={"mobile"}
                             value={formData.phone}
                             onChangeText={(text) => handleInputChange('phone', text)}
                             keyboardType={'number-pad'}
@@ -202,7 +203,7 @@ const SignUpForm = ({ navigation }) => {
                         </View>
                     }
                     <CustomButton
-                        title={"Sign Up"}
+                        title={"Register"}
                         onPress={inputValidation}
                         buttonStyle={styles.customButton}
                         textStyle={styles.customButtonText}
@@ -211,7 +212,7 @@ const SignUpForm = ({ navigation }) => {
                     <View style={styles.googleMobileIcon}>
                         <TouchableOpacity style={styles.googlePhoneTouchable}>
                             <Image source={GooglePNG} style={styles.googlePhonePNG} />
-                            <Text style={{color: 'black'}} >Google</Text>
+                            <Text style={{ color: 'black' }} >Google</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.googlePhoneTouchable}>
                             <Image source={PhonePNG} style={styles.googlePhonePNG} />

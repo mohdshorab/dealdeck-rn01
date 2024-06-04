@@ -8,25 +8,20 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { observer } from "mobx-react";
 
-const Profile = observer(() => {
+const Profile = observer(({ navigation }) => {
 
     const { auth, products } = useStore();
-    const { user } = auth.profileData
-
-    const get = async () => {
-        // const res = await fetchTheSponsoredProduct()
-        // console.log(res.data)
-    }
+    const { user } = auth?.profileData;
 
     useEffect(() => {
         console.log('products.recentlyViewedProducts', products.sponsoredItem)
-        get()
+        console.log('auth.profileData', auth.profileData)
     }, [])
 
 
     return (
         <SafeAreaView >
-            <CustomHeader titleOnHead={'Your Profile'} />
+            <CustomHeader titleOnHead={'Your Profile'} navigation={navigation} showCart/>
             <ScrollView style={styles.scrollviewContainer} >
                 <View style={styles.profileContainer} >
                     {user && user.avatar ? <Image style={styles.profileImage} source={{ uri: user.avatar }} />
@@ -34,7 +29,7 @@ const Profile = observer(() => {
                         <Image style={styles.profileImage} source={profileIcon} />
                     }
                     <Image />
-                    {user && user.lname ? <Text style={styles.userNameText}>Hey, {user.lname}</Text>
+                    {user && user.fname ? <Text style={styles.userNameText}>Hey, {user.fname}</Text>
                         :
                         <Text style={styles.userNameText}>Syncing Error</Text>}
                 </View>
@@ -69,12 +64,7 @@ const Profile = observer(() => {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.emptyView} />
-                <View style={{ backgroundColor: 'white', width: '95%', alignSelf: 'center', paddingVertical: 10 }} >
-                    <Text style={[styles.myOrdersText, { fontWeight: '400' }]} >Sponsored</Text>
-
-                </View>
-                <View style={styles.emptyView} />
-                <View style={{ backgroundColor: 'white', paddingTop: 10 }} >
+                <View style={{ backgroundColor: 'white', paddingTop: 10, marginHorizontal: 10 }} >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, marginVertical: 10 }} >
                         <TouchableOpacity style={{ alignItems: 'center' }} >
                             <Ionicons name={'save-sharp'} size={40} color={'orange'} />
@@ -93,8 +83,8 @@ const Profile = observer(() => {
                 <View style={styles.emptyView} />
                 {
                     products.recentlyViewedProducts && products.recentlyViewedProducts.length > 0 ? (
-                        <>
-                            <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
+                        <View style={{ marginLeft: 10 }}>
+                            <Text style={styles.myOrdersText}>Recently viewed Items</Text>
                             <FlatList
                                 data={products.recentlyViewedProducts}
                                 horizontal
@@ -110,7 +100,7 @@ const Profile = observer(() => {
                                         <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
                                         <View style={styles.priceContainer}>
                                             <Text style={styles.productPrice}>${item.price}</Text>
-                                            <Icon name="chevron-right" color="green" size={13} />
+                                            <FontAwesome name="chevron-right" color="green" size={13} />
                                             <Text style={styles.productDiscountPrice}>
                                                 ${(item.price - (item.price * item.discountPercentage) / 100).toFixed(0)}
                                             </Text>
@@ -118,21 +108,16 @@ const Profile = observer(() => {
                                     </TouchableOpacity>
                                 )}
                             />
-                        </>
+                        </View>
                     ) : null}
-                {products.sponsoredItem && (
-                    <View>
-                        <Text>{products.sponsoredItem.title}</Text>
-                    </View>
 
-                )}
-                <View style={styles.emptyView} />
                 <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-evenly', alignItems: 'center', alignSelf: 'center', paddingHorizontal: 10 }} >
                     <View style={{ backgroundColor: 'white', flexDirection: 'row', alignItems: 'center', borderWidth: 0.5, justifyContent: 'center', width: '100%', paddingVertical: 5 }}>
                         <FontAwesome name={'sign-out'} size={25} color={'#4a4b4d'} />
                         <Text style={[styles.profileMenuText, { fontWeight: '700', fontSize: 18 }]} >Logout</Text>
                     </View>
                 </TouchableOpacity>
+                <View style={[styles.emptyView,{marginBottom:50}]} />
             </ScrollView>
         </SafeAreaView>
     )
@@ -223,6 +208,13 @@ const styles = StyleSheet.create({
     productDiscountPrice: {
         color: 'green',
         marginTop: 2,
+    },
+    recentlyViewedText: {
+        fontSize: 20,
+        marginLeft: 10,
+        fontWeight: '700',
+        marginTop: 5,
+        color: 'black',
     },
 
 

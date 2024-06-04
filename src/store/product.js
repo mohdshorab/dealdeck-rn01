@@ -1,147 +1,158 @@
 import { observable, action, makeAutoObservable } from "mobx";
+import firestore from '@react-native-firebase/firestore';
 import { fetchTheNextGenProduct, fetchTheSponsoredProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly, searchTheProduct } from "../service/productService";
-import { isNull, isUndefined } from 'lodash';
-import { Alert } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const RECENTLY_VIEWED_PRODUCTS_KEY = 'recentlyViewedProducts';
-const MAX_RECENTLY_VIEWED_PRODUCTS = 6;
 export default class Products {
-
-    @observable showLoader;
-    @observable products;
-    @observable productCategories;
-    @observable randomProduct;
-    @observable recentlyViewedProducts;
-    @observable sponsoredItem;
-
-
-    @action
-    initialState() {
-        this.showLoader = false;
-        this.products = {};
-        this.productCategories = [];
-        this.randomProduct = [];
-        this.recentlyViewedProducts = [];
-        this.sponsoredItem = {};
-    }
+    @observable products = {};
+    @observable productCategories = [];
+    @observable randomProduct = [];
+    @observable recentlyViewedProducts = [];
+    @observable sponsoredItem = null;
 
     constructor(store) {
         this.store = store;
         makeAutoObservable(this);
-        this.initialState();
     }
 
     @action
-    init = async () => {
+    init = async (profileInfo) => {
         try {
-            await Promise.allSettled([
-                this.loadAllProducts,
-                this.loadProductsCategories,
-                this.loadRandomProducts,
-                this.getRecentlyViewedProducts,
-            ])
-                .then((results) => {
-                    results.forEach(element => {
-                        console.log(element.status);
-                    })
-                })
-            // this.showLoader(false);
+            await Promise.all([
+                this.fetchAllProducts(),
+                this.fetchProductsCategories(),
+                this.fetchRandomProducts(),
+                this.fetchRecentlyViewedProducts(profileInfo),
+            ]);
         } catch (e) {
-            console.log(e);
-            // this.showLoader(false);
+            console.error('Error initializing store:', e);
         }
     }
 
     @action
-    loadAllProducts = async () => {
+    fetchAllProducts = async () => {
         const res = await getAllProducts();
-        if (!isNull(res.products) && !isUndefined(res.products)) {
-            this.products = res.products;
-        }
+        this.products = res.products || {};
     }
 
     @action
-    loadProductsCategories = async () => {
+    fetchProductsCategories = async () => {
         const res = await getProductsCategories();
-        (!isNull(res) && !isUndefined(res)) ? this.productCategories = res : null
+        this.productCategories = res || [];
     }
 
     @action
-    loadRandomProducts = async () => {
+    fetchRandomProducts = async () => {
         const res = await getProductsRandomly();
-        res && res?.products.length ? this.randomProduct = res.products : []
+        this.randomProduct = res?.products || [];
     }
 
     @action
-    loadProductsOfCategory = async (category) => {
+    fetchProductsByCategory = async (category) => {
         const res = await getProductsOfCategory(category);
-        if (res && res?.products.length) return res.products;
-        else Alert.alert('Got an error while fetching the data.')
+        return res?.products || [];
     }
 
     @action
-    loadProductsOfSearch = async (productName) => {
+    fetchProductsBySearch = async (productName) => {
         const res = await searchTheProduct(productName);
-        if (res && res?.products.length) return res.products;
-        else Alert.alert('Got an error while fetching the data.')
+        return res?.products || [];
     }
 
-
-
     @action
-    getRecentlyViewedProducts = async () => {
-        try {
-            const storedProducts = await AsyncStorage.getItem(RECENTLY_VIEWED_PRODUCTS_KEY);
-            return storedProducts ? JSON.parse(storedProducts) : [];
-        } catch (error) {
-            console.error('Error retrieving recently viewed products:', error);
-            return [];
-        }
-    };
-
-    @action
-    addRecentlyViewedProduct = async (product) => {
-        try {
-            const recentlyViewedProducts = await this.getRecentlyViewedProducts();
-            const existingProductIndex = recentlyViewedProducts.findIndex(
-                (p) => p.id === product.id
-            );
-
-            if (existingProductIndex !== -1) {
-                // If the product already exists, move it to the start of the list
-                recentlyViewedProducts.splice(existingProductIndex, 1);
-            } else if (recentlyViewedProducts.length >= MAX_RECENTLY_VIEWED_PRODUCTS) {
-                // If the list is full, remove the oldest product
-                recentlyViewedProducts.pop();
-            }
-
-            const updatedProducts = [product, ...recentlyViewedProducts];
-
-            await AsyncStorage.setItem(
-                RECENTLY_VIEWED_PRODUCTS_KEY,
-                JSON.stringify(updatedProducts)
-            );
-        } catch (error) {
-            console.error('Error saving recently viewed product:', error);
-        }
-    };
-
-    @action
-    loadNextGenProduct = async () => {
+    fetchNextGenProduct = async () => {
         const res = await fetchTheNextGenProduct();
-        if (res && res?.length) return res;
+        return res || [];
     }
 
     @action
-    loadTheSponsoredItem = async () => {
-        try{
+    fetchSponsoredProduct = async () => {
+        try {
             const res = await fetchTheSponsoredProduct();
-this.sponsoredItem ={data:'none'}        }
-        catch(e){
-            console.error('Error fetching sponsored product:', error);   
+            this.sponsoredItem = res;
+        } catch (error) {
+            console.error('Error fetching sponsored product:', error);
+            this.sponsoredItem = null;
         }
     }
 
+    @action
+    fetchRecentlyViewedProducts = async (profileData) => {
+        const { id, authProvider } = profileData;
+        console.log(id, authProvider)
+        try {
+            let querySnapshot;
+            if (authProvider == 'email') {
+                querySnapshot = await firestore()
+                    .collection('RegisteredUsers')
+                    .where('id', '==', id)
+                    .get();
+            }
+            else {
+                querySnapshot = await firestore()
+                    .collection('UsersLoggedUsingGoogle')
+                    .where('id', '==', id)
+                    .get();
+            }
+            console.log(querySnapshot)
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                this.recentlyViewedProducts = userData.recentlyViewedProducts;
+            }
+        }
+        catch (e) {
+
+        }
+    }
+
+
+    @action
+    addProductToTheRecentlyViewedInFS = async (product, userInfo) => {
+        const { id, authProvider, } = userInfo;
+        console.log('userINFO', id, authProvider)
+        try {
+            let querySnapshot;
+            if (authProvider == 'email') {
+                querySnapshot = await firestore()
+                    .collection('RegisteredUsers')
+                    .where('id', '==', id)
+                    .get();
+            }
+            else {
+                querySnapshot = await firestore()
+                    .collection('UsersLoggedUsingGoogle')
+                    .where('id', '==', id)
+                    .get();
+            }
+            console.log('querySnapshot', querySnapshot)
+            if (!querySnapshot.empty) {
+                const userDocRef = querySnapshot.docs[0].ref;
+                const userData = querySnapshot.docs[0].data();
+                console.log('DEBUG');
+                console.log(userData)
+                const isProductAlreadyExist = userData.recentlyViewedProducts.findIndex(
+                    (item) => item.id === product.id
+                )
+                if (isProductAlreadyExist == -1) {
+                    console.log('isProductAlreadyExist', isProductAlreadyExist)
+                    if (userData.recentlyViewedProducts.length == 8) {
+                        userData.recentlyViewedProducts.pop()
+                    }
+                    console.log('userData.recentlyViewedProducts', userData.recentlyViewedProducts);
+                    userData.recentlyViewedProducts.unshift(product)
+                    console.log('PRO');
+                }
+                else {
+                    console.log('isProductAlreadyExist !== -1')
+                    userData.recentlyViewedProducts.splice(isProductAlreadyExist, 1)
+                    userData.recentlyViewedProducts.unshift(product)
+                }
+                await userDocRef.update({ recentlyViewedProducts: userData.recentlyViewedProducts })
+                this.recentlyViewedProducts = userData.recentlyViewedProducts
+            }
+        }
+        catch (e) {
+            console.log('Got an error in addProductToTheRecentlyViewedInFS', e);
+        }
+    }
 
 }

@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import Category from '../screens/Category';
 import Profile from '../screens/Profile';
+import { CartScreen } from '../screens/Cart';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,9 +31,9 @@ const tabScreens = [
     icon: 'user',
   },
   {
-    name: 'OrderDetail',
-    component: OrderDetail,
-    label: 'Orders',
+    name: 'Cart',
+    component: CartScreen,
+    label: 'Cart',
     icon: 'shopping-cart',
   },
 ];

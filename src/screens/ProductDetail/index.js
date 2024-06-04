@@ -24,7 +24,7 @@ import { MasonryTiles } from '../../components/Mansory/masonryTiles';
 import SaleBanner from '../../components/SaleBanner';
 
 const ProductDetail = observer(({ route, navigation }) => {
-  const { products, cart } = useStore();
+  const { auth, products, cart } = useStore();
   const { productData } = route.params;
   const [similarProducts, setSimilarProducts] = useState([]);
   const [pincode, setPincode] = useState('');
@@ -34,20 +34,15 @@ const ProductDetail = observer(({ route, navigation }) => {
   const emi = (productData.price / 6).toFixed(2);
 
   useEffect(() => {
-    console.log(productData);
     setLoader(true);
+    products.addProductToTheRecentlyViewedInFS(productData, auth.profileData)
     getSimilarProduct();
     setPincode('');
-    products.loadRandomProducts();
     setLoader(false);
   }, []);
 
-  useEffect(() => {
-    products.addRecentlyViewedProduct(productData);
-  }, [productData]);
-
   const getSimilarProduct = async () => {
-    const res = await products.loadProductsOfCategory(productData.category);
+    const res = await products.fetchProductsByCategory(productData.category);
     const filteredSimilarProducts = res.filter(
       product => product.id !== productData.id,
     );
@@ -128,7 +123,7 @@ const ProductDetail = observer(({ route, navigation }) => {
                 maxStars={5}
                 rating={productData.rating}
                 starSize={16}
-                fullStarColor={'black'}
+                fullStarColor={'#999999'}
               />
               <TouchableOpacity>
                 <Text style={styles.ratingText}>{productData.reviews.length} ratings</Text>
@@ -203,7 +198,7 @@ const ProductDetail = observer(({ route, navigation }) => {
 
           <View style={styles.optionContainer}>
             <View style={styles.option}>
-              <Icon name="times-circle" size={25} color="blue" style={styles.icon} />
+              <Icon name="rotate-right" size={25} color="blue" style={styles.icon} />
               <Text style={styles.optionText}>{productData.returnPolicy}</Text>
             </View>
             <View style={styles.option}>
@@ -227,10 +222,10 @@ const ProductDetail = observer(({ route, navigation }) => {
             'furniture' ? (
             <>
               <View style={{ justifyContent: 'space-evenly', flexDirection: 'row' }} >
-                <Text style={{ alignSelf: 'center', color: '#4a4b4d', fontWeight: 'bold', borderWidth: 0.5, padding: 2 }}>
+                <Text style={{ alignSelf: 'center', color: '#4a4b4d', fontWeight: 'bold', borderWidth: 0.5, paddingHorizontal:5, paddingVertical:2, borderRadius:5 }}>
                   {productData.brand}
                 </Text>
-                <Text style={{ alignSelf: 'center', color: 'black' }}>
+                <Text style={{ alignSelf: 'center', color: 'black', }}>
                   {productData.warrantyInformation}
                 </Text>
                 <Text style={{ alignSelf: 'center', color: 'black' }}>
@@ -287,22 +282,6 @@ const ProductDetail = observer(({ route, navigation }) => {
           </ScrollView>
           <View style={styles.straightLine} />
 
-          <SaleBanner
-            saleText={'RBI Card'}
-            sloganText={'Your Credit Journey Starts Here'}
-            discountText={'Get upto 30% cashback'}
-            bgImage={require('../../assets/images/cc-bg.png')}
-            floatingImage1={require('../../assets/images/cc-removebg-preview.png')}
-            floatingImage1Styles={{
-              height: 200,
-              width: 200,
-              top: -75,
-              right: -25,
-            }}
-            floatingImage2={require('../../assets/images/cc-2-removebg-preview.png')}
-            floatingImage2Styles={{ bottom: -40, left: -22 }}
-          />
-
           {/* New In products snippet */}
           <TouchableOpacity onPress={() => { }}>
             <Text style={styles.similarProductsText}>
@@ -345,12 +324,12 @@ const ProductDetail = observer(({ route, navigation }) => {
             })}
           </View>
         </View>
+        {/* <View style={styles.bottomSpacer} /> */}
       </ScrollView>
-      <View style={styles.bottomSpacer} />
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={() => {
-            cart.addItemToCart(productData)
+          onPress={async () => {
+            await cart.addItemToCart(productData, auth.profileData)
           }}
           style={[styles.button, styles.yellowButton]}>
           <Text style={styles.buttonText}>Add to cart</Text>
@@ -395,10 +374,18 @@ const styles = StyleSheet.create({
   },
   yellowButton: {
     backgroundColor: 'white',
+    borderTopWidth:2,
+    borderTopColor: 'green',
+    borderBottomColor: 'green',
+    borderBottomWidth:2
   },
   redButton: {
     backgroundColor: 'green',
     fontWeight: 'bold',
+    // borderTopWidth:2,
+    // borderTopColor: 'white',
+    // borderBottomColor: 'white',
+    // borderBottomWidth:2
   },
   buttonText: {
     color: 'black',
@@ -432,7 +419,7 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     shadowOpacity: 1,
   },
-  bottomSpacer: { marginVertical: 15, shadowOpacity: 1, height: 20 },
+  bottomSpacer: {  shadowOpacity: 1, height: 50 },
   similarProductBrand: { fontSize: 13, marginTop: 5, color: 'black' },
   similarProductTitle: { fontSize: 13, fontWeight: '500', color: 'black' },
   similarProductPrice: { color: 'black', fontWeight: '800' },
@@ -463,7 +450,7 @@ const styles = StyleSheet.create({
   },
   emiText: { fontSize: 15, color: 'black' },
   priceText: { fontWeight: 'bold', fontSize: 18, color: 'black' },
-  ratingText: { color: 'black', marginLeft: 10 },
+  ratingText: { color: 'blue', marginLeft: 10 },
   priceView: {
     padding: 5,
     flex: 1,
@@ -498,15 +485,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   buttonContainer: {
-    // flex: 1,
     flexDirection: 'row',
-    
-    // position: 'absolute',
-    // bottom: 0,
-    // width: '100%',
-    // justifyContent: 'space-evenly',
-    // borderTopWidth: 1,
-    // borderBottomWidth: 1,
   },
   discountPercentage: { fontWeight: '500', fontSize: 15, color: 'black' },
   mrpText: {

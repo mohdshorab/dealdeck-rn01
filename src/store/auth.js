@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from "mobx";
-import { getTheQuerySnapshot, getTheQuerySnapshotOfGoogleUsers, loginWithEmailAndPassword, registerUserEmailPassToFirestore, updateUserObject, updateGoogleUserObject, registerGoogleUserToFirestore } from "../service/authServices";
+import { getTheQuerySnapshot, updateGoogleUserOnFS, loginWithEmailAndPassword, registerUserEmailPassToFirestore, getTheQuerySnapshotOfGoogleUsers } from "../service/authServices";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import moment from 'moment';
 import { generateDeviceId } from "../utils";
@@ -41,12 +41,12 @@ export default class AuthStore {
             const userSnapshot = await getTheQuerySnapshot(data.email, data.password);
             if (!userSnapshot.empty) {
                 const res = await loginWithEmailAndPassword(userSnapshot, deviceId);
-                if (res?.status === 'success') {
+                if (res?.status) {
                     this.profileData = res;
-                    return res;
+                    return true;
                 }
-                if (res?.status === false) {
-                    return { message: "Please check your email and password, or try sign-up" };
+                else {
+                    return false;
                 }
             }
         }
@@ -62,66 +62,19 @@ export default class AuthStore {
         try {
             await GoogleSignin.hasPlayServices();
             const result = await GoogleSignin.signIn();
-            await this.updateGoogleUserOnFS(result.user)
-            return { message: 'success' };
+            const { user } = result;
+            const userSnapshot = await getTheQuerySnapshotOfGoogleUsers(user.email);
+            const res = await updateGoogleUserOnFS(result.user, userSnapshot)
+            if (res?.status) {
+                this.profileData = res
+                return true
+            }
+            else return res
         } catch (error) {
             console.log('Error during Google Sign-In:', error);
             GoogleSignin.revokeAccess();
             await GoogleSignin.signOut();
-            return { message: 'Unable to perform signin' };
-        }
-    };
-
-    @action
-    updateGoogleUserOnFS = async (googleUser) => {
-        const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
-        const deviceId = generateDeviceId(); // Generate a unique device ID
-        try {
-            const userSnapshot = await getTheQuerySnapshotOfGoogleUsers(googleUser.email);
-            if (userSnapshot.empty) {
-                const newId = userSnapshot.size + 1;
-                const newUserObject = {
-                    id: newId,
-                    user: {
-                        email: googleUser.email,
-                        avatar: googleUser.photo,
-                        fname: googleUser.givenName,
-                        lname: googleUser.familyName,
-                        mobile: '',
-                    },
-                    noOfLoggedInDevices: 0,
-                    loggedInDevices: [
-                        {
-                            deviceId: deviceId,
-                            loginTime: currentTime,
-                            loginCount: 0,
-                        },
-                    ],
-                    savedProducts: [],
-                    favProducts: [],
-                    recentlyViewedProducts: [],
-                    savedCards: [],
-                    savedAddresses: [],
-                    orderedProducts: [],
-                    username: googleUser.givenName,
-                    createdAt: currentTime,
-                    updatedAt: null,
-                    authProvider: 'google',
-                    googleId: googleUser.id,
-                };
-                const res = await registerGoogleUserToFirestore(newUserObject);
-                this.profileData = res;
-                return res;
-            } else {
-                const res = await updateGoogleUserObject(userSnapshot, deviceId);
-                if (res?.status === 'success') {
-                    this.profileData = res;
-                    return res;
-                }
-            }
-        } catch (error) {
-            console.log('Error during Google Sign-In:', error);
-            return { message: 'Error, Please connect with @dealdeck' };
+            return { status: false };
         }
     };
 
@@ -132,8 +85,8 @@ export default class AuthStore {
         const { selectedImageURI, firstName, lastName, email, phone, passwordAgain } = data;
         const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
         const deviceId = generateDeviceId(); // Generate a unique device ID
-        const userSnapshot = await getTheQuerySnapshot(email, passwordAgain);
         try {
+            const userSnapshot = await getTheQuerySnapshot(email, passwordAgain);
             if (userSnapshot.empty) {
                 const newId = userSnapshot.size + 1;
                 const newUserObject = {
@@ -160,29 +113,20 @@ export default class AuthStore {
                     savedCards: [],
                     savedAddresses: [],
                     orderedProducts: [],
+                    cart:[],
                     username: firstName,
                     createdAt: currentTime,
                     updatedAt: null,
                     authProvider: 'email',
                 };
                 const res = await registerUserEmailPassToFirestore(newUserObject);
-                if (res?.status === 'success') {
-                    return res;
-                }
-                if (res?.status === 'exist') {
-                    return { message: 'User already exists, please log in.' };
-                }
-                if (res?.status === 'error') {
-                    return { message: 'Error, Please connect with @dealdeck' };
-                }
+                if (res?.status) return res;
             }
-            else {
-                return { status: 'exist' };
-            }
+            else return res;
         }
         catch (error) {
             console.log('Error during Google Sign-In:', error);
-            return { message: 'Error, Please connect with @dealdeck' };
+            return { status: 'false', message: 'Error, Please connect with @dealdeck' };
         }
 
 

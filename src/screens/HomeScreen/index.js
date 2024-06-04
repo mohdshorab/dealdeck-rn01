@@ -22,49 +22,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
 
 const HomeScreen = observer(({ navigation }) => {
-  const { products } = useStore();
+  const { products, auth } = useStore();
   const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setLoader] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
-  const [nextGenProducts, setNextGenProducts] = useState([]);
+
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        await products.loadProductsCategories();
-        await products.loadRandomProducts();
-        await fetchRecentlyViewedProducts();
-        await getNextGenProducts();
-      } catch (err) {
-        setError('Unable to fetch data');
-      } finally {
-        setLoader(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  const fetchRecentlyViewedProducts = async () => {
-    try {
-      const product = await products.getRecentlyViewedProducts();
-      setRecentlyViewedProducts(product || []);
-    } catch (error) {
-      console.error('Error fetching recently viewed products:', error);
-      setError('Unable to fetch data');
-    }
-  };
-
-  const getNextGenProducts = async () => {
-    try {
-      const res = await products.loadNextGenProduct();
-      setNextGenProducts(res);
-    } catch (error) {
-      console.error('Error loading Next Gen products:', error);
-      setError('Unable to fetch data');
-    }
-  };
+    products.fetchRecentlyViewedProducts(auth.profileData)
+  }, [])
 
   const categoryWithImages = products.productCategories.map(item => ({
     name: item.name,
@@ -73,17 +39,15 @@ const HomeScreen = observer(({ navigation }) => {
   }));
 
   const handleRefresh = async () => {
-    setLoader(true);
+    setIsLoading(true);
     setRefreshing(true);
     try {
-      await products.loadProductsCategories();
-      await products.loadRandomProducts();
-      await fetchRecentlyViewedProducts();
+      await products.init();
     } catch (err) {
       setError('Unable to fetch data');
     } finally {
       setRefreshing(false);
-      setLoader(false);
+      setIsLoading(false);
     }
   };
 
@@ -122,7 +86,7 @@ const HomeScreen = observer(({ navigation }) => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {categoryWithImages.map(item => (
                 <TouchableOpacity
-                  key={item.name}
+                  key={item.slug}
                   style={styles.itemContainer}
                   onPress={() => navigation.navigate('ProductsOfCategory', { category: item.slug })}
                 >
@@ -137,11 +101,11 @@ const HomeScreen = observer(({ navigation }) => {
             <Text style={styles.errorText}>Unable to fetch collections</Text>
           )}
         </View>
-        {recentlyViewedProducts && recentlyViewedProducts.length > 0 ? (
+        {products.recentlyViewedProducts && products.recentlyViewedProducts.length > 0 ? (
           <>
             <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
             <FlatList
-              data={recentlyViewedProducts}
+              data={products.recentlyViewedProducts}
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={item => item.id.toString()}
@@ -245,7 +209,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     overflow: 'hidden',
-    borderRadius: 50
+    borderRadius: 50,
   },
   image: {
     width: '100%',
@@ -257,7 +221,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
     fontWeight: '500',
-    fontSize: 12
+    fontSize: 12,
   },
   productTile: {
     padding: 10,

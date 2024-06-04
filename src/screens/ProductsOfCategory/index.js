@@ -31,7 +31,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
 
   const getTheProducts = async () => {
     setLoader(true);
-    const res = await products.loadProductsOfCategory(category);
+    const res = await products.fetchProductsByCategory(category);
     res.length > 0 ? setProductsOfCat(res) : null;
     setLoader(false);
   };
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     height: 160,
     width: '100%',
     resizeMode: 'cover',
-    elevation: 10,
+    // elevation: 10,
     marginBottom: 10,
     borderRadius: 30,
     // borderBottomRightRadius: 10,
