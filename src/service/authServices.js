@@ -11,66 +11,43 @@ export const getTheQuerySnapshot = async (email, password) => {
             .get();
         return querySnapshot;
     } catch (error) {
-        console.log('Error checking user existence fb service : ', error);
+        console.error('Error checking user existence:', error);
         throw error;
     }
 }
 
-
-
 export const getTheQuerySnapshotOfGoogleUsers = async (email) => {
-    try {
-        if (!email) {
-            throw new Error('Email is required to check user existence.');
-        }
-        console.log('Checking user existence for email:', email);
+    if (!email) {
+        throw new Error('Email is required to check user existence.');
+    }
 
+    try {
         const querySnapshot = await firestore()
             .collection('UsersLoggedUsingGoogle')
             .where('user.email', '==', email)
             .get();
 
-        console.log('QuerySnapshot:', querySnapshot);
         return querySnapshot;
     } catch (error) {
-        console.log('Error checking user existence in Firestore:', error);
+        console.error('Error checking user existence in Firestore:', error);
         throw error;
     }
 };
-
-
 
 export const loginWithEmailAndPassword = async (userSnapshot, deviceId) => {
     try {
         const userDocRef = userSnapshot.docs[0].ref;
         const userData = userSnapshot.docs[0].data();
-        const existingDeviceIndex = userData.loggedInDevices.findIndex(
-            (device) => device.deviceId === deviceId
-        );
-        const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
-        if (existingDeviceIndex !== -1) {
-            // Device already logged in, update loginCount and loginTime
-            userData.loggedInDevices[existingDeviceIndex] = {
-                ...userData.loggedInDevices[existingDeviceIndex],
-                loginTime: currentTime,
-                loginCount: userData.loggedInDevices[existingDeviceIndex].loginCount + 1,
-            };
-        } else {
-            // New device, add to loggedInDevices
-            userData.loggedInDevices.push({
-                deviceId: deviceId,
-                loginTime: currentTime,
-                loginCount: 1,
-            });
-            userData.noOfLoggedInDevices += 1;
-        }
+        const { loggedInDevices, noOfLoggedInDevices } = await updateLoggedInDevices(userData, deviceId);
+
         await userDocRef.update({
-            loggedInDevices: userData.loggedInDevices,
-            noOfLoggedInDevices: userData.noOfLoggedInDevices,
+            loggedInDevices,
+            noOfLoggedInDevices,
         });
+
         return { status: true, ...userData };
     } catch (error) {
-        console.log('Error checking user existence fb service while logging in : ', error);
+        console.error('Error logging in:', error);
         return { status: false };
     }
 }
@@ -79,90 +56,159 @@ export const registerUserEmailPassToFirestore = async (userObject) => {
     try {
         const docID = userObject.id.toString();
         const usersCollection = firestore().collection('RegisteredUsers');
-        // Add the new user object to Firestore with an automatically generated document ID
         await usersCollection.doc(docID).set(userObject);
         return { status: true };
     } catch (error) {
-        console.log('Error registering user:', error);
+        console.error('Error registering user:', error);
         return { status: false };
     }
 }
 
-
 export const updateGoogleUserOnFS = async (googleUser, userSnapshot) => {
-    console.log('GoogleUser', googleUser)
     const currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
-    const deviceId = generateDeviceId(); // Generate a unique device ID
+    const deviceId = generateDeviceId();
+
     try {
         const usersCollection = firestore().collection('UsersLoggedUsingGoogle');
 
         if (userSnapshot.empty) {
-            const newUserObject = {
-                id: userSnapshot.size + 1, // Assuming userSnapshot.size can be used to generate a new ID
-                user: {
-                    email: googleUser.email,
-                    avatar: googleUser.photo,
-                    fname: googleUser.givenName,
-                    lname: googleUser.familyName,
-                    mobile: '',
-                },
-                noOfLoggedInDevices: 1,
-                loggedInDevices: [
-                    {
-                        deviceId: deviceId,
-                        loginTime: currentTime,
-                        loginCount: 1,
-                    },
-                ],
-                savedProducts: [],
-                favProducts: [],
-                recentlyViewedProducts: [],
-                savedCards: [],
-                savedAddresses: [],
-                orderedProducts: [],
-                cart:[],
-                username: googleUser.givenName,
-                createdAt: currentTime,
-                updatedAt: null,
-                authProvider: 'google',
-                googleId: googleUser.id,
-            };
-
+            const newUserObject = createNewGoogleUserObject(googleUser, deviceId, currentTime, userSnapshot.size + 1);
             const docID = newUserObject.id.toString();
             await usersCollection.doc(docID).set(newUserObject);
             return { ...newUserObject, status: true };
         } else {
             const userDocRef = userSnapshot.docs[0].ref;
             const userData = userSnapshot.docs[0].data();
-            const existingDeviceIndex = userData.loggedInDevices.findIndex(
-                (device) => device.deviceId === deviceId
-            );
-
-            if (existingDeviceIndex !== -1) {
-                userData.loggedInDevices[existingDeviceIndex] = {
-                    ...userData.loggedInDevices[existingDeviceIndex],
-                    loginTime: currentTime,
-                    loginCount: userData.loggedInDevices[existingDeviceIndex].loginCount + 1,
-                };
-            } else {
-                userData.loggedInDevices.push({
-                    deviceId: deviceId,
-                    loginTime: currentTime,
-                    loginCount: 1,
-                });
-                userData.noOfLoggedInDevices += 1;
-            }
+            const { loggedInDevices, noOfLoggedInDevices } = await updateLoggedInDevices(userData, deviceId, currentTime);
 
             await userDocRef.update({
-                loggedInDevices: userData.loggedInDevices,
-                noOfLoggedInDevices: userData.noOfLoggedInDevices,
+                loggedInDevices,
+                noOfLoggedInDevices,
             });
 
             return { ...userData, status: true };
         }
     } catch (error) {
-        console.log('Error during Google Sign-In:', error);
+        console.error('Error during Google Sign-In:', error);
         return { status: false, message: 'Error, Please connect with @dealdeck' };
     }
 };
 
+export const ensureGooglePlayServices = async () => {
+    try {
+        await GoogleSignin.hasPlayServices();
+    } catch (error) {
+        console.error('Google Play Services not available:', error);
+        throw error;
+    }
+}
+
+export const handleGoogleSignInError = async () => {
+    try {
+        GoogleSignin.revokeAccess();
+        await GoogleSignin.signOut();
+    } catch (error) {
+        console.error('Error revoking access or signing out:', error);
+    }
+}
+
+export const createNewUserObject = (email, passwordAgain, selectedImageURI, firstName, lastName, phone, currentTime, deviceId, userSnapshot) => {
+    const newId = userSnapshot.size + 1; // You can update this logic to generate a unique id
+    return {
+        id: newId,
+        user: {
+            email,
+            password: passwordAgain,
+            avatar: selectedImageURI,
+            fname: firstName,
+            lname: lastName,
+            mobile: phone,
+        },
+        noOfLoggedInDevices: 0,
+        loggedInDevices: [
+            {
+                deviceId,
+                loginTime: currentTime,
+                loginCount: 0,
+            },
+        ],
+        savedProducts: [],
+        favProducts: [],
+        recentlyViewedProducts: [],
+        savedCards: [],
+        savedAddresses: [],
+        orderedProducts: [],
+        cart: [],
+        username: firstName,
+        createdAt: currentTime,
+        updatedAt: null,
+        authProvider: 'email',
+    };
+}
+
+const createNewGoogleUserObject = (googleUser, deviceId, currentTime, id) => {
+    return {
+        id,
+        user: {
+            email: googleUser.email,
+            avatar: googleUser.photo,
+            fname: googleUser.givenName,
+            lname: googleUser.familyName,
+            mobile: '',
+        },
+        noOfLoggedInDevices: 1,
+        loggedInDevices: [
+            {
+                deviceId,
+                loginTime: currentTime,
+                loginCount: 1,
+            },
+        ],
+        savedProducts: [],
+        favProducts: [],
+        recentlyViewedProducts: [],
+        savedCards: [],
+        savedAddresses: [],
+        orderedProducts: [],
+        cart: [],
+        username: googleUser.givenName,
+        createdAt: currentTime,
+        updatedAt: null,
+        authProvider: 'google',
+        googleId: googleUser.id,
+    };
+}
+
+const updateLoggedInDevices = async (userData, deviceId, currentTime = moment().format('MMMM Do YYYY, h:mm:ss a')) => {
+    const existingDeviceIndex = userData.loggedInDevices.findIndex(
+        (device) => device.deviceId === deviceId
+    );
+
+    if (existingDeviceIndex !== -1) {
+        // Device already logged in, update loginCount and loginTime
+        const updatedLoggedInDevices = [...userData.loggedInDevices];
+        updatedLoggedInDevices[existingDeviceIndex] = {
+            ...updatedLoggedInDevices[existingDeviceIndex],
+            loginTime: currentTime,
+            loginCount: updatedLoggedInDevices[existingDeviceIndex].loginCount + 1,
+        };
+        return {
+            loggedInDevices: updatedLoggedInDevices,
+            noOfLoggedInDevices: userData.noOfLoggedInDevices,
+        };
+    } else {
+        // New device, add to loggedInDevices
+        const updatedLoggedInDevices = [
+            ...userData.loggedInDevices,
+            {
+                deviceId,
+                loginTime: currentTime,
+                loginCount: 1,
+            },
+        ];
+        return {
+            loggedInDevices: updatedLoggedInDevices,
+            noOfLoggedInDevices: userData.noOfLoggedInDevices + 1,
+        };
+    }
+}

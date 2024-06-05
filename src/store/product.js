@@ -22,6 +22,7 @@ export default class Products {
                 this.fetchProductsCategories(),
                 this.fetchRandomProducts(),
                 this.fetchRecentlyViewedProducts(profileInfo),
+                this.fetchSponsoredProduct(),
             ]);
         } catch (e) {
             console.error('Error initializing store:', e);
@@ -77,82 +78,50 @@ export default class Products {
 
     @action
     fetchRecentlyViewedProducts = async (profileData) => {
-        const { id, authProvider } = profileData;
-        console.log(id, authProvider)
         try {
-            let querySnapshot;
-            if (authProvider == 'email') {
-                querySnapshot = await firestore()
-                    .collection('RegisteredUsers')
-                    .where('id', '==', id)
-                    .get();
-            }
-            else {
-                querySnapshot = await firestore()
-                    .collection('UsersLoggedUsingGoogle')
-                    .where('id', '==', id)
-                    .get();
-            }
-            console.log(querySnapshot)
+            const querySnapshot = await this.getUserQuerySnapshot(profileData);
             if (!querySnapshot.empty) {
                 const userData = querySnapshot.docs[0].data();
-                this.recentlyViewedProducts = userData.recentlyViewedProducts;
+                this.recentlyViewedProducts = userData.recentlyViewedProducts || [];
             }
-        }
-        catch (e) {
-
+        } catch (e) {
+            console.error('Error fetching recently viewed products:', e);
         }
     }
-
 
     @action
     addProductToTheRecentlyViewedInFS = async (product, userInfo) => {
-        const { id, authProvider, } = userInfo;
-        console.log('userINFO', id, authProvider)
         try {
-            let querySnapshot;
-            if (authProvider == 'email') {
-                querySnapshot = await firestore()
-                    .collection('RegisteredUsers')
-                    .where('id', '==', id)
-                    .get();
-            }
-            else {
-                querySnapshot = await firestore()
-                    .collection('UsersLoggedUsingGoogle')
-                    .where('id', '==', id)
-                    .get();
-            }
-            console.log('querySnapshot', querySnapshot)
+            const querySnapshot = await this.getUserQuerySnapshot(userInfo);
             if (!querySnapshot.empty) {
                 const userDocRef = querySnapshot.docs[0].ref;
                 const userData = querySnapshot.docs[0].data();
-                console.log('DEBUG');
-                console.log(userData)
-                const isProductAlreadyExist = userData.recentlyViewedProducts.findIndex(
-                    (item) => item.id === product.id
-                )
-                if (isProductAlreadyExist == -1) {
-                    console.log('isProductAlreadyExist', isProductAlreadyExist)
-                    if (userData.recentlyViewedProducts.length == 8) {
-                        userData.recentlyViewedProducts.pop()
-                    }
-                    console.log('userData.recentlyViewedProducts', userData.recentlyViewedProducts);
-                    userData.recentlyViewedProducts.unshift(product)
-                    console.log('PRO');
-                }
-                else {
-                    console.log('isProductAlreadyExist !== -1')
-                    userData.recentlyViewedProducts.splice(isProductAlreadyExist, 1)
-                    userData.recentlyViewedProducts.unshift(product)
-                }
-                await userDocRef.update({ recentlyViewedProducts: userData.recentlyViewedProducts })
-                this.recentlyViewedProducts = userData.recentlyViewedProducts
+                const updatedRecentlyViewedProducts = this.updateRecentlyViewedProducts(userData.recentlyViewedProducts, product);
+                await userDocRef.update({ recentlyViewedProducts: updatedRecentlyViewedProducts });
+                this.recentlyViewedProducts = updatedRecentlyViewedProducts;
             }
-        }
-        catch (e) {
-            console.log('Got an error in addProductToTheRecentlyViewedInFS', e);
+        } catch (e) {
+            console.error('Error adding product to recently viewed:', e);
         }
     }
 
+    getUserQuerySnapshot = async (profileData) => {
+        const { id, authProvider } = profileData;
+        const collectionName = authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
+        return await firestore().collection(collectionName).where('id', '==', id).get();
+    }
+
+    updateRecentlyViewedProducts = (recentlyViewedProducts, product) => {
+        const productIndex = recentlyViewedProducts.findIndex((item) => item.id === product.id);
+        if (productIndex === -1) {
+            if (recentlyViewedProducts.length === 8) {
+                recentlyViewedProducts.pop();
+            }
+            return [product, ...recentlyViewedProducts];
+        } else {
+            const updatedRecentlyViewedProducts = [...recentlyViewedProducts];
+            updatedRecentlyViewedProducts.splice(productIndex, 1);
+            return [product, ...updatedRecentlyViewedProducts];
+        }
+    }
 }
