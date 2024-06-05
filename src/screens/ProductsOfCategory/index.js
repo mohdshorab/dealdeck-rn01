@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -11,22 +11,21 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useStore} from '../../store';
-import {observer} from 'mobx-react';
+import { useStore } from '../../store';
+import { observer } from 'mobx-react';
 import CustomHeader from '../../components/Header';
-import {MasonryTiles} from '../../components/Mansory/masonryTiles';
+import { MasonryTiles } from '../../components/Mansory/masonryTiles';
 // eslint-disable-next-line no-unused-vars
-import {categoriesName, imageUrls} from '../../constants/dummyJSONs';
+import { categoriesName, imageUrls } from '../../constants/dummyJSONs';
 
-const ProductsOfCategory = observer(({route, navigation}) => {
-  const {category} = route.params;
-  const {products} = useStore();
+const ProductsOfCategory = observer(({ route, navigation }) => {
+  const { category } = route.params;
+  const { products } = useStore();
   const [productsOfCat, setProductsOfCat] = useState([]);
   const [isLoading, setLoader] = useState(false);
 
   useEffect(() => {
     getTheProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getTheProducts = async () => {
@@ -40,13 +39,13 @@ const ProductsOfCategory = observer(({route, navigation}) => {
     console.log('CATEGORY', category)
     const imageSrc = imageUrls[category] || imageUrls.default;
 
-    return <Image source={{uri: imageSrc}} style={styles.stateicImageBanner} />;
+    return <Image source={{ uri: imageSrc }} style={styles.stateicImageBanner} />;
   };
 
   if (isLoading) {
     return (
       <SafeAreaView>
-        <CustomHeader 
+        <CustomHeader
           titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
           navigation={navigation}
         />
@@ -58,14 +57,15 @@ const ProductsOfCategory = observer(({route, navigation}) => {
   const bgImage = category == 'laptops' || 'smartphones' ? 'https://img.freepik.com/free-vector/paper-style-white-monochrome-background_23-2149014827.jpg' : 'https://images.unsplash.com/photo-1620503374956-c942862f0372?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGNvbG9yJTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D';
 
   return (
-    <SafeAreaView style={{backgroundColor: 'white'}}>
+    <SafeAreaView style={{ backgroundColor: 'white' }}>
       <ImageBackground
         source={{
-          uri: bgImage, 
+          uri: bgImage,
         }}>
         <CustomHeader
-        navigation={navigation}
+          navigation={navigation}
           titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
+          showCart
         />
         <ScrollView
           style={{
@@ -78,7 +78,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            // style={{backgroundColor: 'white'}}
+          // style={{backgroundColor: 'white'}}
           >
             {productsOfCat.length > 0 &&
               productsOfCat.map(item => {
@@ -97,11 +97,11 @@ const ProductsOfCategory = observer(({route, navigation}) => {
                     key={item.name}
                     style={styles.itemContainer}
                     onPress={() => {
-                      navigation.navigate('ProductDetail', {productData: item});
+                      navigation.navigate('ProductDetail', { productData: item });
                     }}>
                     <View style={styles.imageContainer}>
                       <Image
-                        source={{uri: item.images[1]}}
+                        source={{ uri: item.images[1] }}
                         style={styles.image}
                       />
                     </View>
@@ -154,7 +154,7 @@ const ProductsOfCategory = observer(({route, navigation}) => {
               })}
             </View>
           </View>
-          <View style={{marginBottom:40}} />
+          <View style={{ marginBottom: 40 }} />
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {width: 5, height: 5},
+        shadowOffset: { width: 5, height: 5 },
         shadowOpacity: 0.5,
         shadowRadius: 2,
       },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     color: 'black',
     alignSelf: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 2, height: 12},
+    shadowOffset: { width: 2, height: 12 },
     shadowOpacity: 0.5,
     shadowRadius: 2,
   },

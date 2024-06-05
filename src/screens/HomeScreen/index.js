@@ -118,10 +118,10 @@ const HomeScreen = observer(({ navigation }) => {
                   <Text style={styles.productBrand}>{item.brand}</Text>
                   <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
                   <View style={styles.priceContainer}>
-                    <Text style={styles.productPrice}>${item.price}</Text>
+                    <Text style={styles.productPrice}>${(item.price + (item.price * item.discountPercentage) / 100).toFixed(0)}</Text>
                     <Icon name="chevron-right" color="green" size={13} />
                     <Text style={styles.productDiscountPrice}>
-                      ${(item.price - (item.price * item.discountPercentage) / 100).toFixed(0)}
+                      ${item.price}
                     </Text>
                   </View>
                 </TouchableOpacity>

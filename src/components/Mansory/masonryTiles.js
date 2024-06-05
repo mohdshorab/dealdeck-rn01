@@ -4,8 +4,8 @@ import StarRating from 'react-native-star-rating';
 
 export const MasonryTiles = ({ product, index, navigation }) => {
   // const formattedTitle = product.title.replace(/-/, ' ').replace(/\b\w/g, (match) => match.toUpperCase());
-  const discountedPrice =
-    product.price - (product.price * product.discountPercentage) / 100;
+  const ActualPrice =
+    product.price + (product.price * product.discountPercentage) / 100;
   const notEvenIndex = index % 2 !== 0;
   const getRandomNumber = () => Math.random();
   // (50% probability)
@@ -24,7 +24,7 @@ export const MasonryTiles = ({ product, index, navigation }) => {
         </View>
       )}
       <View style={styles.ratingContainer}>
-        <Text style={{color: 'green', fontWeight:'500'}} > {product.rating}</Text>
+        <Text style={{ color: 'green', fontWeight: '500' }} > {product.rating}</Text>
         <StarRating
           disabled={true}
           maxStars={1}
@@ -33,21 +33,21 @@ export const MasonryTiles = ({ product, index, navigation }) => {
           fullStarColor={'green'}
         />
       </View>
-      <View style={{ paddingHorizontal:10, paddingBottom:10 }} >
-        <Text style={styles.itemTitle} adjustsFontSizeToFit numberOfLines={1}>
-          {product.title}
+      <View style={{ paddingHorizontal: 10, paddingVertical: 10 }} >
+        <Text style={styles.itemTitle} adjustsFontSizeToFit numberOfLines={2}>
+          {product.title.split(" ").splice(-3).join(" ")}
         </Text>
-        <View style={styles.productDetailsView}>
+        {/* <View style={styles.productDetailsView}>
           <Text style={styles.discountPercentage}>
             {product.discountPercentage}% off
           </Text>
         </View>
         <View style={styles.productDetailsView}>
-          <Text style={styles.productPrice}>${product.price}</Text>
-          <Text style={styles.discountedPrice}>
-            ${discountedPrice.toFixed(2)}
-          </Text>
-        </View>
+          <Text style={styles.productPrice}>${ActualPrice.toFixed(2)}</Text>
+        </View> */}
+        <Text style={styles.discountedPrice}>
+          @ ${product.price}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -80,7 +80,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
     alignSelf: 'flex-start',
-    color: 'black'
+    color: 'black',
+    fontWeight:'500'
   },
   productDetailsView: {
     justifyContent: 'space-between',
@@ -105,9 +106,10 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   discountedPrice: {
-    fontWeight: 'bold',
+    fontWeight: '500',
     color: 'black',
     fontSize: 13,
+    paddingTop:10
   },
   rating: {
     color: 'darkblue',
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     position: 'absolute',
-    bottom: 66,
+    top: 80,
     left: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 2,

@@ -6,21 +6,22 @@ import { observer } from 'mobx-react';
 
 const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart, titleStyle }) => {
   const { cart } = useStore();
-  const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-
-  const handleSearchIconPress = () => {
-    setIsSearchBarVisible(true);
-    setSearchText('');
-  };
-
-  const handleSearchBlur = () => {
-    setIsSearchBarVisible(false);
-  };
 
   const handleSearchTextChange = (text) => {
     setSearchText(text);
   };
+
+  const renderCartIcon = () => (
+    <TouchableOpacity onPress={() => navigation.navigate('CartScreen')}>
+      <Icon name="shopping-cart" size={24} color="#4a4b4d" />
+      {cart.cartCount > 0 && (
+        <View style={styles.cartCountContainer}>
+          <Text style={styles.cartCountText}>{cart.cartCount}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -28,69 +29,28 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
         <>
           <Image
             source={require('../../assets/images/dealdeck_logo.png')}
-            style={{
-              height: 40,
-              width: 40,
-              resizeMode: 'contain',
-              borderRadius: 35,
-            }}
+            style={styles.logo}
           />
-          {/* Input Bar */}
           <View style={styles.inputContainer}>
-            <TextInput style={styles.inputPlaceholder} value='Search products' />
+            <TextInput
+              style={styles.input}
+              placeholder="Search products"
+              value={searchText}
+              onChangeText={handleSearchTextChange}
+            />
             <Icon name="search" size={24} color="#000" />
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
-            <Icon name="shopping-cart" size={24} color="#4a4b4d" />
-            <View
-              style={{
-                position: 'absolute',
-                top: -10,
-                right: -5,
-                fontWeight: 'bold',
-                backgroundColor: 'red',
-                borderRadius: 10,
-                width: 15,
-                alignItems: 'center'
-              }
-              }
-            >
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart?.cartItems?.length}</Text>
-            </View>
-          </TouchableOpacity>
+          {renderCartIcon()}
         </>
       ) : (
-        < View style={[styles.productDetailHeader, { justifyContent: showCart ? 'space-between' : null }]}>
-
+        <View style={[styles.productDetailHeader, showCart && { justifyContent: 'space-between' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name="arrow-back-ios" size={20} color="#4a4b4d" />
+            <Icon name="arrow-back-ios" size={20} color="black" />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={[styles.productName, titleStyle]}>{titleOnHead}</Text>
           </View>
-          {
-            showCart ?
-              (
-                <TouchableOpacity onPress={() => navigation.navigate('CartScreen')} >
-                  <Icon name="shopping-cart" size={24} color="#4a4b4d" />
-                  <View
-                    style={{
-                      position: 'absolute',
-                      top: -10,
-                      right: -5,
-                      fontWeight: 'bold',
-                      backgroundColor: 'red',
-                      borderRadius: 10,
-                      width: 15,
-                      alignItems: 'center'
-                    }
-                    }
-                  >
-                    <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }} >{cart?.cartItems?.length}</Text>
-                  </View>
-                </TouchableOpacity>
-              )
-              : null}
+          {showCart && renderCartIcon()}
         </View>
       )}
     </View>
@@ -115,29 +75,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flex: 1,
     marginHorizontal: 16,
-    justifyContent: 'space-between'
   },
-  inputPlaceholder: {
-    marginLeft: 8,
-    color: '#000',
-  },
-  searchInput: {
+  input: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
     color: '#000',
   },
   productDetailHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignContent: 'flex-start',
     flex: 1,
   },
   productName: {
     fontSize: 18,
-    color: '#4a4b4d',
+    color: 'black',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -146,6 +96,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginLeft: 16,
+  },
+  logo: {
+    height: 40,
+    width: 40,
+    resizeMode: 'contain',
+    borderRadius: 35,
+  },
+  cartCountContainer: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cartCountText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
 });
 

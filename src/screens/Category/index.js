@@ -6,7 +6,6 @@ import { categoriesName } from '../../constants/dummyJSONs';
 import { CategoryImages } from '../../constants/categoriesImage';
 
 const Category = observer(({navigation}) => {
-    useEffect(() => { }, []);
 
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={()=> navigation.navigate('ProductsOfCategory',{category:item})} style={styles.categoryContainer}>
@@ -17,7 +16,7 @@ const Category = observer(({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <CustomHeader titleOnHead={'Category'} navigation={navigation} />
+            <CustomHeader titleOnHead={'Category'} navigation={navigation} showCart />
             <FlatList
                 data={categoriesName}
                 renderItem={renderItem}
@@ -47,14 +46,13 @@ const styles = StyleSheet.create({
 
     },
     categoryImage: {
-        width: 120,
-        height: 120,
-        position: 'absolute',
-        right:0,
-        borderWidth:1,
+        width: 100,
+        height: 100,
+        // position: 'absolute',
+        // right:0,
+        // borderWidth:1,
         width:'50%',
-        borderTopRightRadius: 20,
-        borderBottomRightRadius:20
+        borderRadius:20
     },
     categoryText: {
         paddingLeft:10,

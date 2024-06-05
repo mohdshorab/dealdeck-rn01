@@ -222,7 +222,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             'furniture' ? (
             <>
               <View style={{ justifyContent: 'space-evenly', flexDirection: 'row' }} >
-                <Text style={{ alignSelf: 'center', color: '#4a4b4d', fontWeight: 'bold', borderWidth: 0.5, paddingHorizontal:5, paddingVertical:2, borderRadius:5 }}>
+                <Text style={{ alignSelf: 'center', color: '#4a4b4d', fontWeight: 'bold', borderWidth: 0.5, paddingHorizontal: 5, paddingVertical: 2, borderRadius: 5 }}>
                   {productData.brand}
                 </Text>
                 <Text style={{ alignSelf: 'center', color: 'black', }}>
@@ -324,16 +324,24 @@ const ProductDetail = observer(({ route, navigation }) => {
             })}
           </View>
         </View>
-        {/* <View style={styles.bottomSpacer} /> */}
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={async () => {
-            await cart.addItemToCart(productData, auth.profileData)
-          }}
-          style={[styles.button, styles.yellowButton]}>
-          <Text style={styles.buttonText}>Add to cart</Text>
-        </TouchableOpacity>
+        {
+          (cart.cartItems.findIndex(item => item.id === productData.id) == -1) ?
+            <TouchableOpacity
+              onPress={async () => {
+                await cart.addItemToCart(productData, auth.profileData)
+              }}
+              style={[styles.button, styles.yellowButton]}>
+              <Text style={styles.buttonText}>Add to cart</Text>
+            </TouchableOpacity>
+            :
+            <TouchableOpacity
+              onPress={() => navigation.navigate('CartScreen')}
+              style={[styles.button, styles.yellowButton]}>
+              <Text style={styles.buttonText}>Go to cart</Text>
+            </TouchableOpacity>
+        }
         <TouchableOpacity style={[styles.button, styles.redButton]}>
           <Text style={[styles.buttonText, { color: 'white' }]}>Buy Now</Text>
         </TouchableOpacity>
@@ -374,10 +382,10 @@ const styles = StyleSheet.create({
   },
   yellowButton: {
     backgroundColor: 'white',
-    borderTopWidth:2,
+    borderTopWidth: 2,
     borderTopColor: 'green',
     borderBottomColor: 'green',
-    borderBottomWidth:2
+    borderBottomWidth: 2
   },
   redButton: {
     backgroundColor: 'green',
@@ -419,7 +427,7 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     shadowOpacity: 1,
   },
-  bottomSpacer: {  shadowOpacity: 1, height: 50 },
+  bottomSpacer: { shadowOpacity: 1, height: 50 },
   similarProductBrand: { fontSize: 13, marginTop: 5, color: 'black' },
   similarProductTitle: { fontSize: 13, fontWeight: '500', color: 'black' },
   similarProductPrice: { color: 'black', fontWeight: '800' },
