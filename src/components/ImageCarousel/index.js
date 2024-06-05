@@ -31,7 +31,7 @@ const Carousel = ({
         {images.map((image, index) => (
           <TouchableOpacity onPress={onPress} key={index} style={styles.slide}>
             {typeof image === 'string' ? (
-              <Image source={{ uri: image }} style={styles.image} />
+              <Image source={{ uri: image }} style={[styles.image,{resizeMode: 'contain'}]} />
             ) : (
               <Image source={image.image} style={styles.image} />
             )}

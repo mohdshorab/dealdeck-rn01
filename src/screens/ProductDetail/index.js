@@ -11,17 +11,16 @@ import {
   Alert,
   RefreshControl,
   TextInput,
-  Button,
-  Modal,
 } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import CustomHeader from '../../components/Header';
 import Carousel from '../../components/ImageCarousel';
 import { useStore } from '../../store';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library you're using
+import Icon from 'react-native-vector-icons/FontAwesome';
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { observer } from 'mobx-react';
 import { MasonryTiles } from '../../components/Mansory/masonryTiles';
-import SaleBanner from '../../components/SaleBanner';
+import { Share } from 'react-native';
 
 const ProductDetail = observer(({ route, navigation }) => {
   const { auth, products, cart } = useStore();
@@ -75,7 +74,22 @@ const ProductDetail = observer(({ route, navigation }) => {
   };
 
   const checkDeliveryAvailability = pincode => {
-    return pincode === '110016';
+    return pincode === '110017';
+  };
+
+  const shareProduct = (product) => {
+    const title = product.title
+    const price = product.price;
+    const description = product.description;
+    const imageUrl = product.thumbnail;
+
+    const message = `Check out this product:\n\nTitle: ${title}\nPrice: ${price}\nDescription: ${description}\n\n${imageUrl}`;
+
+    Share.share({
+      message: message,
+    })
+      .then(result => console.log(result))
+      .catch(errorMsg => console.log(errorMsg));
   };
 
   if (showLoader) {
@@ -107,7 +121,6 @@ const ProductDetail = observer(({ route, navigation }) => {
           <View style={styles.straightLine} />
           <View
             style={{
-              // paddingVertical: 10,
               borderRadius: 10,
             }}>
             <View style={styles.brandView}>
@@ -324,6 +337,12 @@ const ProductDetail = observer(({ route, navigation }) => {
             })}
           </View>
         </View>
+        <TouchableOpacity style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
+          <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => shareProduct(productData)} style={{ position: 'absolute', right: 13, top: 60, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
+          <AntDesignIcon name="sharealt" size={23} color={'#4a4b4d'} />
+        </TouchableOpacity>
       </ScrollView>
       <View style={styles.buttonContainer}>
         {
@@ -390,10 +409,6 @@ const styles = StyleSheet.create({
   redButton: {
     backgroundColor: 'green',
     fontWeight: 'bold',
-    // borderTopWidth:2,
-    // borderTopColor: 'white',
-    // borderBottomColor: 'white',
-    // borderBottomWidth:2
   },
   buttonText: {
     color: 'black',
