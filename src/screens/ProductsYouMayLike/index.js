@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View, Platform, TouchableOpacity } from "react-native";
-import { MasonryTiles } from "../../components/Mansory/masonryTiles";
+import { MasonryTiles } from "../../components/Mansory";
 import CustomHeader from "../../components/Header";
 import { useStore } from "../../store";
 

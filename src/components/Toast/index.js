@@ -6,12 +6,13 @@ const ShowToast = (props) => {
         Toast.show({
             type: props.type,
             text1: props?.text1,
-            position: 'top',
+            position: props.position,
             text1Style: { color: props?.color },
             autoHide: true,
-            visibilityTime: 2000,
+            visibilityTime: props?.visibilityTime ? props?.visibilityTime : 2000,
             topOffset: Platform.OS === 'ios' ? 50 : 0,
-            onHide:props.onHide
+            onHide:props.onHide,
+            bottomOffset: props?.bottomOffset ? props?.bottomOffset: null
         })
 
     )

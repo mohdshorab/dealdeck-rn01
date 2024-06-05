@@ -58,10 +58,7 @@ export const CartScreen = observer(({ navigation }) => {
             )}
             {cart.cartCount > 0 && (
                 <View style={styles.totalContainer}>
-                    <View style={styles.subTotalContainer} >
-                        <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
-                        <Text style={styles.itemCount}>({cart.cartCount} items)</Text>
-                    </View>
+                    <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
                     <CustomButton title={'Place Order'} textStyle={{ fontWeight: 'bold', fontSize: 18 }} />
                 </View>
             )}
@@ -179,11 +176,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
+        paddingBottom:5
     },
-    subTotalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 8
-
-    }
 });

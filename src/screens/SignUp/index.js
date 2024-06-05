@@ -11,8 +11,8 @@ import CustomButton from "../../components/Button";
 import ImagePickerComponent from "../../components/ImagePicker";
 import GooglePNG from '../../assets/images/GooglePNG.png';
 import PhonePNG from '../../assets/images/PhonePNG.png';
-import ShowToast from "../../components/Toast/toast";
-import CustomModal from "../../components/Modal/customModal";
+import ShowToast from "../../components/Toast";
+import CustomModal from "../../components/Modal";
 import CustomHeader from "../../components/Header";
 import CustomLoader from "../../components/CustomLoader";
 

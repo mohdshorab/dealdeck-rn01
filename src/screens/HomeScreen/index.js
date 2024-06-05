@@ -17,7 +17,7 @@ import Carousel from '../../components/ImageCarousel';
 import { carouselJson } from '../../constants/dummyJSONs';
 import { CategoryImages } from '../../constants/categoriesImage';
 import { observer } from 'mobx-react';
-import { MasonryTiles } from '../../components/Mansory/masonryTiles';
+import { MasonryTiles } from '../../components/Mansory';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
 

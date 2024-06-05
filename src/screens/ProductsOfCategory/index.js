@@ -14,7 +14,7 @@ import {
 import { useStore } from '../../store';
 import { observer } from 'mobx-react';
 import CustomHeader from '../../components/Header';
-import { MasonryTiles } from '../../components/Mansory/masonryTiles';
+import { MasonryTiles } from '../../components/Mansory';
 // eslint-disable-next-line no-unused-vars
 import { categoriesName, imageUrls } from '../../constants/dummyJSONs';
 

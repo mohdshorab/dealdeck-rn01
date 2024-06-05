@@ -82,7 +82,7 @@ export default class AuthStore {
         try {
             const userSnapshot = await getTheQuerySnapshot(email, passwordAgain);
             if (userSnapshot.empty) {
-                const newUserObject = createNewUserObject(email, passwordAgain, selectedImageURI, firstName, lastName, phone, currentTime, deviceId,userSnapshot);
+                const newUserObject = createNewUserObject(email, passwordAgain, selectedImageURI, firstName, lastName, phone, currentTime, deviceId, userSnapshot);
                 const res = await registerUserEmailPassToFirestore(newUserObject);
                 if (res?.status) {
                     return res;
@@ -93,6 +93,31 @@ export default class AuthStore {
         } catch (error) {
             console.error('Error during registration:', error);
             return { status: false, message: 'Error, Please connect with @dealdeck' };
+        }
+    }
+
+    @action
+    logout = async () => {
+        try {
+            const collectionName = this.profileData.authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
+            const userSnapshot = await firestore().collection(collectionName).where('id', '==', id).get();
+            if (!userSnapshot.empty) {
+                const userDocRef = userSnapshot.docs[0].ref;
+                const userData = userSnapshot.docs[0].data();
+                const loggedDevices = userData.loggedInDevices;
+                const currentDeviceID = generateDeviceId();
+                const currentDeviceIndex = loggedDevices.findIndex(item => item.deviceId == currentDeviceID)
+                if (currentDeviceIndex !== -1) {
+                    loggedDevices.splice(currentDeviceIndex, 1);
+                    await userDocRef.update({ loggedInDevices: loggedDevices });
+                    return true
+                }
+                return false
+            }
+            return false
+        }
+        catch (e) {
+            console.error('Error doing logout : ', e)
         }
     }
 

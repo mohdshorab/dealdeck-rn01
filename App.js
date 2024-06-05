@@ -18,9 +18,8 @@ import AppStackNavigation from './src/navigation/Nav';
 import Toast from 'react-native-toast-message';
 import { StoreProvider } from './src/store';
 import NetInfo from '@react-native-community/netinfo';
-import { stores } from './src/store';
 import codePush from "react-native-code-push";
-import ShowToast from './src/components/Toast/toast';
+import ShowToast from './src/components/Toast';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 GoogleSignin.configure({
@@ -54,7 +53,7 @@ class App extends Component {
       console.log('checkstate', state.isConnected, state);
       const text1 = state?.isConnected ? 'You are connected with internet' : 'Disconnected'
       const type = state?.isConnected ? 'success' : 'error';
-      ShowToast({ type: type, text1: text1, color: type == 'error' ? "red" : 'green', })
+      ShowToast({ type: type, text1: text1, color: type == 'error' ? "red" : 'green', position: 'top' })
       // if (state.isConnected && !stores.auth.isNetworkAvailable) {
       //   this.syncData();
       // }

@@ -17,7 +17,7 @@ import GooglePNG from '../../assets/images/GooglePNG.png';
 import PhonePNG from '../../assets/images/PhonePNG.png';
 import { useStore } from "../../store";
 import { observer } from 'mobx-react';
-import ShowToast from "../../components/Toast/toast";
+import ShowToast from "../../components/Toast";
 
 const LogInForm = observer(({ navigation }) => {
     const { auth, products, cart } = useStore();

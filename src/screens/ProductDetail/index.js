@@ -19,9 +19,10 @@ import { useStore } from '../../store';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { observer } from 'mobx-react';
-import { MasonryTiles } from '../../components/Mansory/masonryTiles';
+import { MasonryTiles } from '../../components/Mansory';
 import { Share } from 'react-native';
 import axios from 'axios';
+import ShowToast from '../../components/Toast';
 
 const ProductDetail = observer(({ route, navigation }) => {
   const { auth, products, cart, favProd } = useStore();
@@ -348,7 +349,10 @@ const ProductDetail = observer(({ route, navigation }) => {
           (favProd.favProdItems.findIndex(item => item.id === productData.id)) == -1
             ?
             <TouchableOpacity
-              onPress={async () => await favProd.addItemToFavourites(productData, auth.profileData)}
+              onPress={async () => {
+                await favProd.addItemToFavourites(productData, auth.profileData)
+                ShowToast({ bottomOffset: 88 , type: 'info', text1: 'Added to favourites', color: 'white', position: 'bottom', })
+              }}
               style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
               <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
             </TouchableOpacity>
@@ -370,6 +374,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             <TouchableOpacity
               onPress={async () => {
                 await cart.addItemToCart(productData, auth.profileData)
+                ShowToast({ bottomOffset: 88 , type: 'info', text1: 'Item added to cart, successfully', color: 'white', position: 'bottom', })
               }}
               style={[styles.button, styles.yellowButton]}>
               <Text style={styles.buttonText}>Add to cart</Text>
