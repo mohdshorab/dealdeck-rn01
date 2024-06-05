@@ -42,7 +42,20 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         width:'95%',
         marginHorizontal:10,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        ...Platform.select({
+            android: {
+                elevation: 10,
+            },
+        }),
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 5, height: 5 },
+                shadowOpacity: 0.5,
+                shadowRadius: 2,
+            },
+        }),
 
     },
     categoryImage: {

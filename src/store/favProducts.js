@@ -91,7 +91,7 @@ export default class FavProdStore {
     updateFavouritesWithProduct = (favProducts, product) => {
         const productIndex = favProducts.findIndex((item) => item.id === product.id);
         if (productIndex === -1) {
-                return [{ ...product}, ...favProducts];
+            return [{ ...product }, ...favProducts];
         } else return favProducts
     }
 }

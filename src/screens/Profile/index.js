@@ -71,7 +71,9 @@ const Profile = observer(({ navigation }) => {
                             <Ionicons name={'save-sharp'} size={30} color={'orange'} />
                             <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Saved Items</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center' }} >
+                        <TouchableOpacity style={{ alignItems: 'center' }} 
+                        onPress={() => navigation.navigate('favProds')}
+                        >
                             <FontAwesome name={'heart'} size={30} color={'red'} />
                             <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Favourites</Text>
                         </TouchableOpacity>
