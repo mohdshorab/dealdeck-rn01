@@ -21,12 +21,14 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { observer } from 'mobx-react';
 import { MasonryTiles } from '../../components/Mansory/masonryTiles';
 import { Share } from 'react-native';
+import axios from 'axios';
 
 const ProductDetail = observer(({ route, navigation }) => {
-  const { auth, products, cart } = useStore();
+  const { auth, products, cart, favProd } = useStore();
   const { productData } = route.params;
   const [similarProducts, setSimilarProducts] = useState([]);
   const [pincode, setPincode] = useState('');
+  const [areaName, setAreaName] = useState('');
   const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
 
   const [showLoader, setLoader] = useState(false);
@@ -62,19 +64,18 @@ const ProductDetail = observer(({ route, navigation }) => {
     if (numericText.length <= 6) {
       setPincode(numericText);
     }
+    setAreaName('')
   };
 
-  const handleCheckDelivery = () => {
-    const isDeliverable = checkDeliveryAvailability(pincode);
-    if (isDeliverable) {
-      Alert.alert('Hurray', 'Product is deliverable to your pincode.');
-    } else {
-      Alert.alert('Sorry', 'Product cannot be delivered to your pincode.');
+  const checkDeliveryAvailability = async () => {
+    try {
+      const response = await axios.get(`https://api.zippopotam.us/in/${pincode}`);
+      const place = response.data.places[0];
+      setAreaName(`Product is deliverable to : ${place['place name']}, ${place['state abbreviation']}`)
+    } catch (error) {
+      console.error(error);
+      setAreaName('Area not found');
     }
-  };
-
-  const checkDeliveryAvailability = pincode => {
-    return pincode === '110017';
   };
 
   const shareProduct = (product) => {
@@ -194,7 +195,7 @@ const ProductDetail = observer(({ route, navigation }) => {
               maxLength={6}
               value={pincode}
               onChangeText={handlePincodeChange}
-              placeholder="Enter Pincode"
+              placeholder="Enter 6 digit Pincode"
               placeholderTextColor={'black'}
             />
             <TouchableOpacity
@@ -202,11 +203,17 @@ const ProductDetail = observer(({ route, navigation }) => {
                 styles.pincodeBtn,
                 pincode.length !== 6 && styles.buttonDisabled,
               ]}
-              onPress={handleCheckDelivery}
+              onPress={() => checkDeliveryAvailability()}
               disabled={pincode.length !== 6}>
-              <Text style={styles.checkDeliveryBtn}>Check Delivery</Text>
+              <Text
+                style={styles.checkDeliveryBtn}
+              >Check Delivery</Text>
             </TouchableOpacity>
           </View>
+          {areaName && pincode.length == 6 ?
+            <Text numberOfLines={2} style={{ alignSelf: 'center', fontWeight: '500', fontSize: 14, marginTop: 10 }} >{areaName}</Text>
+            : null
+          }
           <View style={styles.straightLine} />
 
           <View style={styles.optionContainer}>
@@ -337,9 +344,22 @@ const ProductDetail = observer(({ route, navigation }) => {
             })}
           </View>
         </View>
-        <TouchableOpacity style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
-          <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
-        </TouchableOpacity>
+        {
+          (favProd.favProdItems.findIndex(item => item.id === productData.id)) == -1
+            ?
+            <TouchableOpacity
+              onPress={async () => await favProd.addItemToFavourites(productData, auth.profileData)}
+              style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
+              <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity
+              onPress={async () => await favProd.removeItemFromFavourites(productData, auth.profileData)}
+              style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
+              <AntDesignIcon name="heart" size={23} color={'red'} />
+            </TouchableOpacity>
+
+        }
         <TouchableOpacity onPress={() => shareProduct(productData)} style={{ position: 'absolute', right: 13, top: 60, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
           <AntDesignIcon name="sharealt" size={23} color={'#4a4b4d'} />
         </TouchableOpacity>
