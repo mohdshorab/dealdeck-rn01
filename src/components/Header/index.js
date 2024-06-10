@@ -37,6 +37,7 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
               placeholder="Search products"
               value={searchText}
               onChangeText={handleSearchTextChange}
+              placeholderTextColor={'#000'}
             />
             <Icon name="search" size={24} color="#000" />
           </View>
@@ -72,7 +73,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
     flex: 1,
     marginHorizontal: 16,
   },
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    paddingVertical:10,
   },
   productName: {
     fontSize: 18,

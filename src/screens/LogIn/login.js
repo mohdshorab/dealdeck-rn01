@@ -20,11 +20,12 @@ import { observer } from 'mobx-react';
 import ShowToast from "../../components/Toast";
 
 const LogInForm = observer(({ navigation }) => {
-    const { auth, products, cart } = useStore();
+    const { auth, products, cart, favProd } = useStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailWarning, setEmailWarning] = useState('');
     const [passwordWarning, setPasswordWarning] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleEmailChange = (text) => {
         setEmail(text);
@@ -58,24 +59,57 @@ const LogInForm = observer(({ navigation }) => {
         }
 
         if (valid) {
-            const res = await auth.login({ email, password })
-            if (res) {
-                await products.init(auth.profileData);
-                await cart.init(auth.profileData)
-                navigation.navigate('Home');
+            setLoading(true); // Start loader
+            try {
+                const res = await auth.login({ email, password });
+                if (res) {
+                    await products.init(auth.profileData);
+                    await cart.init(auth.profileData);
+                    navigation.navigate('Home');
+                } else {
+                    ShowToast({ type: "error", text1: "Login failed, retry after sometime", color: "red" });
+                }
+            } catch (error) {
+                ShowToast({ type: "error", text1: "Login failed, retry after sometime", color: "red" });
+            } finally {
+                setLoading(false); // Stop loader
             }
         }
     };
 
     const googleSignIn = async () => {
-        const res = await auth.googleSignIn();
-        if (res?.status) {
-            await products.init()
-            console.log('profileData',auth.profileData)
-            navigation.navigate('Home')
+        setLoading(true); // Start loader
+        try {
+            const res = await auth.googleSignIn();
+            if (res?.status) {
+                await products.init(auth.profileData);
+                await cart.init(auth.profileData);
+                await favProd.init(auth.profileData)
+                navigation.navigate('Home');
+            } else {
+                let errorMessage;
+                switch (res.error) {
+                    case 'SIGN_IN_CANCELLED':
+                        errorMessage = "Sign-in cancelled";
+                        break;
+                    case 'IN_PROGRESS':
+                        errorMessage = "Another sign-in operation is already in progress";
+                        break;
+                    case 'UNKNOWN_ERROR':
+                        errorMessage = "An error occurred during sign-in";
+                        break;
+                    default:
+                        errorMessage = res.error || "An unknown error occurred";
+                }
+                ShowToast({ type: "error", text1: errorMessage, color: "red" });
+            }
+        } catch (error) {
+            ShowToast({ type: "error", text1: "Login failed, retry after sometime", color: "red" });
+        } finally {
+            setLoading(false); // Stop loader
         }
-        else ShowToast({ type: "error", text1: res.message, color: "red" });
     }
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -136,9 +170,9 @@ const LogInForm = observer(({ navigation }) => {
                             <Text style={{ color: 'black' }} >Google</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.socialLoginButton} onPress={async () => {
-                            await products.init(auth.profileData)
-
-                            navigation.navigate('Home')
+                            // await products.init(auth.profileData)
+                            // navigation.navigate('Home')
+                            await auth.googleSignOut()
 
                         }}>
                             <Image source={PhonePNG} style={styles.socialLoginIcon} />
@@ -213,7 +247,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
     },
     loginButton: {
-        height: 30,
+        height: 40,
         paddingLeft: 10,
         marginTop: 15
     },

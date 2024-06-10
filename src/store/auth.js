@@ -53,24 +53,33 @@ export default class AuthStore {
         }
     }
 
-    @action
     googleSignIn = async () => {
         try {
             await ensureGooglePlayServices();
             const result = await GoogleSignin.signIn();
+
+            if (result.isCancelled) {
+                return { status: false, error: 'SIGN_IN_CANCELLED' };
+            }
             const { user } = result;
             const userSnapshot = await getTheQuerySnapshotOfGoogleUsers(user.email);
             const res = await updateGoogleUserOnFS(result.user, userSnapshot);
+
             if (res?.status) {
                 this.profileData = res;
-                return true;
+                return { status: true };
             } else {
-                return res;
+                return { status: false, error: res.message };
             }
         } catch (error) {
             console.error('Error during Google Sign-In:', error);
+
+            if (error.code === 'IN_PROGRESS') {
+                return { status: false, error: 'IN_PROGRESS' };
+            }
+
             await handleGoogleSignInError();
-            return { status: false };
+            return { status: false, error: 'UNKNOWN_ERROR' };
         }
     }
 
@@ -120,5 +129,17 @@ export default class AuthStore {
             console.error('Error doing logout : ', e)
         }
     }
+
+    @action
+    googleSignOut = async () => {
+        try {
+          await GoogleSignin.revokeAccess();
+          await GoogleSignin.signOut();
+          console.log('User signed out successfully');
+        } catch (error) {
+          console.error('Error during sign-out:', error);
+          // Handle sign-out error
+        }
+      };
 
 }

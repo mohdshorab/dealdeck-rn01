@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
 import { useStore } from '../../store';
 import CustomHeader from '../../components/Header';
@@ -9,13 +9,18 @@ const FavProducts = observer(({ navigation }) => {
 
     const { auth,cart, favProd } = useStore();
 
+    useEffect(() => {
+        favProd.fetchFavProdItem(auth.profileData)
+    }, [])
+    
+
     const renderItem = ({ item }) => (
         <View style={styles.subContainer} >
             <TouchableOpacity style={styles.categoryContainer} onPress={() => { navigation.navigate('ProductDetail', { productData: item }) }} >
                 <Image source={{ uri: item.thumbnail }} style={styles.categoryImage} />
-                <View>
+                <View  style={{ flexDirection: 'column' }} >
                     <Text style={styles.brandText}>Brand: {item.brand}</Text>
-                    <Text style={styles.categoryText}>{item.title}</Text>
+                    <Text style={styles.categoryText} numberOfLines={2} >{item.title}</Text>
                     <Text style={styles.priceText}>just @{item.price}</Text>
                 </View>
                 <MaterialIcon name="chevron-thin-right" size={30} color='#4a4b4d' />
@@ -25,12 +30,12 @@ const FavProducts = observer(({ navigation }) => {
                     style={{ alignItems: 'center', padding: 5, width: '50%', borderRightWidth: 0.5 }}
                     onPress={async () => await cart.addItemToCart(item, auth.profileData)}
                 >
-                    <Text>Add to cart</Text>
+                    <Text style={{ color: 'black', fontWeight: '500' }} >Add to cart</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ alignItems: 'center', padding: 5, width: '50%' }}
                     onPress={async () => await favProd.removeItemFromFavourites(item, auth.profileData)}
                 >
-                    <Text>Remove from Favourites</Text>
+                    <Text style={{ color: 'black', fontWeight: '500' }} >Remove from Favourites</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -61,7 +66,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 100,
         borderRadius: 20,
-        width: '95%',
+        // width: '95%',
         marginHorizontal: 10,
         backgroundColor: 'white',
         justifyContent: 'space-evenly'
@@ -74,7 +79,7 @@ const styles = StyleSheet.create({
     },
     categoryText: {
         fontWeight: '500',
-        // width: '50%',
+        width: '50%',
         fontSize: 16,
         color: 'black'
     },

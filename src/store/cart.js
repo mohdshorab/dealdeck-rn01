@@ -65,8 +65,6 @@ export default class CartStore {
                 const updatedCart = this.updateCartWithProduct(userData.cart, product);
                 await userDocRef.update({ cart: updatedCart });
                 this.cartItems = updatedCart;
-                console.log('updatedCart', updatedCart)
-                console.log('updatedCart', this.cartItems)
             } else {
                 console.error('User data not found');
             }

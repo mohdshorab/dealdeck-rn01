@@ -108,6 +108,8 @@ export default class Products {
     getUserQuerySnapshot = async (profileData) => {
         const { id, authProvider } = profileData;
         const collectionName = authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
+        console.log('ID',id)
+        console.log(await firestore().collection(collectionName).where('id', '==', id).get())
         return await firestore().collection(collectionName).where('id', '==', id).get();
     }
 

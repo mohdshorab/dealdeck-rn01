@@ -23,6 +23,7 @@ import { MasonryTiles } from '../../components/Mansory';
 import { Share } from 'react-native';
 import axios from 'axios';
 import ShowToast from '../../components/Toast';
+import CarouselWithThumbnails from '../../components/CarouselWithThumbnail';
 
 const ProductDetail = observer(({ route, navigation }) => {
   const { auth, products, cart, favProd } = useStore();
@@ -55,15 +56,16 @@ const ProductDetail = observer(({ route, navigation }) => {
     setLoader(true);
     setRefreshing(true);
     getSimilarProduct();
-    products.loadRandomProducts();
+    products.fetchRandomProducts();
     setRefreshing(false);
     setLoader(false);
   };
 
-  const handlePincodeChange = text => {
+  const handlePincodeChange = async (text) => {
     const numericText = text.replace(/[^0-9]/g, '');
     if (numericText.length <= 6) {
       setPincode(numericText);
+      await checkDeliveryAvailability();
     }
     setAreaName('')
   };
@@ -113,11 +115,8 @@ const ProductDetail = observer(({ route, navigation }) => {
             title="Release to refresh"
           />
         }>
-        <Carousel
+        <CarouselWithThumbnails
           images={productData.images}
-          showsPagination
-          height={200}
-        // showsButtons={true}
         />
         <View style={styles.subContainer}>
           <View style={styles.straightLine} />
@@ -191,6 +190,7 @@ const ProductDetail = observer(({ route, navigation }) => {
                 borderWidth: 1,
                 borderColor: 'gray',
                 paddingHorizontal: 10,
+                color: 'black'
               }}
               keyboardType="numeric"
               maxLength={6}
@@ -212,7 +212,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             </TouchableOpacity>
           </View>
           {areaName && pincode.length == 6 ?
-            <Text numberOfLines={2} style={{ alignSelf: 'center', fontWeight: '500', fontSize: 14, marginTop: 10 }} >{areaName}</Text>
+            <Text numberOfLines={2} style={{ alignSelf: 'center', fontWeight: '500', fontSize: 14, marginTop: 10, color:'black' }} >{areaName}</Text>
             : null
           }
           <View style={styles.straightLine} />
@@ -351,7 +351,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             <TouchableOpacity
               onPress={async () => {
                 await favProd.addItemToFavourites(productData, auth.profileData)
-                ShowToast({ bottomOffset: 88 , type: 'info', text1: 'Added to favourites', color: 'white', position: 'bottom', })
+                ShowToast({ bottomOffset: 88, type: 'info', text1: 'Added to favourites', color: 'white', position: 'bottom', })
               }}
               style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
               <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
@@ -374,7 +374,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             <TouchableOpacity
               onPress={async () => {
                 await cart.addItemToCart(productData, auth.profileData)
-                ShowToast({ bottomOffset: 88 , type: 'info', text1: 'Item added to cart, successfully', color: 'white', position: 'bottom', })
+                ShowToast({ bottomOffset: 88, type: 'info', text1: 'Item added to cart, successfully', color: 'white', position: 'bottom', })
               }}
               style={[styles.button, styles.yellowButton]}>
               <Text style={styles.buttonText}>Add to cart</Text>
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: 5
   },
-  subContainer: { marginTop: '10%', width: '95%', alignSelf: 'center' },
+  subContainer: { width: '95%', alignSelf: 'center' },
   brandView: { flex: 1, flexDirection: 'row' },
   moreProductText: { fontWeight: 'bold', fontSize: 15, color: 'grey' },
   BrandNameText: { fontWeight: 'bold', fontSize: 15, color: 'black' },

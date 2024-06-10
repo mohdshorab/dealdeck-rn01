@@ -128,9 +128,10 @@ const HomeScreen = observer(({ navigation }) => {
               )}
             />
           </>
-        ) : (
+        ) : products.recentlyViewedProducts.length !== 0 && (
           <Text style={styles.errorText}>Unable to fetch recently viewed items</Text>
-        )}
+        )
+        }
         <SaleBanner
           saleText="Laptop Sale"
           sloganText="Unleash Your Productivity, Anywhere"

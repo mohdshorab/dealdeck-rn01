@@ -71,8 +71,8 @@ const Profile = observer(({ navigation }) => {
                             <Ionicons name={'save-sharp'} size={30} color={'orange'} />
                             <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Saved Items</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center' }} 
-                        onPress={() => navigation.navigate('favProds')}
+                        <TouchableOpacity style={{ alignItems: 'center' }}
+                            onPress={() => navigation.navigate('favProds')}
                         >
                             <FontAwesome name={'heart'} size={30} color={'red'} />
                             <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Favourites</Text>
@@ -113,7 +113,10 @@ const Profile = observer(({ navigation }) => {
                             />
                         </View>
                     ) : null}
-                <CustomButton title={'Logout'} buttonStyle={{ height: 30, borderRadius: 5, width: '90%', alignSelf: 'center', }} textStyle={{ fontSize: 18 }} />
+                <CustomButton
+                    title={'Logout'} buttonStyle={{ height: 30, borderRadius: 5, width: '90%', alignSelf: 'center', }} textStyle={{ fontSize: 18 }}
+                    onPress={() => auth.googleSignOut() && navigation.navigate('logInForm')}
+                />
                 <View style={[styles.emptyView, { marginBottom: 50 }]} />
             </ScrollView>
         </SafeAreaView>

@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { generateDeviceId } from '../utils';
 import moment from 'moment';
 
@@ -72,10 +73,10 @@ export const updateGoogleUserOnFS = async (googleUser, userSnapshot) => {
         const usersCollection = firestore().collection('UsersLoggedUsingGoogle');
 
         if (userSnapshot.empty) {
-            const newUserObject = createNewGoogleUserObject(googleUser, deviceId, currentTime, userSnapshot.size + 1);
-            const docID = newUserObject.id.toString();
-            await usersCollection.doc(docID).set(newUserObject);
-            return { ...newUserObject, status: true };
+            const newUserObject = createNewGoogleUserObject(googleUser, deviceId, currentTime);
+            const newDocRef = usersCollection.doc(); // Get a new document reference
+            await newDocRef.set({ ...newUserObject, id: newDocRef.id }); // Set the document data
+            return { ...newUserObject, id: newDocRef.id, status: true };
         } else {
             const userDocRef = userSnapshot.docs[0].ref;
             const userData = userSnapshot.docs[0].data();
@@ -146,9 +147,8 @@ export const createNewUserObject = (email, passwordAgain, selectedImageURI, firs
     };
 }
 
-const createNewGoogleUserObject = (googleUser, deviceId, currentTime, id) => {
+const createNewGoogleUserObject = (googleUser, deviceId, currentTime) => {
     return {
-        id,
         user: {
             email: googleUser.email,
             avatar: googleUser.photo,
