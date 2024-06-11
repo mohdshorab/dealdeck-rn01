@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: '100%',
     height: 100,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   itemTitle: {
     fontSize: 14,
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     top: 5,
     left: 0,
     fontWeight: 'bold',
-    // borderWidth:1,
     backgroundColor: '#000000',
     padding: 2,
   },

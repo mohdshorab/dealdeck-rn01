@@ -16,7 +16,7 @@ const Category = observer(({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <CustomHeader titleOnHead={'Category'} navigation={navigation} showCart />
+            <CustomHeader titleOnHead={'Category'} navigation={navigation} />
             <FlatList
                 data={categoriesName}
                 renderItem={renderItem}
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
             ios: {
                 shadowColor: '#000',
                 shadowOffset: { width: 5, height: 5 },
-                shadowOpacity: 0.5,
+                shadowOpacity: 0.1,
                 shadowRadius: 2,
             },
         }),

@@ -76,26 +76,6 @@ export const searchTheProduct = async (productName) => {
   }
 }
 
-export const fetchTheNextGenProduct = async () => {
-  try {
-    const respone = await axios.get('https://api.escuelajs.co/api/v1/categories/2/products');
-    return respone.data;
-  } catch (error) {
-    console.error('API Error:', error);
-    throw new Error('Failed to fetch product categories from the API.');
-  }
-}
-
-export const fetchTheSponsoredProduct = async () => {
-  try {
-    const response = await axios.get(`https://dummyjson.com/products/1`);
-    return response.data
-  }
-  catch (e) {
-    console.error('API Error:', error);
-    throw new Error('Failed to fetch product categories from the API.');
-  }
-}
 
 export const addProductToRecentlyView = async (product, userId) => {
   try {

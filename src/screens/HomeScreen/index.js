@@ -42,7 +42,7 @@ const HomeScreen = observer(({ navigation }) => {
     setIsLoading(true);
     setRefreshing(true);
     try {
-      await products.init();
+      await products.init(auth.profileData);
     } catch (err) {
       setError('Unable to fetch data');
     } finally {

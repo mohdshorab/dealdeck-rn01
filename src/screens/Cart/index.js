@@ -10,7 +10,11 @@ export const CartScreen = observer(({ navigation }) => {
     const { cart, auth } = useStore();
 
     const renderItem = ({ item }) => (
-        <View style={styles.itemContainer}>
+        <TouchableOpacity
+            style={styles.itemContainer}
+            onPress={() => navigation.push('ProductDetail', { productData: item })
+            }
+        >
             <Image source={{ uri: item.thumbnail }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
                 <Text style={styles.brandText}>{item.brand}</Text>
@@ -33,10 +37,9 @@ export const CartScreen = observer(({ navigation }) => {
                         <Icon name="add" size={24} color="#333" />
                     </TouchableOpacity>
                     : null
-
                 }
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -59,7 +62,7 @@ export const CartScreen = observer(({ navigation }) => {
             {cart.cartCount > 0 && (
                 <View style={styles.totalContainer}>
                     <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
-                    <CustomButton title={'Place Order'} textStyle={{ fontWeight: 'bold', fontSize: 18 }} />
+                    <CustomButton title={'Place Order'} textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }} />
                 </View>
             )}
         </SafeAreaView>
@@ -147,6 +150,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 32,
+        backgroundColor: 'white'
     },
     emptyCartImage: {
         width: 200,
@@ -176,6 +180,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
-        paddingBottom:5
+        paddingBottom: 5
     },
 });

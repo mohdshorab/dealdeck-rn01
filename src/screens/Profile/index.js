@@ -1,176 +1,215 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CustomHeader from "../../components/Header";
-import profileIcon from '../../assets/images/profileIcon.png'
+import profileIcon from '../../assets/images/profileIcon.png';
 import { useStore } from "../../store";
-import FeatherIcon from 'react-native-vector-icons/Feather'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import FeatherIcon from 'react-native-vector-icons/Feather';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { observer } from "mobx-react";
 import CustomButton from "../../components/Button";
 
 const Profile = observer(({ navigation }) => {
-
     const { auth, products } = useStore();
     const { user } = auth?.profileData;
 
     useEffect(() => {
-        console.log('products.recentlyViewedProducts', products.sponsoredItem)
-        console.log('auth.profileData', auth.profileData)
-    }, [])
+        console.log('products.recentlyViewedProducts', products.sponsoredItem);
+        console.log('auth.profileData', auth.profileData);
+    }, []);
 
+    const renderRecentlyViewedItem = ({ item }) => (
+        <TouchableOpacity
+            onPress={() => navigation.navigate('ProductDetail', { productData: item })}
+            style={styles.productTile}
+        >
+            <Image source={{ uri: item.thumbnail }} style={styles.productImage} resizeMode="contain" />
+            <Text style={styles.productBrand}>{item.brand}</Text>
+            <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
+            <View style={styles.priceContainer}>
+                <Text style={styles.productPrice}>${item.price}</Text>
+                <FontAwesome name="chevron-right" color="green" size={13} />
+                <Text style={styles.productDiscountPrice}>
+                    ${(item.price - (item.price * item.discountPercentage) / 100).toFixed(0)}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    );
 
     return (
-        <SafeAreaView >
-            <CustomHeader titleOnHead={'Your Profile'} navigation={navigation} showCart />
-            <ScrollView style={styles.scrollviewContainer} >
-                <View style={styles.profileContainer} >
-                    {user && user.avatar ? <Image style={styles.profileImage} source={{ uri: user.avatar }} />
-                        :
+        <SafeAreaView style={styles.container}>
+            <CustomHeader titleOnHead={'Your Profile'} navigation={navigation} />
+            <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
+                <View style={styles.profileContainer}>
+                    {user && user.avatar ? (
+                        <Image style={styles.profileImage} source={{ uri: user.avatar }} />
+                    ) : (
                         <Image style={styles.profileImage} source={profileIcon} />
-                    }
-                    <Image />
-                    {user && user.fname ? <Text style={styles.userNameText}>Hey, {user.fname}</Text>
-                        :
-                        <Text style={styles.userNameText}>Syncing Error</Text>}
+                    )}
+                    <Text style={styles.userNameText}>
+                        {user && user.fname ? `Hey, ${user.fname}` : 'Syncing Error'}
+                    </Text>
                 </View>
-                <View style={styles.emptyView} />
-                <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white', width: '100%', alignSelf: 'center', paddingHorizontal: 10 }} >
-                    <Text style={styles.myOrdersText} >My Orders</Text>
-                    <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={30} />
-                </TouchableOpacity>
-                <View style={styles.emptyView} />
-                <View style={{ backgroundColor: 'white', width: '100%', alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 10 }} >
-                    <Text style={styles.myOrdersText} >Account Setting</Text>
-                    <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-between', backgroundColor: 'white', marginVertical: 10 }} >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <FontAwesome name={'user'} size={22} color={'#4a4b4d'} style={{ width: 20 }} />
-                            <Text style={styles.profileMenuText} >Edit Profile</Text>
-                        </View>
-                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={25} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-between', backgroundColor: 'white', }} >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <FontAwesome name={'credit-card-alt'} size={16} color={'#4a4b4d'} style={{ width: 20 }} />
-                            <Text style={styles.profileMenuText} >Saved Cards</Text>
-                        </View>
-                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={25} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ flexDirection: "row", justifyContent: 'space-between', backgroundColor: 'white', marginTop: 10 }} >
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <FontAwesome name={'location-arrow'} size={24} color={'#4a4b4d'} style={{ width: 20 }} />
-                            <Text style={styles.profileMenuText} >Saved Addresses</Text>
-                        </View>
-                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={25} />
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.emptyView} />
-                <View style={{ backgroundColor: 'white', paddingHorizontal: 10, width: '100%' }} >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, marginVertical: 10 }} >
-                        <TouchableOpacity style={{ alignItems: 'center' }} >
-                            <Ionicons name={'save-sharp'} size={30} color={'orange'} />
-                            <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Saved Items</Text>
+
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>Quick Actions</Text>
+                    <View style={styles.quickActionsContainer}>
+                        <TouchableOpacity style={styles.quickActionButton} onPress={() => navigation.navigate('favProds')}>
+                            <FontAwesome name={'heart'} size={22} color={'red'} />
+                            <Text style={styles.quickActionText}>Favourites</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center' }}
-                            onPress={() => navigation.navigate('favProds')}
-                        >
-                            <FontAwesome name={'heart'} size={30} color={'red'} />
-                            <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Favourites</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center' }} >
-                            <FontAwesome name={'gift'} size={30} color={'orange'} />
-                            <Text style={{ color: '#4a4b4d', fontSize: 14, fontWeight: '600', paddingTop: 5 }}>Coupons</Text>
+                        <TouchableOpacity style={styles.quickActionButton}>
+                            <FontAwesome name={'gift'} size={24} color={'orange'} />
+                            <Text style={styles.quickActionText}>Coupons</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.emptyView} />
-                {
-                    products.recentlyViewedProducts && products.recentlyViewedProducts.length > 0 ? (
-                        <View style={{ backgroundColor: 'white', paddingHorizontal: 10, width: '100%', paddingTop: 5 }}>
-                            <Text style={styles.myOrdersText}>Recently viewed Items</Text>
-                            <FlatList
-                                data={products.recentlyViewedProducts}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={item => item.id.toString()}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity
-                                        onPress={() => navigation.navigate('ProductDetail', { productData: item })}
-                                        style={styles.productTile}
-                                    >
-                                        <Image source={{ uri: item.thumbnail }} style={styles.productImage} resizeMode="contain" />
-                                        <Text style={styles.productBrand}>{item.brand}</Text>
-                                        <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
-                                        <View style={styles.priceContainer}>
-                                            <Text style={styles.productPrice}>${item.price}</Text>
-                                            <FontAwesome name="chevron-right" color="green" size={13} />
-                                            <Text style={styles.productDiscountPrice}>
-                                                ${(item.price - (item.price * item.discountPercentage) / 100).toFixed(0)}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                )}
-                            />
+
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>Recently Viewed</Text>
+                    {products.recentlyViewedProducts && products.recentlyViewedProducts.length > 0 ? (
+                        <FlatList
+                            data={products.recentlyViewedProducts}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={renderRecentlyViewedItem}
+                        />
+                    ) : (
+                        <Text style={styles.noItemsText}>No recently viewed items.</Text>
+                    )}
+                </View>
+
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>My Orders</Text>
+                    <TouchableOpacity style={styles.orderButton}>
+                        <Text style={styles.orderButtonText}>View Orders</Text>
+                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.sectionContainer}>
+                    <Text style={styles.sectionTitle}>Account Settings</Text>
+                    <TouchableOpacity style={styles.menuItemContainer}>
+                        <View style={styles.menuItemTextContainer}>
+                            <Ionicons name={'person-outline'} size={24} color={'#4a4b4d'} style={styles.menuItemIcon} />
+                            <Text style={styles.menuItemText}>Edit Profile</Text>
                         </View>
-                    ) : null}
+                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItemContainer}>
+                        <View style={styles.menuItemTextContainer}>
+                            <FontAwesome name={'credit-card-alt'} size={24} color={'#4a4b4d'} style={styles.menuItemIcon} />
+                            <Text style={styles.menuItemText}>Saved Cards</Text>
+                        </View>
+                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItemContainer}>
+                        <View style={styles.menuItemTextContainer}>
+                            <Ionicons name={'location-outline'} size={24} color={'#4a4b4d'} style={styles.menuItemIcon} />
+                            <Text style={styles.menuItemText}>Saved Addresses</Text>
+                        </View>
+                        <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
+                    </TouchableOpacity>
+                </View>
+
                 <CustomButton
-                    title={'Logout'} buttonStyle={{ height: 30, borderRadius: 5, width: '90%', alignSelf: 'center', }} textStyle={{ fontSize: 18 }}
+                    title={'Logout'}
+                    buttonStyle={styles.logoutButton}
+                    textStyle={styles.logoutButtonText}
                     onPress={() => auth.googleSignOut() && navigation.navigate('logInForm')}
                 />
-                <View style={[styles.emptyView, { marginBottom: 50 }]} />
             </ScrollView>
         </SafeAreaView>
-    )
+    );
 });
 
 export default Profile;
-const styles = StyleSheet.create({
-    Subcontainer: {
-        marginBottom: 10,
-        paddingBottom: 10,
-        backgroundColor: '#00C0FF',
-        borderBottomLeftRadius: 200,
-        borderBottomRightRadius: 200,
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    scrollViewContentContainer: {
+        alignItems: 'center',
+        paddingBottom: 20,
+    },
+    profileContainer: {
+        alignItems: 'center',
+        paddingVertical: 20,
+        width: '100%',
+        backgroundColor: 'white',
+        marginBottom: 20,
     },
     profileImage: {
         height: 100,
         width: 100,
         resizeMode: 'contain',
-        marginVertical: 10,
         borderRadius: 100,
-        marginHorizontal: 10
-    },
-    profileContainer: {
-        // flexDirection: 'row',
-        alignItems: 'center',
-        paddingBottom: 20,
-        width: '100%',
-        backgroundColor: 'white',
+        marginHorizontal: 10,
     },
     userNameText: {
         fontWeight: 'bold',
-
         fontSize: 20,
-        color: '#4a4b4d'
+        color: '#4a4b4d',
     },
-    myOrdersText: {
+    sectionContainer: {
+        backgroundColor: 'white',
+        width: '100%',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        marginBottom: 20,
+        borderRadius: 10,
+    },
+    sectionTitle: {
         fontWeight: '600',
         fontSize: 18,
-        color: 'black'
+        color: 'black',
+        marginBottom: 10,
     },
-    scrollviewContainer: {
-        width: '100%',
-        alignSelf: 'center'
+    quickActionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
     },
-    emptyView: {
-        height: 10
+    quickActionButton: {
+        alignItems: 'center',
+        paddingVertical: 10,
     },
-    profileMenuText: {
+    quickActionText: {
+        color: '#4a4b4d',
+        fontSize: 14,
+        fontWeight: '600',
+        paddingTop: 5,
+    },
+    menuItemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+    },
+    menuItemTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    menuItemIcon: {
+        marginRight: 10,
+    },
+    menuItemText: {
         fontWeight: '400',
         fontSize: 16,
         color: '#4a4b4d',
-        paddingLeft: 10
+    },
+    orderButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+    },
+    orderButtonText: {
+        fontWeight: '500',
+        fontSize: 16,
+        color: '#4a4b4d',
     },
     productTile: {
         padding: 10,
@@ -209,13 +248,21 @@ const styles = StyleSheet.create({
         color: 'green',
         marginTop: 2,
     },
-    recentlyViewedText: {
-        fontSize: 20,
-        marginLeft: 10,
-        fontWeight: '700',
-        marginTop: 5,
-        color: 'black',
+    noItemsText: {
+        fontWeight: '500',
+        fontSize: 16,
+        color: '#4a4b4d',
+        textAlign: 'center',
     },
-
-
-})
+    logoutButton: {
+        height: 50,
+        borderRadius: 10,
+        width: '90%',
+        alignSelf: 'center',
+        marginVertical: 20,
+    },
+    logoutButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+});

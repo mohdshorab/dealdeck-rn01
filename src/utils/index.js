@@ -10,3 +10,14 @@ export const generateDeviceId = () => {
 
     return deviceId;
 };
+
+export const searchTheProduct = async (text) => {
+    try {
+        fetch('https://dummyjson.com/products/search?q=phone')
+            .then(res => res.json())
+            .then(console.log);
+    }
+    catch (e) {
+        console.error('Error found while searching', e)
+    }
+}

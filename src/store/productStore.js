@@ -1,13 +1,12 @@
 import { observable, action, makeAutoObservable } from "mobx";
 import firestore from '@react-native-firebase/firestore';
-import { fetchTheNextGenProduct, fetchTheSponsoredProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly, searchTheProduct } from "../service/productService";
+import { fetchTheNextGenProduct, fetchTheSponsoredProduct, getAllProducts, getProductsCategories, getProductsOfCategory, getProductsRandomly, getSearchResults, searchTheProduct } from "../service/productService";
 
 export default class Products {
     @observable products = {};
     @observable productCategories = [];
     @observable randomProduct = [];
     @observable recentlyViewedProducts = [];
-    @observable sponsoredItem = null;
 
     constructor(store) {
         this.store = store;
@@ -60,23 +59,6 @@ export default class Products {
     }
 
     @action
-    fetchNextGenProduct = async () => {
-        const res = await fetchTheNextGenProduct();
-        return res || [];
-    }
-
-    @action
-    fetchSponsoredProduct = async () => {
-        try {
-            const res = await fetchTheSponsoredProduct();
-            this.sponsoredItem = res;
-        } catch (error) {
-            console.error('Error fetching sponsored product:', error);
-            this.sponsoredItem = null;
-        }
-    }
-
-    @action
     fetchRecentlyViewedProducts = async (profileData) => {
         try {
             const querySnapshot = await this.getUserQuerySnapshot(profileData);
@@ -105,10 +87,22 @@ export default class Products {
         }
     }
 
+    @action
+    getSearchResults = async (text) => {
+        try {
+            const result = await getSearchResults(text);
+            if (result?.products && result?.products.length > 0) return { ...result, status: true }
+            else return { status: false }
+        }
+        catch (e) {
+            console.error('Error in searching :', e);
+         }
+    }
+
     getUserQuerySnapshot = async (profileData) => {
         const { id, authProvider } = profileData;
         const collectionName = authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
-        console.log('ID',id)
+        console.log('ID', id)
         console.log(await firestore().collection(collectionName).where('id', '==', id).get())
         return await firestore().collection(collectionName).where('id', '==', id).get();
     }

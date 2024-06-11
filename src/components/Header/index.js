@@ -8,7 +8,8 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
   const { cart } = useStore();
   const [searchText, setSearchText] = useState('');
 
-  const handleSearchTextChange = (text) => {
+  const handleSearchTextChange = async (text) => {
+    const res = await getSearchResults(text);
     setSearchText(text);
   };
 
@@ -41,7 +42,6 @@ const CustomHeader = observer(({ showFullHead, navigation, titleOnHead, showCart
             />
             <Icon name="search" size={24} color="#000" />
           </View>
-          {renderCartIcon()}
         </>
       ) : (
         <View style={[styles.productDetailHeader, showCart && { justifyContent: 'space-between' }]}>
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: '#000',
+    paddingVertical:12
   },
   productDetailHeader: {
     flexDirection: 'row',

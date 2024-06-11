@@ -44,7 +44,7 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
 
   if (isLoading) {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{ backgroundColor: 'white' }} >
         <CustomHeader
           titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
           navigation={navigation}
@@ -126,11 +126,9 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
           </ScrollView>
           <View
             style={{
-              // backgroundColor: '#CCC1AF',
               padding: 5,
               width: '100%',
               marginVertical: 20,
-              // borderRadius: 200,
             }}>
             <Text style={styles.productTitleText}>TOP RATED</Text>
             <View style={styles.NewItemsList}>
@@ -192,7 +190,7 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 5, height: 5 },
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.1,
         shadowRadius: 2,
       },
     }),
@@ -206,7 +204,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   name: {
     marginTop: 2,
