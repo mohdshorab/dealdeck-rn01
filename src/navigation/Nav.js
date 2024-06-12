@@ -12,6 +12,8 @@ import { ProductsYouMayLike } from "../screens/ProductsYouMayLike";
 import { CartScreen } from "../screens/Cart";
 import Forgotpass from "../screens/ForgotPassword";
 import FavProducts from "../screens/FavProducts";
+import { SavedCards } from "../screens/SavedCards";
+import { MyAddresses } from "../screens/SavedAddresses";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +32,9 @@ const protectedRoutes = [
   { name: "profile", component: Profile },
   { name: "CartScreen", component: CartScreen },
   { name: 'Forgotpass', component: Forgotpass },
-  { name: "favProds", component: FavProducts}
+  { name: "favProds", component: FavProducts},
+  { name: "savedCards", component: SavedCards},
+  { name: 'myAddresses', component: MyAddresses}
 ];
 
 

@@ -2,6 +2,7 @@ import { action, makeAutoObservable, observable } from "mobx";
 import { getTheQuerySnapshot, updateGoogleUserOnFS, loginWithEmailAndPassword, registerUserEmailPassToFirestore, getTheQuerySnapshotOfGoogleUsers, ensureGooglePlayServices, handleGoogleSignInError, createNewUserObject } from "../service/authServices";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import moment from 'moment';
+import firestore from '@react-native-firebase/firestore';
 import { generateDeviceId } from "../utils";
 
 export default class AuthStore {
@@ -11,6 +12,8 @@ export default class AuthStore {
     @observable notificationList;
     @observable showPassword;
     @observable isLoggedIn;
+    @observable savedCards;
+    @observable savedAddress;
 
     constructor(store) {
         this.store = store;
@@ -26,6 +29,8 @@ export default class AuthStore {
         this.isLogout = false;
         this.notificationList = [];
         this.isLoggedIn = true;
+        this.savedCards = [];
+        this.savedAddress = [];
     }
 
     @action
@@ -53,6 +58,7 @@ export default class AuthStore {
         }
     }
 
+    @action
     googleSignIn = async () => {
         try {
             await ensureGooglePlayServices();
@@ -133,13 +139,78 @@ export default class AuthStore {
     @action
     googleSignOut = async () => {
         try {
-          await GoogleSignin.revokeAccess();
-          await GoogleSignin.signOut();
-          console.log('User signed out successfully');
+            await GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+            console.log('User signed out successfully');
         } catch (error) {
-          console.error('Error during sign-out:', error);
-          // Handle sign-out error
+            console.error('Error during sign-out:', error);
+            // Handle sign-out error
         }
-      };
+    };
+
+    @action
+    addCardToUserProfile = async (cardInfo) => {
+        try {
+            console.log('cardino store',cardInfo)
+            const collectionName = this.profileData.authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
+            const userSnapshot = await firestore().collection(collectionName).where('id', '==', this.profileData.id).get();
+            if (!userSnapshot.empty) {
+                const userDocRef = userSnapshot.docs[0].ref;
+                const userData = userSnapshot.docs[0].data();
+                const cardsArray = userData.savedCards;
+                const index = cardsArray.findIndex(i => cardInfo.cardNumber == i.cardNumber)
+                if (index == -1) {
+                    const newId = userData.savedCards.length + 1
+                    const newCard = {
+                        id: newId,
+                        cardNumber: cardInfo.cardNumber,
+                        cardLastFourDigits: cardInfo.cardLastFourDigits,
+                        cardType: cardInfo.cardType,
+                        expirationMonth: cardInfo.expirationMonth,
+                        expirationYear: cardInfo.expirationYear,
+                        securityCode: cardInfo.securityCode
+                    }
+                    console.log(newCard)
+                    // cardsArray.push(newCard);
+                    // await userDocRef.update({ savedCards: cardsArray })
+                    // this.savedCards = cardsArray;
+                    return true;
+                }
+                else return false;
+            }
+        }
+        catch (e) {
+            console.error('Got error while adding CC', e)
+        }
+    }
+
+    @action
+    addAddressToUserProfile = async (address) => {
+        try {
+            const collectionName = this.profileData.authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';
+            const userSnapshot = await firestore().collection(collectionName).where('id', '==', this.profileData.id).get();
+            if (!userSnapshot.empty) {
+                const userDocRef = userSnapshot.docs[0].ref;
+                const userData = userSnapshot.docs[0].data();
+                const addressArray = userData.savedAddress;
+                const index = addressArray.findIndex(i => address.id == i.id)
+                if (index == -1) {
+                    const newId = userData.savedAddress.length + 1
+                    const newAddress = {
+
+                    }
+                    console.log(newAddress)
+                    addressArray.push(newAddress);
+                    await userDocRef.update({ savedAddress: addressArray })
+                    this.savedCards = addressArray;
+                    return true;
+                }
+                else return false;
+            }
+        }
+        catch (e) {
+            console.error('Got error while adding CC', e)
+        }
+    }
 
 }

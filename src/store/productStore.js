@@ -21,7 +21,6 @@ export default class Products {
                 this.fetchProductsCategories(),
                 this.fetchRandomProducts(),
                 this.fetchRecentlyViewedProducts(profileInfo),
-                this.fetchSponsoredProduct(),
             ]);
         } catch (e) {
             console.error('Error initializing store:', e);

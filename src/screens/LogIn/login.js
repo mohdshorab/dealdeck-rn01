@@ -65,6 +65,7 @@ const LogInForm = observer(({ navigation }) => {
                 if (res) {
                     await products.init(auth.profileData);
                     await cart.init(auth.profileData);
+                    await favProd.init(auth.profileData)
                     navigation.navigate('Home');
                 } else {
                     ShowToast({ type: "error", text1: "Login failed, retry after sometime", color: "red" });
@@ -170,8 +171,10 @@ const LogInForm = observer(({ navigation }) => {
                             <Text style={{ color: 'black' }} >Google</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.socialLoginButton} onPress={async () => {
-                            // await products.init(auth.profileData)
-                            // navigation.navigate('Home')
+                            await products.init(auth.profileData);
+                            await cart.init(auth.profileData);
+                            await favProd.init(auth.profileData)
+                            navigation.navigate('Home')
                             await auth.googleSignOut()
 
                         }}>

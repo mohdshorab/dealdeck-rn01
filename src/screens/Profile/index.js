@@ -97,14 +97,18 @@ const Profile = observer(({ navigation }) => {
                         </View>
                         <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItemContainer}>
+                    <TouchableOpacity 
+                    onPress={() => navigation.navigate('savedCards')}
+                    style={styles.menuItemContainer}>
                         <View style={styles.menuItemTextContainer}>
                             <FontAwesome name={'credit-card-alt'} size={24} color={'#4a4b4d'} style={styles.menuItemIcon} />
                             <Text style={styles.menuItemText}>Saved Cards</Text>
                         </View>
                         <FeatherIcon name='chevron-right' color={'#4a4b4d'} size={24} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItemContainer}>
+                    <TouchableOpacity style={styles.menuItemContainer}
+                    onPress={()=> navigation.navigate('myAddresses')}
+                    >
                         <View style={styles.menuItemTextContainer}>
                             <Ionicons name={'location-outline'} size={24} color={'#4a4b4d'} style={styles.menuItemIcon} />
                             <Text style={styles.menuItemText}>Saved Addresses</Text>

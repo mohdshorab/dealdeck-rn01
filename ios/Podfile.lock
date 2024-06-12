@@ -1417,6 +1417,8 @@ PODS:
     - glog
   - react-native-blur (4.3.2):
     - React-Core
+  - react-native-date-picker (5.0.4):
+    - React-Core
   - react-native-geolocation (3.2.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -1602,6 +1604,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -1707,6 +1710,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
@@ -1814,6 +1819,7 @@ SPEC CHECKSUMS:
   React-jsinspector: c712f9e3bb9ba4122d6b82b4f906448b8a281580
   React-logger: 342f358b8decfbf8f272367f4eacf4b6154061be
   react-native-blur: cfdad7b3c01d725ab62a8a729f42ea463998afa2
+  react-native-date-picker: 6891317e850deae5b53d51355226e07a495aba61
   react-native-geolocation: 1279fd4390e311ec3f2fc2878279934147fdd061
   react-native-image-picker: ec9b713e248760bfa0f879f0715391de4651a7cb
   react-native-netinfo: ccbe1085dffd16592791d550189772e13bf479e2
