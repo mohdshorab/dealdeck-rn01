@@ -101,3 +101,31 @@ export const imageUrls = {
   default:
     'https://img.freepik.com/premium-vector/mega-sale-banner-with-red-ribbon-illustration_275806-126.jpg',
 };
+
+
+export const CCImages = [
+  {
+      name: 'Visa',
+      image: require('../assets/images/visa.png')
+  },
+  {
+      name: 'American Express',
+      image: require('../assets/images/amex.png')
+  },
+  {
+      name: 'MasterCard',
+      image: require('../assets/images/mast.png')
+  },
+  {
+      name: 'Discover',
+      image: require('../assets/images/disc.png')
+  },
+  {
+      name: 'Diners Club',
+      image: require('../assets/images/dicl.png')
+  },
+  {
+      name: 'JCB',
+      image: require('../assets/images/jcb.png')
+  },
+]

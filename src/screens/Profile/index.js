@@ -36,6 +36,24 @@ const Profile = observer(({ navigation }) => {
         </TouchableOpacity>
     );
 
+    if (!auth.profileData || !user) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <CustomHeader titleOnHead={'Your Profile'} navigation={navigation} />
+                <View style={styles.loginPromptContainer}>
+                    <Image source={profileIcon} style={styles.profileIcon} />
+                    <Text style={styles.loginPromptText}>Please log in to view your profile.</Text>
+                    <CustomButton
+                        title={'Log In'}
+                        buttonStyle={styles.loginButton}
+                        textStyle={styles.loginButtonText}
+                        onPress={() => navigation.navigate('logInForm')}
+                    />
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <CustomHeader titleOnHead={'Your Profile'} navigation={navigation} />
@@ -121,7 +139,7 @@ const Profile = observer(({ navigation }) => {
                     title={'Logout'}
                     buttonStyle={styles.logoutButton}
                     textStyle={styles.logoutButtonText}
-                    onPress={() => auth.googleSignOut() && navigation.navigate('logInForm')}
+                    onPress={async () => await auth.googleSignOut() && navigation.navigate('logInForm')}
                 />
             </ScrollView>
         </SafeAreaView>
@@ -266,6 +284,34 @@ const styles = StyleSheet.create({
         marginVertical: 20,
     },
     logoutButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    loginPromptContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    profileIcon: {
+        height: 100,
+        width: 100,
+        resizeMode: 'contain',
+        marginBottom: 20,
+    },
+    loginPromptText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#4a4b4d',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    loginButton: {
+        height: 50,
+        borderRadius: 10,
+        width: '60%',
+    },
+    loginButtonText: {
         fontSize: 18,
         fontWeight: 'bold',
     },

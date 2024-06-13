@@ -1,19 +1,26 @@
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
-import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, Image, Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useStore } from "../../store";
 import CustomHeader from "../../components/Header";
 import CustomButton from "../../components/Button";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export const CartScreen = observer(({ navigation }) => {
     const { cart, auth } = useStore();
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOnPress = () => {
+        if (Object.keys(auth.profileData).length === 0) {
+            setShowModal(true);
+        }
+    }
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.itemContainer}
-            onPress={() => navigation.push('ProductDetail', { productData: item })
-            }
+            onPress={() => navigation.push('ProductDetail', { productData: item })}
         >
             <Image source={{ uri: item.thumbnail }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
@@ -62,11 +69,64 @@ export const CartScreen = observer(({ navigation }) => {
             {cart.cartCount > 0 && (
                 <View style={styles.totalContainer}>
                     <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
-                    <CustomButton title={'Place Order'} textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }} />
+                    <CustomButton
+                        onPress={() => handleOnPress()}
+                        title={'Place Order'}
+                        textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }}
+                        />
                 </View>
             )}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showModal}
+                onRequestClose={() => setShowModal(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>To Proceed to checkout please login.</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
+                            <TouchableOpacity
+                                style={{ padding: 10, alignItems: 'center' }}
+                                onPress={() => navigation.navigate('logInForm')}>
+                                <MaterialIcons
+                                    name="login"
+                                    size={46}
+                                    color='#4285F4'
+                                />
+                                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Log in</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ padding: 10, alignItems: 'center' }}
+                                onPress={() => navigation.navigate('logInForm')}>
+                                <Image
+                                    source={require('../../assets/images/GooglePNG.png')}
+                                    style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                                />
+                                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Google</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ padding: 10, alignItems: 'center', }}
+                                onPress={() => navigation.navigate('logInForm')}>
+                                <Image
+                                    source={require('../../assets/images/PhonePNG.png')}
+                                    style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                                />
+                                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Phone</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity style={{
+                            position: 'absolute', top: 10, right: 10
+                        }}
+                            onPress={() => setShowModal(false)}
+                        >
+                            <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Skip & Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
-    );
+    )
 });
 
 const styles = StyleSheet.create({
@@ -175,11 +235,52 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         borderTopWidth: 1,
         borderTopColor: '#ddd',
+        paddingBottom:25
     },
     totalText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
-        paddingBottom: 5
+        paddingVertical: 20
     },
+    loginButton: {
+        marginTop: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+    },
+    loginButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 24,
+        borderRadius: 8,
+        width: '100%',
+        maxWidth: 500,
+        elevation: 5,
+        position: 'relative',
+        alignContent: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 24,
+        textAlign: 'center',
+        paddingTop: 15,
+        color:'black'
+    },
+    modalButton: {
+        padding: 10, backgroundColor: '#2196F3', borderRadius: 10
+    },
+    modalButtonText: {
+        color: 'white', fontWeight: '700'
+    }
 });

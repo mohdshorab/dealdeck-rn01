@@ -16,12 +16,17 @@ export default class Products {
     @action
     init = async (profileInfo) => {
         try {
-            await Promise.all([
+            const promises = [
                 this.fetchAllProducts(),
                 this.fetchProductsCategories(),
                 this.fetchRandomProducts(),
-                this.fetchRecentlyViewedProducts(profileInfo),
-            ]);
+            ];
+    
+            if (profileInfo && Object.keys(profileInfo).length > 0) {
+                promises.push(this.fetchRecentlyViewedProducts(profileInfo));
+            }
+    
+            await Promise.all(promises);
         } catch (e) {
             console.error('Error initializing store:', e);
         }

@@ -1,31 +1,7 @@
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const CCImages = [
-    {
-        name: 'Visa',
-        image: require('../assets/images/visa.png')
-    },
-    {
-        name: 'American Express',
-        image: require('../assets/images/amex.png')
-    },
-    {
-        name: 'MasterCard',
-        image: require('../assets/images/mast.png')
-    },
-    {
-        name: 'Discover',
-        image: require('../assets/images/disc.png')
-    },
-    {
-        name: 'Diners Club',
-        image: require('../assets/images/dicl.png')
-    },
-    {
-        name: 'JCB',
-        image: require('../assets/images/jcb.png')
-    },
-]
+
 
 export const generateDeviceId = () => {
     const imei = DeviceInfo.getUniqueId(); // Get IMEI or UID for iOS devices
@@ -66,3 +42,23 @@ export const creditCardValidator = (text) => {
         default: return false
     }
 }
+
+export const getValueFromAsyncStorage = async (key) => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return value;
+  } catch (error) {
+    console.error('Error retrieving value from AsyncStorage:', error);
+    return null;
+  }
+};
+
+
+export const setValueInAsyncStorage = async (key, value) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (error) {
+    console.error('Error storing value in AsyncStorage:', error);
+  }
+};

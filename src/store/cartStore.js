@@ -1,5 +1,7 @@
 import { observable, action, makeAutoObservable, computed } from "mobx";
+import { isNull, isUndefined } from 'lodash';
 import firestore from '@react-native-firebase/firestore';
+import { getValueFromAsyncStorage, setValueInAsyncStorage } from "../utils";
 
 export default class CartStore {
     constructor(store) {
@@ -28,7 +30,7 @@ export default class CartStore {
     }
 
     @action
-    init = async (profileInfo) => {
+    init = async (profileInfo ) => {
         try {
             await this.fetchCartItem(profileInfo);
         } catch (e) {
@@ -39,13 +41,22 @@ export default class CartStore {
     @action
     fetchCartItem = async (profileInfo) => {
         try {
-            const { id, authProvider } = profileInfo;
-            const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
-            if (!querySnapshot.empty) {
-                const userData = querySnapshot.docs[0].data();
-                this.cartItems = userData.cart || [];
-            } else {
-                console.error('User data not found');
+            if (Object.keys(profileInfo).length === 0) {
+                const items = await getValueFromAsyncStorage('CartItemsForNonLoggedPerson')
+                if (!isNull(items) && !isUndefined(items)) {
+                    const parsedItems = JSON.parse(items);
+                    this.cartItems = parsedItems;
+                }
+            }
+            else {
+                const { id, authProvider } = profileInfo;
+                const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    this.cartItems = userData.cart || [];
+                } else {
+                    console.error('User data not found');
+                }
             }
         } catch (e) {
             console.error('Error fetching cart items:', e);
@@ -53,20 +64,34 @@ export default class CartStore {
     }
 
     @action
-    addItemToCart = async (product, userInfo) => {
-        const { id, authProvider } = userInfo;
-        console.log(id, authProvider)
+    addItemToCart = async (product, userInfo = {}) => {
         try {
-            const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
-            console.log(querySnapshot)
-            if (!querySnapshot.empty) {
-                const userDocRef = querySnapshot.docs[0].ref;
-                const userData = querySnapshot.docs[0].data();
-                const updatedCart = this.updateCartWithProduct(userData.cart, product);
-                await userDocRef.update({ cart: updatedCart });
-                this.cartItems = updatedCart;
+            if (Object.keys(userInfo).length === 0) {
+                const jsonValue = await getValueFromAsyncStorage('CartItemsForNonLoggedPerson');
+                let jsonParse = [];
+                if (!isNull(jsonValue) && !isUndefined(jsonValue)) {
+                    jsonParse = JSON.parse(jsonValue);
+                }
+                const indexIfProductExistOrNot = jsonParse.findIndex((item) => item.id === product.id);
+                if (indexIfProductExistOrNot === -1) {
+                    const newProduct = { ...product, noOfItems: 1 };
+                    jsonParse.push(newProduct);
+                    await setValueInAsyncStorage('CartItemsForNonLoggedPerson', jsonParse);
+                    this.cartItems = jsonParse;
+                }
             } else {
-                console.error('User data not found');
+                const { id, authProvider } = userInfo;
+                const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
+                console.log(querySnapshot)
+                if (!querySnapshot.empty) {
+                    const userDocRef = querySnapshot.docs[0].ref;
+                    const userData = querySnapshot.docs[0].data();
+                    const updatedCart = this.updateCartWithProduct(userData.cart, product);
+                    await userDocRef.update({ cart: updatedCart });
+                    this.cartItems = updatedCart;
+                } else {
+                    console.error('User data not found');
+                }
             }
         } catch (error) {
             console.error('Error adding item to cart:', error);
@@ -74,37 +99,31 @@ export default class CartStore {
     }
 
     @action
-    removeItemFromCart = async (product, userInfo) => {
-        const { id, authProvider } = userInfo;
+    increaseItemCount = async (product, userInfo = {}) => {
         try {
-            const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
-            if (!querySnapshot.empty) {
-                const userDocRef = querySnapshot.docs[0].ref;
-                const userData = querySnapshot.docs[0].data();
-                const updatedCart = userData.cart.filter((item) => item.id !== product.id);
-                await userDocRef.update({ cart: updatedCart });
-                this.cartItems = updatedCart;
-            } else {
-                console.error('User data not found');
+            if (Object.keys(userInfo).length == 0) {
+                const jsonValue = await getValueFromAsyncStorage('CartItemsForNonLoggedPerson');
+                let cartItems = [];
+                if (!isNull(jsonValue) && !isUndefined(jsonValue)) {
+                    cartItems = JSON.parse(jsonValue);
+                }
+                const indexIfProductExistOrNot = cartItems.findIndex((item) => item.id === product.id);
+                cartItems[indexIfProductExistOrNot].noOfItems += 1;
+                await setValueInAsyncStorage('CartItemsForNonLoggedPerson', cartItems)
+                this.cartItems = cartItems;
             }
-        } catch (error) {
-            console.error('Error removing item from cart:', error);
-        }
-    }
-
-    @action
-    increaseItemCount = async (product, userInfo) => {
-        const { id, authProvider } = userInfo;
-        try {
-            const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
-            if (!querySnapshot.empty) {
-                const userDocRef = querySnapshot.docs[0].ref;
-                const userData = querySnapshot.docs[0].data();
-                const updatedCart = this.updateCartWithProduct(userData.cart, product, 1);
-                await userDocRef.update({ cart: updatedCart });
-                this.cartItems = updatedCart;
-            } else {
-                console.error('User data not found');
+            else {
+                const { id, authProvider } = userInfo;
+                const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
+                if (!querySnapshot.empty) {
+                    const userDocRef = querySnapshot.docs[0].ref;
+                    const userData = querySnapshot.docs[0].data();
+                    const updatedCart = this.updateCartWithProduct(userData.cart, product, 1);
+                    await userDocRef.update({ cart: updatedCart });
+                    this.cartItems = updatedCart;
+                } else {
+                    console.error('User data not found');
+                }
             }
         } catch (error) {
             console.error('Error increasing item count:', error);
@@ -113,17 +132,35 @@ export default class CartStore {
 
     @action
     decreaseItemCount = async (product, userInfo) => {
-        const { id, authProvider } = userInfo;
         try {
-            const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
-            if (!querySnapshot.empty) {
-                const userDocRef = querySnapshot.docs[0].ref;
-                const userData = querySnapshot.docs[0].data();
-                const updatedCart = this.updateCartWithProduct(userData.cart, product, -1);
-                await userDocRef.update({ cart: updatedCart });
-                this.cartItems = updatedCart;
-            } else {
-                console.error('User data not found');
+            if (Object.keys(userInfo).length === 0) {
+                const jsonValue = await getValueFromAsyncStorage('CartItemsForNonLoggedPerson');
+                let cartItems = [];
+                if (!isNull(jsonValue) && !isUndefined(jsonValue)) {
+                    cartItems = JSON.parse(jsonValue);
+                }
+                const indexIfProductExistOrNot = cartItems.findIndex((item) => item.id === product.id);
+                if (cartItems[indexIfProductExistOrNot].noOfItems === 1) {
+                    cartItems.splice(indexIfProductExistOrNot, 1);
+                }
+                else {
+                    cartItems[indexIfProductExistOrNot].noOfItems -= 1;
+                }
+                await setValueInAsyncStorage('CartItemsForNonLoggedPerson', cartItems)
+                this.cartItems = cartItems;
+            }
+            else {
+                const { id, authProvider } = userInfo;
+                const querySnapshot = await this.getUserQuerySnapshot(authProvider, id);
+                if (!querySnapshot.empty) {
+                    const userDocRef = querySnapshot.docs[0].ref;
+                    const userData = querySnapshot.docs[0].data();
+                    const updatedCart = this.updateCartWithProduct(userData.cart, product, -1);
+                    await userDocRef.update({ cart: updatedCart });
+                    this.cartItems = updatedCart;
+                } else {
+                    console.error('User data not found');
+                }
             }
         } catch (error) {
             console.error('Error decreasing item count:', error);

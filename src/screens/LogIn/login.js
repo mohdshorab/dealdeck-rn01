@@ -18,6 +18,7 @@ import PhonePNG from '../../assets/images/PhonePNG.png';
 import { useStore } from "../../store";
 import { observer } from 'mobx-react';
 import ShowToast from "../../components/Toast";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LogInForm = observer(({ navigation }) => {
     const { auth, products, cart, favProd } = useStore();
@@ -114,83 +115,86 @@ const LogInForm = observer(({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView>
-                <View style={styles.logoContainer}>
-                    <Image style={styles.dealDeackLogo} source={dealdeck_logo} />
+            {/* <ScrollView> */}
+            <TouchableOpacity
+                style={styles.touchableOpacitySkipText}
+                onPress={async () => {
+                    await products.init(auth.profileData);
+                    await cart.init(auth.profileData);
+                    navigation.navigate('Home');
+                }}
+            >
+                <Text style={styles.skipText} >Skip</Text>
+            </TouchableOpacity>
+            <View style={styles.logoContainer}>
+                <Image style={styles.dealDeackLogo} source={dealdeck_logo} />
+            </View>
+            <View style={styles.formContainer}>
+                <Text style={styles.loginText}>Login</Text>
+                {emailWarning ? (
+                    <Text style={styles.warningText}>{emailWarning}</Text>
+                ) : null}
+                <View style={styles.inputContainer}>
+                    <Icon name="mail" size={24} color="#00c0ff" style={styles.inputIcon} />
+                    <CustomTextInput
+                        backgroundColor={"#fff"}
+                        placeholder={"email"}
+                        value={email}
+                        onChangeText={handleEmailChange}
+                        keyboardType={'email-address'}
+                        style={styles.inputField}
+                    />
                 </View>
-                <View style={styles.formContainer}>
-                    <Text style={styles.loginText}>Login</Text>
-                    {emailWarning ? (
-                        <Text style={styles.warningText}>{emailWarning}</Text>
-                    ) : null}
-                    <View style={styles.inputContainer}>
-                        <Icon name="mail" size={24} color="#00c0ff" style={styles.inputIcon} />
-                        <CustomTextInput
-                            backgroundColor={"#fff"}
-                            placeholder={"email"}
-                            value={email}
-                            onChangeText={handleEmailChange}
-                            keyboardType={'email-address'}
-                            style={styles.inputField}
-                        />
-                    </View>
-                    {passwordWarning ? (
-                        <Text style={styles.warningText}>{passwordWarning}</Text>
-                    ) : null}
-                    <View style={styles.inputContainer}>
-                        <Icon name="lock" size={24} color="#00c0ff" style={styles.inputIcon} />
-                        <CustomTextInput
-                            backgroundColor={"#fff"}
-                            placeholder={"password"}
-                            value={password}
-                            onChangeText={handlePasswordChange}
-                            secureTextEntry={!auth.showPassword}
-                            style={styles.inputField}
-                        />
-                        <TouchableOpacity onPress={() => auth.willShowPassword(!auth.showPassword)}>
-                            {auth.showPassword ? (
-                                <Icon name="eye" color="#808080" style={styles.eyeIcon} size={17} />
-                            ) : (
-                                <Icon name="eye-with-line" color="#808080" style={styles.eyeIcon} size={17} />
-                            )}
-                        </TouchableOpacity>
-                    </View>
+                {passwordWarning ? (
+                    <Text style={styles.warningText}>{passwordWarning}</Text>
+                ) : null}
+                <View style={styles.inputContainer}>
+                    <Icon name="lock" size={24} color="#00c0ff" style={styles.inputIcon} />
+                    <CustomTextInput
+                        backgroundColor={"#fff"}
+                        placeholder={"password"}
+                        value={password}
+                        onChangeText={handlePasswordChange}
+                        secureTextEntry={!auth.showPassword}
+                        style={styles.inputField}
+                    />
+                    <TouchableOpacity onPress={() => auth.willShowPassword(!auth.showPassword)}>
+                        {auth.showPassword ? (
+                            <Icon name="eye" color="#808080" style={styles.eyeIcon} size={17} />
+                        ) : (
+                            <Icon name="eye-with-line" color="#808080" style={styles.eyeIcon} size={17} />
+                        )}
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
                     <TouchableOpacity onPress={() => navigation.navigate('Forgotpass')} >
                         <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                     </TouchableOpacity>
-                    <CustomButton
-                        title={"LogIn"}
-                        onPress={inputValidation}
-                        buttonStyle={styles.loginButton}
-                        textStyle={styles.loginButtonText}
-                    />
-                    <Text style={styles.orText}>Or Login with...</Text>
-                    <View style={styles.socialLoginContainer}>
-                        <TouchableOpacity style={styles.socialLoginButton} onPress={() => googleSignIn()} >
-                            <Image source={GooglePNG} style={styles.socialLoginIcon} />
-                            <Text style={{ color: 'black' }} >Google</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.socialLoginButton} onPress={async () => {
-                            await products.init(auth.profileData);
-                            await cart.init(auth.profileData);
-                            await favProd.init(auth.profileData)
-                            navigation.navigate('Home')
-                            await auth.googleSignOut()
-
-                        }}>
-                            <Image source={PhonePNG} style={styles.socialLoginIcon} />
-                            <Text style={styles.mobileText}>Mobile</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.registerContainer}>
-                        <Text style={styles.registerText}>New to the App?  </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('signUpForm')}>
-                            <Text style={styles.registerLink}>Register Yourself Here.</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('signUpForm')}>
+                        <Text style={styles.registerLink}>Register Yourself Here.</Text>
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
+                <CustomButton
+                    title={"LogIn"}
+                    onPress={inputValidation}
+                    buttonStyle={styles.loginButton}
+                    textStyle={styles.loginButtonText}
+                />
+                <Text style={styles.orText}>Or Login with...</Text>
+                <View style={styles.socialLoginContainer}>
+                    <TouchableOpacity style={styles.socialLoginButton} onPress={() => googleSignIn()} >
+                        <Image source={GooglePNG} style={styles.socialLoginIcon} />
+                        <Text style={{ color: 'black' }} >Google</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.socialLoginButton} onPress={async () => {
+                            await AsyncStorage.clear()
+                    }}>
+                        <Image source={PhonePNG} style={styles.socialLoginIcon} />
+                        <Text style={styles.mobileText}>Mobile</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            {/* </ScrollView> */}
         </SafeAreaView>
     )
 });
@@ -247,7 +251,8 @@ const styles = StyleSheet.create({
     forgotPasswordText: {
         color: '#4a4b4d',
         fontWeight: '500',
-        alignSelf: "flex-end",
+        fontSize: 15
+        // alignSelf: "flex-end",
     },
     loginButton: {
         height: 40,
@@ -300,6 +305,16 @@ const styles = StyleSheet.create({
     registerLink: {
         color: "#00C0FF",
         fontSize: 15
+    },
+    skipText: {
+        fontWeight: '500',
+        fontSize: 18,
+        color: '#01BFFF'
+    },
+    touchableOpacitySkipText: {
+        position: 'absolute',
+        right: 40,
+        top: 10,
     }
 });
 

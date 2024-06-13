@@ -11,10 +11,10 @@ import {
   Alert,
   RefreshControl,
   TextInput,
+  Modal,
 } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import CustomHeader from '../../components/Header';
-import Carousel from '../../components/ImageCarousel';
 import { useStore } from '../../store';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -24,6 +24,7 @@ import { Share } from 'react-native';
 import axios from 'axios';
 import ShowToast from '../../components/Toast';
 import CarouselWithThumbnails from '../../components/CarouselWithThumbnail';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 const ProductDetail = observer(({ route, navigation }) => {
   const { auth, products, cart, favProd } = useStore();
@@ -32,6 +33,7 @@ const ProductDetail = observer(({ route, navigation }) => {
   const [pincode, setPincode] = useState('');
   const [areaName, setAreaName] = useState('');
   const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
+  const [showModal, setShowModal] = useState(false);
 
   const [showLoader, setLoader] = useState(false);
   const emi = (productData.price / 6).toFixed(2);
@@ -212,7 +214,7 @@ const ProductDetail = observer(({ route, navigation }) => {
             </TouchableOpacity>
           </View>
           {areaName && pincode.length == 6 ?
-            <Text numberOfLines={2} style={{ alignSelf: 'center', fontWeight: '500', fontSize: 14, marginTop: 10, color:'black' }} >{areaName}</Text>
+            <Text numberOfLines={2} style={{ alignSelf: 'center', fontWeight: '500', fontSize: 14, marginTop: 10, color: 'black' }} >{areaName}</Text>
             : null
           }
           <View style={styles.straightLine} />
@@ -350,8 +352,13 @@ const ProductDetail = observer(({ route, navigation }) => {
             ?
             <TouchableOpacity
               onPress={async () => {
-                await favProd.addItemToFavourites(productData, auth.profileData)
-                ShowToast({ bottomOffset: 88, type: 'info', text1: 'Added to favourites', color: 'white', position: 'bottom', })
+                if (!Object.keys(auth.profileData).length === 0) {
+                  await favProd.addItemToFavourites(productData, auth.profileData)
+                  ShowToast({ bottomOffset: 88, type: 'info', text1: 'Added to favourites', color: 'white', position: 'bottom', })
+                }
+                else {
+                  setShowModal(true)
+                 }
               }}
               style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
               <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />
@@ -370,7 +377,7 @@ const ProductDetail = observer(({ route, navigation }) => {
       </ScrollView>
       <View style={styles.buttonContainer}>
         {
-          (cart.cartItems.findIndex(item => item.id === productData.id) == -1) ?
+          (cart.cartItems.findIndex(item => item.id === productData.id) === -1) ?
             <TouchableOpacity
               onPress={async () => {
                 await cart.addItemToCart(productData, auth.profileData)
@@ -390,6 +397,55 @@ const ProductDetail = observer(({ route, navigation }) => {
           <Text style={[styles.buttonText, { color: 'white' }]}>Buy Now</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Login and save your favourite products</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
+              <TouchableOpacity
+                style={{ padding: 10, alignItems: 'center' }}
+                onPress={() => navigation.navigate('logInForm')}>
+                <MaterialIcons
+                  name="login"
+                  size={46}
+                  color='#4285F4'
+                />
+                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Log in</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ padding: 10, alignItems: 'center' }}
+                onPress={() => navigation.navigate('logInForm')}>
+                <Image
+                  source={require('../../assets/images/GooglePNG.png')}
+                  style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                />
+                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Google</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ padding: 10, alignItems: 'center', }}
+                onPress={() => navigation.navigate('logInForm')}>
+                <Image
+                  source={require('../../assets/images/PhonePNG.png')}
+                  style={{ height: 50, width: 50, resizeMode: 'contain' }}
+                />
+                <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Phone</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={{
+              position: 'absolute', top: 10, right: 10
+            }}
+              onPress={() => setShowModal(false)}
+            >
+              <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Skip & Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 });
@@ -564,4 +620,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  loginButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  loginButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 24,
+    borderRadius: 8,
+    width: '100%',
+    maxWidth: 500,
+    elevation: 5,
+    position: 'relative',
+    alignContent: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 24,
+    textAlign: 'center',
+    paddingTop: 15,
+    color: 'black'
+  },
+  modalButton: {
+    padding: 10, backgroundColor: '#2196F3', borderRadius: 10
+  },
+  modalButtonText: {
+    color: 'white', fontWeight: '700'
+  }
 });

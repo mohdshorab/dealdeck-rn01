@@ -5,9 +5,10 @@ import CustomHeader from "../../components/Header";
 import { useStore } from "../../store";
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import CustomTextInput from "../../components/TextInput";
-import { CCImages, creditCardValidator } from "../../utils";
+import { creditCardValidator } from "../../utils";
 import { CustomDatePicker } from "../../components/DatePicker";
 import CustomButton from "../../components/Button";
+import { CCImages } from "../../constants/dummyJSONs";
 
 export const SavedCards = observer(({ navigation }) => {
     const { auth } = useStore();

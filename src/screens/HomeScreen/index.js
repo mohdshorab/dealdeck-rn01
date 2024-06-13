@@ -25,12 +25,26 @@ const HomeScreen = observer(({ navigation }) => {
   const { products, auth } = useStore();
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
 
   useEffect(() => {
-    products.fetchRecentlyViewedProducts(auth.profileData)
-  }, [])
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        if (auth.profileData && Object.keys(auth.profileData).length > 0) {
+          await products.fetchRecentlyViewedProducts(auth.profileData);
+        }
+      } catch (err) {
+        console.error('Error fetching recently viewed products', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (auth.profileData && Object.keys(auth.profileData).length > 0) {
+      fetchData();
+    }
+  }, [auth.profileData, products.fetchRecentlyViewedProducts]);
 
   const categoryWithImages = products.productCategories.map(item => ({
     name: item.name,
@@ -44,7 +58,7 @@ const HomeScreen = observer(({ navigation }) => {
     try {
       await products.init(auth.profileData);
     } catch (err) {
-      setError('Unable to fetch data');
+      console.error('Unable to fetch data', err);
     } finally {
       setRefreshing(false);
       setIsLoading(false);
@@ -56,17 +70,6 @@ const HomeScreen = observer(({ navigation }) => {
       <SafeAreaView style={styles.container}>
         <CustomHeader showFullHead navigation={navigation} />
         <ActivityIndicator size="large" />
-      </SafeAreaView>
-    );
-  }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <CustomHeader showFullHead navigation={navigation} />
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
       </SafeAreaView>
     );
   }
