@@ -63,7 +63,7 @@ const TabNav = () => {
           component={component}
           options={{
             tabBarLabel: label,
-            unmountOnBlur,
+            unmountOnBlur: true,
             tabBarIcon: ({ color, size }) => (
               <FeatherIcon name={icon} color={color} size={size} />
             ),

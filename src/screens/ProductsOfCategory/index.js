@@ -44,7 +44,7 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{flex:1, backgroundColor: 'white' }} >
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }} >
         <CustomHeader
           titleOnHead={category.charAt(0).toUpperCase() + category.slice(1)}
           navigation={navigation}
@@ -57,9 +57,9 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
   const bgImage = category == 'laptops' || 'smartphones' ? 'https://img.freepik.com/free-vector/paper-style-white-monochrome-background_23-2149014827.jpg' : 'https://images.unsplash.com/photo-1620503374956-c942862f0372?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGNvbG9yJTIwYmFja2dyb3VuZHxlbnwwfHwwfHx8MA%3D%3D';
 
   return (
-    <SafeAreaView style={{ flex:1,backgroundColor: 'white' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <ImageBackground
-      style={{flex:1}}
+        style={{ flex: 1 }}
         source={{
           uri: bgImage,
         }}>
@@ -88,10 +88,11 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
                 const formattedName = item.title
                   .replace(/-/, ' ')
                   .replace(/\b\w/g, match => match.toUpperCase());
-                const words = formattedName.split(' ');
-                const lastTwoWords = words.slice(-2).join(' ');
+                const words = formattedName
+                // .split(' ');
+                const lastTwoWords = words
 
-                const bandTitle = item.brand.split(' ').slice(-1).join(' ');
+                const bandTitle = item.brand
 
                 return (
                   <TouchableOpacity
@@ -106,7 +107,7 @@ const ProductsOfCategory = observer(({ route, navigation }) => {
                         style={styles.image}
                       />
                     </View>
-                    <Text style={styles.name}>{lastTwoWords}</Text>
+                    <Text numberOfLines={1} style={styles.name}>{lastTwoWords}</Text>
                     <Text style={styles.discountedPrice}>
                       From ${discountedPrice.toFixed(0)}
                     </Text>

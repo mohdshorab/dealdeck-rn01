@@ -12,6 +12,7 @@ import {
   RefreshControl,
   TextInput,
   Modal,
+  FlatList,
 } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import CustomHeader from '../../components/Header';
@@ -34,6 +35,7 @@ const ProductDetail = observer(({ route, navigation }) => {
   const [areaName, setAreaName] = useState('');
   const [refreshing, setRefreshing] = useState(false); // Define the refreshing state
   const [showModal, setShowModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   const [showLoader, setLoader] = useState(false);
   const emi = (productData.price / 6).toFixed(2);
@@ -100,6 +102,31 @@ const ProductDetail = observer(({ route, navigation }) => {
       .catch(errorMsg => console.log(errorMsg));
   };
 
+  const renderReviews = ({ item }) => {
+    return (
+      <View style={{ marginVertical: 10 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: 'black' }}>{item.reviewerName}</Text>
+            <Text style={{ fontSize: 14 }} >{item.reviewerEmail}</Text>
+          </View>
+          <StarRating
+            disabled={true}
+            maxStars={5}
+            rating={productData.rating}
+            starSize={16}
+            fullStarColor={'#999999'}
+          />
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ fontWeight: '700', color: 'black' }} >Comment : </Text>
+          <Text style={{ color: 'black' }}>{item.comment}</Text>
+        </View>
+        <Text style={{ color: 'black' }}>Bought on {item.date.slice(0, 10)}</Text>
+      </View>
+    )
+  }
+
   if (showLoader) {
     return (
       <SafeAreaView>
@@ -143,7 +170,9 @@ const ProductDetail = observer(({ route, navigation }) => {
                 starSize={16}
                 fullStarColor={'#999999'}
               />
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setShowReviewModal(true)}
+              >
                 <Text style={styles.ratingText}>{productData.reviews.length} ratings</Text>
               </TouchableOpacity>
             </View>
@@ -444,6 +473,29 @@ const ProductDetail = observer(({ route, navigation }) => {
               onPress={() => setShowModal(false)}
             >
               <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Skip & Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showReviewModal}
+        onRequestClose={() => setShowReviewModal(false)}
+      >
+        <View style={[styles.modalContainer]}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>User Reviews</Text>
+            <FlatList
+              data={productData.reviews}
+              renderItem={renderReviews}
+            />
+            <TouchableOpacity style={{
+              position: 'absolute', top: 10, right: 10
+            }}
+              onPress={() => setShowReviewModal(false)}
+            >
+              <Text style={{ fontWeight: 700, fontSize: 14, paddingTop: 5, color: '#666' }} >Close</Text>
             </TouchableOpacity>
           </View>
         </View>

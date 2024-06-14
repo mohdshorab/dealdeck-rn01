@@ -20,11 +20,20 @@ import { observer } from 'mobx-react';
 import { MasonryTiles } from '../../components/Mansory';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
+import { SkeletonLoader } from '../../components/Shimmer';
+
 const HomeScreen = observer(({ navigation }) => {
   const { products, auth, cart } = useStore();
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [skeloading, setSkeloading] = useState(true)
+
   useEffect(() => {
+    products.fetchProductsCategories();
+    setTimeout(() => {
+      setSkeloading(false)
+    }, 1500);
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -39,11 +48,6 @@ const HomeScreen = observer(({ navigation }) => {
     if (auth.profileData && Object.keys(auth.profileData).length > 0) {
       fetchData();
     }
-    cart.fetchUnauthenticatedCartItemsMerged().then(() => {
-      if (cart.unauthenticatedCartItems.length > 0) {
-        setModalVisible(true);
-      }
-    });
   }, [auth.profileData, products.fetchRecentlyViewedProducts]);
 
   const categoryWithImages = products.productCategories.map((item) => ({
@@ -82,24 +86,47 @@ const HomeScreen = observer(({ navigation }) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        <Carousel images={carouselJson.images} autoplay showsPagination />
+        {skeloading ? <SkeletonLoader
+          height={150}
+        />
+          :
+          <Carousel images={carouselJson.images} autoplay showsPagination />
+        }
         <View>
-          <Text style={styles.collectionText}>Collections</Text>
+          {skeloading ? <SkeletonLoader
+            height={15}
+            shimmerWidth={150}
+          />
+            :
+            <Text style={styles.collectionText}>Collections</Text>
+          }
           {categoryWithImages.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {categoryWithImages.map((item) => (
-                <TouchableOpacity
-                  key={item.slug}
-                  style={styles.itemContainer}
-                  onPress={() =>
-                    navigation.navigate('ProductsOfCategory', { category: item.slug })
-                  }
-                >
-                  <View style={styles.imageContainer}>
-                    <Image source={{ uri: item.image }} style={styles.image} />
-                  </View>
-                  <Text style={styles.name}>{item.name}</Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity
+                    key={item.slug}
+                    style={styles.itemContainer}
+                    onPress={() =>
+                      navigation.navigate('ProductsOfCategory', { category: item.slug })
+                    }
+                  >
+                    {skeloading ? <SkeletonLoader
+                      type={'circle'}
+                      size={75}
+                    /> :
+                      <View style={styles.imageContainer}>
+                        <Image source={{ uri: item.image }} style={styles.image} />
+                      </View>
+                    }
+                    {skeloading ?
+                      <SkeletonLoader
+                        shimmerWidth={50}
+                      /> :
+                      <Text style={styles.name}>{item.name}</Text>
+                    }
+                  </TouchableOpacity>
+                </>
               ))}
             </ScrollView>
           ) : (
@@ -109,7 +136,11 @@ const HomeScreen = observer(({ navigation }) => {
         {products.recentlyViewedProducts &&
           products.recentlyViewedProducts.length > 0 ? (
           <>
-            <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
+            {skeloading ? <SkeletonLoader
+              height={150}
+            /> :
+              <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
+            }
             <FlatList
               data={products.recentlyViewedProducts}
               horizontal
@@ -146,22 +177,33 @@ const HomeScreen = observer(({ navigation }) => {
           </>
         ) : null
         }
-        <SaleBanner
-          saleText="Laptop Sale"
-          sloganText="Unleash Your Productivity, Anywhere"
-          discountText="Up to 50% OFF"
-          bgImage={require('../../assets/images/black-bg.jpg')}
-          floatingImage1={require('../../assets/images/legion_nobg.png')}
-          floatingImage2={require('../../assets/images/ROG_NOBG.png')}
-          onPress={() => navigation.navigate('ProductsOfCategory', { category: 'laptops' })}
-        />
+        {
+          skeloading ?
+            <SkeletonLoader
+              height={130}
+            />
+            :
+            <SaleBanner
+              saleText="Laptop Sale"
+              sloganText="Unleash Your Productivity, Anywhere"
+              discountText="Up to 50% OFF"
+              bgImage={require('../../assets/images/black-bg.jpg')}
+              floatingImage1={require('../../assets/images/legion_nobg.png')}
+              floatingImage2={require('../../assets/images/ROG_NOBG.png')}
+              onPress={() => navigation.navigate('ProductsOfCategory', { category: 'laptops' })}
+            />
+        }
         <View style={styles.divider} />
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Products you may like</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ProductsYouMayLike')}>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
+        {skeloading ? <SkeletonLoader
+          height={20}
+        /> :
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Products you may like</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ProductsYouMayLike')}>
+              <Text style={styles.seeAllText}>See all</Text>
+            </TouchableOpacity>
+          </View>
+        }
         {products.randomProduct.length > 0 ? (
           <View style={styles.newItemsList}>
             {products.randomProduct.map((item, index) => {
@@ -170,9 +212,29 @@ const HomeScreen = observer(({ navigation }) => {
                 const nextItem2 = products.randomProduct[index + 2];
                 return (
                   <View style={styles.rowContainer} key={item.id}>
-                    <MasonryTiles product={item} navigation={navigation} />
-                    {nextItem1 && <MasonryTiles product={nextItem1} navigation={navigation} />}
-                    {nextItem2 && <MasonryTiles product={nextItem2} navigation={navigation} />}
+                    {skeloading ? <>
+                      <SkeletonLoader
+                        type={'rectangle'}
+                        shimmerWidth={120}
+                        height={200}
+                      />
+                      <SkeletonLoader
+                        type={'rectangle'}
+                        shimmerWidth={120}
+                        height={200}
+                      />
+                      <SkeletonLoader
+                        type={'rectangle'}
+                        shimmerWidth={120}
+                        height={200}
+                      />
+                    </> :
+                      <>
+                        <MasonryTiles product={item} navigation={navigation} />
+                        {nextItem1 && <MasonryTiles product={nextItem1} navigation={navigation} />}
+                        {nextItem2 && <MasonryTiles product={nextItem2} navigation={navigation} />}
+                      </>
+                    }
                   </View>
                 );
               }

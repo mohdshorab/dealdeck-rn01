@@ -1,17 +1,34 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import CustomHeader from '../../components/Header';
 import { categoriesName } from '../../constants/dummyJSONs';
 import { CategoryImages } from '../../constants/categoriesImage';
+import { SkeletonLoader } from '../../components/Shimmer';
 
-const Category = observer(({navigation}) => {
+const Category = observer(({ navigation }) => {
+
+    const [skeLoader, setSkeLoader] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setSkeLoader(false)
+        }, 1000);
+    }, [])
+
 
     const renderItem = ({ item }) => (
-        <TouchableOpacity onPress={()=> navigation.navigate('ProductsOfCategory',{category:item})} style={styles.categoryContainer}>
-            <Text style={styles.categoryText}>{item.charAt(0).toUpperCase()+item.slice(1)}</Text>
-            <Image source={{ uri: CategoryImages[item] }} style={styles.categoryImage} />
-        </TouchableOpacity>
+        <>
+            {skeLoader ? <SkeletonLoader
+                height={100}
+                shimmerWidth={'100%'}
+            /> :
+                <TouchableOpacity onPress={() => navigation.navigate('ProductsOfCategory', { category: item })} style={styles.categoryContainer}>
+                    <Text style={styles.categoryText}>{item.charAt(0).toUpperCase() + item.slice(1)}</Text>
+                    <Image source={{ uri: CategoryImages[item] }} style={styles.categoryImage} />
+                </TouchableOpacity>
+            }
+        </>
     );
 
     return (
@@ -37,11 +54,11 @@ const styles = StyleSheet.create({
     categoryContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        height:100,
-        marginVertical:10,
+        height: 100,
+        marginVertical: 10,
         borderRadius: 20,
-        width:'95%',
-        marginHorizontal:10,
+        width: '95%',
+        marginHorizontal: 10,
         backgroundColor: 'white',
         ...Platform.select({
             android: {
@@ -64,12 +81,12 @@ const styles = StyleSheet.create({
         // position: 'absolute',
         // right:0,
         // borderWidth:1,
-        width:'50%',
-        borderRadius:20
+        width: '50%',
+        borderRadius: 20
     },
     categoryText: {
-        paddingLeft:10,
-        fontWeight:'500',
+        paddingLeft: 10,
+        fontWeight: '500',
         width: '50%',
         fontSize: 20,
         color: 'black'

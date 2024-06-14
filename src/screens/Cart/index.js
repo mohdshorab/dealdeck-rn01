@@ -6,13 +6,18 @@ import { useStore } from "../../store";
 import CustomHeader from "../../components/Header";
 import CustomButton from "../../components/Button";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { SkeletonLoader } from "../../components/Shimmer";
 
 export const CartScreen = observer(({ navigation }) => {
     const { cart, auth } = useStore();
     const [showModal, setShowModal] = useState(false);
+    const [skeLoader, setSkeLoader] = useState(true);
 
     useEffect(() => {
         cart.fetchCartItem(auth.profileData)
+        cart.cartCount > 0 && setTimeout(() => {
+            setSkeLoader(false)
+        }, 1500);
     }, [])
 
 
@@ -23,35 +28,44 @@ export const CartScreen = observer(({ navigation }) => {
     }
 
     const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.itemContainer}
-            onPress={() => navigation.push('ProductDetail', { productData: item })}
-        >
-            <Image source={{ uri: item.thumbnail }} style={styles.itemImage} />
-            <View style={styles.itemDetails}>
-                <Text style={styles.brandText}>{item.brand}</Text>
-                <Text style={styles.titleText} numberOfLines={2}>{item.title}</Text>
-                <Text style={styles.priceText}>${item.price}</Text>
-            </View>
-            <View style={styles.quantityContainer}>
+        <>
+            {skeLoader ?
+                <SkeletonLoader
+                    height={100}
+                    row={5}
+                    type={'rectangle'}
+                /> :
                 <TouchableOpacity
-                    onPress={() => cart.decreaseItemCount(item, auth.profileData)}
-                    style={styles.quantityButton}
+                    style={styles.itemContainer}
+                    onPress={() => navigation.push('ProductDetail', { productData: item })}
                 >
-                    <Icon name="remove" size={24} color="#333" />
+                    <Image source={{ uri: item.thumbnail }} style={styles.itemImage} />
+                    <View style={styles.itemDetails}>
+                        <Text style={styles.brandText}>{item.brand}</Text>
+                        <Text style={styles.titleText} numberOfLines={2}>{item.title}</Text>
+                        <Text style={styles.priceText}>${item.price}</Text>
+                    </View>
+                    <View style={styles.quantityContainer}>
+                        <TouchableOpacity
+                            onPress={() => cart.decreaseItemCount(item, auth.profileData)}
+                            style={styles.quantityButton}
+                        >
+                            <Icon name="remove" size={24} color="#333" />
+                        </TouchableOpacity>
+                        <Text style={styles.quantityText}>{item.noOfItems}</Text>
+                        {item.noOfItems < 3 ?
+                            <TouchableOpacity
+                                onPress={() => cart.increaseItemCount(item, auth.profileData)}
+                                style={styles.quantityButton}
+                            >
+                                <Icon name="add" size={24} color="#333" />
+                            </TouchableOpacity>
+                            : null
+                        }
+                    </View>
                 </TouchableOpacity>
-                <Text style={styles.quantityText}>{item.noOfItems}</Text>
-                {item.noOfItems < 3 ?
-                    <TouchableOpacity
-                        onPress={() => cart.increaseItemCount(item, auth.profileData)}
-                        style={styles.quantityButton}
-                    >
-                        <Icon name="add" size={24} color="#333" />
-                    </TouchableOpacity>
-                    : null
-                }
-            </View>
-        </TouchableOpacity>
+            }
+        </>
     );
 
     return (
@@ -72,14 +86,30 @@ export const CartScreen = observer(({ navigation }) => {
                 </View>
             )}
             {cart.cartCount > 0 && (
-                <View style={styles.totalContainer}>
-                    <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
-                    <CustomButton
-                        onPress={() => handleOnPress()}
-                        title={'Place Order'}
-                        textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }}
-                    />
-                </View>
+                <>
+                    <View style={styles.totalContainer}>
+                        {
+                            skeLoader ?
+                                <SkeletonLoader
+                                    shimmerWidth={190}
+                                    height={20}
+                                />
+                                :
+
+                                <Text style={styles.totalText}>Total: ${cart.totalAmount.toFixed(2)}</Text>
+                        }
+                        {skeLoader ? <SkeletonLoader
+                            height={40}
+                        />
+                            :
+                            <CustomButton
+                                onPress={() => handleOnPress()}
+                                title={'Place Order'}
+                                textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }}
+                            />
+                        }
+                    </View>
+                </>
             )}
             <Modal
                 animationType="slide"
