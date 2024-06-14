@@ -1,7 +1,7 @@
 import { observable, action, makeAutoObservable, computed } from "mobx";
 import { isNull, isUndefined } from 'lodash';
 import firestore from '@react-native-firebase/firestore';
-import { getValueFromAsyncStorage, setValueInAsyncStorage } from "../utils";
+import { getValueFromAsyncStorage, removeDataFromAsyncStorage, setValueInAsyncStorage } from "../utils";
 
 export default class CartStore {
     constructor(store) {
@@ -10,7 +10,8 @@ export default class CartStore {
         this.initialState();
     }
 
-    @observable cartItems = [];
+    @observable cartItems;
+    @observable unauthenticatedCartItems;
 
     @computed get cartCount() {
         return this.cartItems.length;
@@ -27,10 +28,11 @@ export default class CartStore {
     @action
     initialState = () => {
         this.cartItems = [];
+        this.unauthenticatedCartItems = [];
     }
 
     @action
-    init = async (profileInfo ) => {
+    init = async (profileInfo) => {
         try {
             await this.fetchCartItem(profileInfo);
         } catch (e) {
@@ -166,6 +168,33 @@ export default class CartStore {
             console.error('Error decreasing item count:', error);
         }
     }
+
+    @action
+    fetchUnauthenticatedCartItemsMerged = async () => {
+        try {
+            const res = await getValueFromAsyncStorage('CartItemsForNonLoggedPerson');
+            if (!isNull(res) && !isUndefined(res)) {
+                this.unauthenticatedCartItems = JSON.parse(res);
+            }
+        }
+        catch (e) {
+            console.error('Error fetching  : unauthenticatedCartItems ', e);
+        }
+    }
+
+    @action
+    clearUnauthenticatedCartItemsMerged = async () => {
+        try {
+            await removeDataFromAsyncStorage('CartItemsForNonLoggedPerson');
+            this.unauthenticatedCartItems = [];
+        }
+        catch (e) {
+            console.error('Error clearing  : unauthenticatedCartItems ', e);
+        }
+    }
+
+
+
 
     getUserQuerySnapshot = async (authProvider, id) => {
         const collectionName = authProvider === 'email' ? 'RegisteredUsers' : 'UsersLoggedUsingGoogle';

@@ -83,9 +83,7 @@ export const SavedCards = observer(({ navigation }) => {
                 </>
             ) : (
                 <View style={styles.noccView}>
-                    {/* <TouchableOpacity onPress={() => setModalVisible(true)}> */}
                     <Image source={require('../../assets/images/nocc.png')} style={styles.nocc} />
-                    {/* </TouchableOpacity> */}
                     <CustomButton
                         title={'Add Credit Card'}
                         buttonStyle={{ padding: 8, paddingHorizontal: 50 }}

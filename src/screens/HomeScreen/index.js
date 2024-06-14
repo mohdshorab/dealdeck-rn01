@@ -20,20 +20,15 @@ import { observer } from 'mobx-react';
 import { MasonryTiles } from '../../components/Mansory';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SaleBanner from '../../components/SaleBanner';
-
 const HomeScreen = observer(({ navigation }) => {
-  const { products, auth } = useStore();
+  const { products, auth, cart } = useStore();
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        if (auth.profileData && Object.keys(auth.profileData).length > 0) {
-          await products.fetchRecentlyViewedProducts(auth.profileData);
-        }
+        await products.fetchRecentlyViewedProducts(auth.profileData);
       } catch (err) {
         console.error('Error fetching recently viewed products', err);
       } finally {
@@ -44,12 +39,17 @@ const HomeScreen = observer(({ navigation }) => {
     if (auth.profileData && Object.keys(auth.profileData).length > 0) {
       fetchData();
     }
+    cart.fetchUnauthenticatedCartItemsMerged().then(() => {
+      if (cart.unauthenticatedCartItems.length > 0) {
+        setModalVisible(true);
+      }
+    });
   }, [auth.profileData, products.fetchRecentlyViewedProducts]);
 
-  const categoryWithImages = products.productCategories.map(item => ({
+  const categoryWithImages = products.productCategories.map((item) => ({
     name: item.name,
     image: CategoryImages[item.slug],
-    slug: item.slug
+    slug: item.slug,
   }));
 
   const handleRefresh = async () => {
@@ -87,11 +87,13 @@ const HomeScreen = observer(({ navigation }) => {
           <Text style={styles.collectionText}>Collections</Text>
           {categoryWithImages.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {categoryWithImages.map(item => (
+              {categoryWithImages.map((item) => (
                 <TouchableOpacity
                   key={item.slug}
                   style={styles.itemContainer}
-                  onPress={() => navigation.navigate('ProductsOfCategory', { category: item.slug })}
+                  onPress={() =>
+                    navigation.navigate('ProductsOfCategory', { category: item.slug })
+                  }
                 >
                   <View style={styles.imageContainer}>
                     <Image source={{ uri: item.image }} style={styles.image} />
@@ -104,36 +106,45 @@ const HomeScreen = observer(({ navigation }) => {
             <Text style={styles.errorText}>Unable to fetch collections</Text>
           )}
         </View>
-        {products.recentlyViewedProducts && products.recentlyViewedProducts.length > 0 ? (
+        {products.recentlyViewedProducts &&
+          products.recentlyViewedProducts.length > 0 ? (
           <>
             <Text style={styles.recentlyViewedText}>Recently viewed Items</Text>
             <FlatList
               data={products.recentlyViewedProducts}
               horizontal
               showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('ProductDetail', { productData: item })}
+                  onPress={() =>
+                    navigation.navigate('ProductDetail', { productData: item })
+                  }
                   style={styles.productTile}
                 >
-                  <Image source={{ uri: item.thumbnail }} style={styles.productImage} resizeMode="contain" />
+                  <Image
+                    source={{ uri: item.thumbnail }}
+                    style={styles.productImage}
+                    resizeMode="contain"
+                  />
                   <Text style={styles.productBrand}>{item.brand}</Text>
-                  <Text style={styles.productName}>{item.title.split(" ").splice(-3).join(" ")}</Text>
+                  <Text style={styles.productName}>
+                    {item.title.split(' ').splice(-3).join(' ')}
+                  </Text>
                   <View style={styles.priceContainer}>
-                    <Text style={styles.productPrice}>${(item.price + (item.price * item.discountPercentage) / 100).toFixed(0)}</Text>
-                    <Icon name="chevron-right" color="green" size={13} />
-                    <Text style={styles.productDiscountPrice}>
-                      ${item.price}
+                    <Text style={styles.productPrice}>
+                      ${(item.price + (item.price * item.discountPercentage) / 100).toFixed(
+                        0
+                      )}
                     </Text>
+                    <Icon name="chevron-right" color="green" size={13} />
+                    <Text style={styles.productDiscountPrice}>${item.price}</Text>
                   </View>
                 </TouchableOpacity>
               )}
             />
           </>
-        ) : products.recentlyViewedProducts.length !== 0 && (
-          <Text style={styles.errorText}>Unable to fetch recently viewed items</Text>
-        )
+        ) : null
         }
         <SaleBanner
           saleText="Laptop Sale"

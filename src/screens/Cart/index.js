@@ -11,6 +11,11 @@ export const CartScreen = observer(({ navigation }) => {
     const { cart, auth } = useStore();
     const [showModal, setShowModal] = useState(false);
 
+    useEffect(() => {
+        cart.fetchCartItem(auth.profileData)
+    }, [])
+
+
     const handleOnPress = () => {
         if (Object.keys(auth.profileData).length === 0) {
             setShowModal(true);
@@ -73,7 +78,7 @@ export const CartScreen = observer(({ navigation }) => {
                         onPress={() => handleOnPress()}
                         title={'Place Order'}
                         textStyle={{ fontWeight: 'bold', fontSize: 18, paddingVertical: 5 }}
-                        />
+                    />
                 </View>
             )}
             <Modal
@@ -235,7 +240,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         borderTopWidth: 1,
         borderTopColor: '#ddd',
-        paddingBottom:25
+        paddingBottom: 25
     },
     totalText: {
         fontSize: 18,
@@ -275,7 +280,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         textAlign: 'center',
         paddingTop: 15,
-        color:'black'
+        color: 'black'
     },
     modalButton: {
         padding: 10, backgroundColor: '#2196F3', borderRadius: 10

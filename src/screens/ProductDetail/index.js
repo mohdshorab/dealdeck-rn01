@@ -40,7 +40,9 @@ const ProductDetail = observer(({ route, navigation }) => {
 
   useEffect(() => {
     setLoader(true);
-    products.addProductToTheRecentlyViewedInFS(productData, auth.profileData)
+    if (Object.keys(auth.profileData).length > 0) {
+      products.addProductToTheRecentlyViewedInFS(productData, auth.profileData)
+    }
     getSimilarProduct();
     setPincode('');
     setLoader(false);
@@ -358,7 +360,7 @@ const ProductDetail = observer(({ route, navigation }) => {
                 }
                 else {
                   setShowModal(true)
-                 }
+                }
               }}
               style={{ position: 'absolute', right: 13, top: 20, backgroundColor: 'white', padding: 5, borderRadius: 20 }}  >
               <AntDesignIcon name="hearto" size={23} color={'#4a4b4d'} />

@@ -46,7 +46,7 @@ class App extends Component {
     // await stores.products.init().then(() => {
       setTimeout(() => {
         this.setState({ showSplashScreen: false });
-      }, 3000); // 3-second delay
+      }, 1500); 
     // });
 
     this.internet = NetInfo.addEventListener((state) => {

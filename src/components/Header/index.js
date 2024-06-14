@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    paddingVertical:0,
+    paddingVertical:8,
   },
   productName: {
     fontSize: 18,
